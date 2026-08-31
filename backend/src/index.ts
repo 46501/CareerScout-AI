@@ -49,17 +49,36 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Database Connection
+if (!process.env.MONGODB_URI || process.env.MONGODB_URI.trim() === '') {
+  console.error('\n======================================================');
+  console.error('ERROR: MONGODB_URI is not configured in .env file.');
+  console.error('Please configure your MongoDB Atlas connection string.');
+  console.error('======================================================\n');
+  process.exit(1);
+}
+
 mongoose
-  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/careerscout')
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('Successfully connected to MongoDB Atlas');
     // Start background jobs once DB is connected
     startScheduler();
     
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+    });
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+      console.log('Shutting down server gracefully...');
+      await mongoose.connection.close();
+      server.close(() => {
+        console.log('Server and MongoDB connection closed.');
+        process.exit(0);
+      });
     });
   })
   .catch((error) => {
-    console.error('MongoDB connection error:', error);
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
   });

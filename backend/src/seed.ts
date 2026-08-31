@@ -4,7 +4,7 @@ import Opportunity from './models/Opportunity';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/careerscout';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const seedOpportunities = [
   {
@@ -87,6 +87,11 @@ const seedOpportunities = [
 ];
 
 const seedDB = async () => {
+  if (!MONGODB_URI) {
+    console.error('MONGODB_URI is not configured. Cannot seed database.');
+    process.exit(1);
+  }
+  
   try {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to DB...');
@@ -100,6 +105,7 @@ const seedDB = async () => {
     mongoose.connection.close();
   } catch (error) {
     console.error('Error seeding data:', error);
+    process.exit(1);
   }
 };
 
