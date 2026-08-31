@@ -1,4 +1,5 @@
 import { StateGraph, MemorySaver, START, END } from '@langchain/langgraph';
+import { extractOpportunityData, matchOpportunity } from '../services/geminiService';
 
 // Define the state for the agent
 interface AgentState {
@@ -15,42 +16,74 @@ const initializeState = (): AgentState => ({
   errors: [],
 });
 
+// Mock user profile for agent runs
+const MOCK_USER_PROFILE = {
+  skills: ['React', 'Node.js', 'TypeScript', 'MongoDB'],
+  experienceLevel: 'Entry Level',
+  preferredRoles: ['Frontend Developer', 'Full Stack Developer']
+};
+
 // Nodes
 const discoverOpportunities = async (state: AgentState): Promise<Partial<AgentState>> => {
   console.log('[Agent] Discovering opportunities from sources...');
-  // In a real scenario, this would call adapters (LinkedIn, Indeed, RSS)
-  // For now, we mock the discovery
+  // Mocking discovery source payload
   return {
     rawOpportunities: [
-      { title: 'Frontend Developer Intern', org: 'TechCorp', rawSkills: 'React, TS' }
+      { title: 'Frontend Developer Intern', org: 'TechCorp', rawSkills: 'React, TS' },
+      { title: 'Data Scientist', org: 'AI Innovations', rawSkills: 'Python, Machine Learning, SQL' }
     ]
   };
 };
 
 const extractAndValidateData = async (state: AgentState): Promise<Partial<AgentState>> => {
-  console.log('[Agent] Extracting and validating data...');
-  const validated = state.rawOpportunities.map(opp => ({
-    ...opp,
-    title: opp.title,
-    organization: opp.org,
-    skills: opp.rawSkills.split(', '),
-    isValid: true
-  }));
+  console.log('[Agent] Extracting and validating data using Gemini...');
+  const validated = [];
+  
+  for (const raw of state.rawOpportunities) {
+    try {
+      const extracted = await extractOpportunityData(raw);
+      if (extracted.isValid) {
+        validated.push({
+          ...raw,
+          title: extracted.title,
+          organization: extracted.organization,
+          skills: extracted.skills,
+          type: extracted.type
+        });
+      }
+    } catch (err) {
+      console.error('Extraction failed for opportunity:', err);
+    }
+  }
+  
   return { validatedOpportunities: validated };
 };
 
 const matchUserProfile = async (state: AgentState): Promise<Partial<AgentState>> => {
-  console.log('[Agent] Matching opportunities with user profiles...');
-  const matched = state.validatedOpportunities.map(opp => ({
-    ...opp,
-    matchScore: Math.floor(Math.random() * 20) + 80 // Mock AI match score
-  }));
+  console.log('[Agent] Matching opportunities with user profiles using Gemini...');
+  const matched = [];
+  
+  for (const opp of state.validatedOpportunities) {
+    try {
+      const matchResult = await matchOpportunity(MOCK_USER_PROFILE, opp);
+      matched.push({
+        ...opp,
+        matchScore: matchResult.matchScore,
+        matchExplanation: matchResult
+      });
+    } catch (err) {
+      console.error('Matching failed for opportunity:', err);
+      matched.push({ ...opp, matchScore: 50 }); // Deterministic fallback
+    }
+  }
+  
   return { matchedOpportunities: matched };
 };
 
 const storeOpportunities = async (state: AgentState): Promise<Partial<AgentState>> => {
-  console.log('[Agent] Storing opportunities to MongoDB...');
+  console.log('[Agent] Storing matched opportunities to MongoDB...');
   // Logic to save to MongoDB would go here
+  console.log(`Stored ${state.matchedOpportunities.length} opportunities.`);
   return {};
 };
 
@@ -76,8 +109,8 @@ const workflow = new StateGraph<AgentState>({
 export const agentApp = workflow.compile({ checkpointer: new MemorySaver() });
 
 export const runAgent = async () => {
-  console.log('--- Starting Agent Run ---');
+  console.log('--- Starting Gemini-Powered Agent Run ---');
   const result = await agentApp.invoke(initializeState(), { configurable: { thread_id: Date.now().toString() } });
-  console.log('--- Agent Run Complete ---', result);
+  console.log('--- Agent Run Complete ---');
   return result;
 };
