@@ -44,7 +44,7 @@ export const extractResumeData = async (resumeText: string) => {
       }
     });
 
-    return JSON.parse(response.text() || '{}');
+    return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error('Gemini extractResumeData error:', error);
     return { skills: [], languages: [], frameworks: [], databases: [], tools: [], projects: [], experience: [], education: [] };
@@ -79,7 +79,7 @@ export const extractOpportunityData = async (rawOpportunity: any) => {
       }
     });
 
-    return JSON.parse(response.text() || '{}');
+    return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error('Gemini extractOpportunityData error:', error);
     return { title: rawOpportunity.title, organization: rawOpportunity.org, skills: (rawOpportunity.rawSkills || '').split(','), isValid: true, type: 'Jobs' };
@@ -117,7 +117,7 @@ export const matchOpportunity = async (userProfile: any, opportunity: any) => {
       }
     });
 
-    return JSON.parse(response.text() || '{}');
+    return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error('Gemini matchOpportunity error:', error);
     return { matchScore: 85, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Error processing match.' };

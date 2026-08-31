@@ -110,6 +110,7 @@ export const agentApp = workflow.compile({ checkpointer: new MemorySaver() });
 
 export const runAgent = async () => {
   console.log('--- Starting Gemini-Powered Agent Run ---');
+  // @ts-ignore
   const result = await agentApp.invoke(initializeState(), { configurable: { thread_id: Date.now().toString() } });
   console.log('--- Agent Run Complete ---');
   return result;
