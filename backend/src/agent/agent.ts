@@ -1,5 +1,6 @@
 import { StateGraph, MemorySaver, START, END } from '@langchain/langgraph';
 import { extractOpportunityData, matchOpportunity } from '../services/geminiService';
+import Opportunity from '../models/Opportunity';
 
 // Define the state for the agent
 interface AgentState {
@@ -82,7 +83,30 @@ const matchUserProfile = async (state: AgentState): Promise<Partial<AgentState>>
 
 const storeOpportunities = async (state: AgentState): Promise<Partial<AgentState>> => {
   console.log('[Agent] Storing matched opportunities to MongoDB...');
-  // Logic to save to MongoDB would go here
+  
+  for (const opp of state.matchedOpportunities) {
+    try {
+      await Opportunity.findOneAndUpdate(
+        { title: opp.title, organization: opp.organization }, // Prevent exact duplicates
+        { 
+          $set: {
+            title: opp.title,
+            organization: opp.organization,
+            skills: opp.skills,
+            type: opp.type || 'Jobs',
+            matchScore: opp.matchScore,
+            description: opp.description || 'Discovered by CareerScout AI Agent.',
+            location: 'Remote', // Default fallback
+            workMode: 'Remote',
+          }
+        },
+        { upsert: true, new: true }
+      );
+    } catch (err) {
+      console.error('Failed to store opportunity:', err);
+    }
+  }
+  
   console.log(`Stored ${state.matchedOpportunities.length} opportunities.`);
   return {};
 };

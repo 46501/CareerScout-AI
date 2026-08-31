@@ -16,7 +16,9 @@ interface OpportunityCardProps {
   postedTime: string;
   matchScore: number;
   earlyApplicant?: boolean;
+  isSaved?: boolean;
   onApply: (id: string) => void;
+  onSave?: (id: string) => void;
   onCardClick: (id: string) => void;
 }
 
@@ -35,7 +37,9 @@ export default function OpportunityCard({
   postedTime,
   matchScore,
   earlyApplicant,
+  isSaved = false,
   onApply,
+  onSave,
   onCardClick
 }: OpportunityCardProps) {
   
@@ -90,8 +94,14 @@ export default function OpportunityCard({
 
         {/* Right side interactions */}
         <div className="flex flex-col items-end justify-between h-full min-h-[120px]">
-          <button className="text-gray-400 hover:text-primary transition-colors p-1" onClick={(e) => { e.stopPropagation(); }}>
-            <Bookmark className="w-5 h-5" />
+          <button 
+            className={clsx("transition-colors p-1", isSaved ? "text-primary" : "text-gray-400 hover:text-primary")} 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if(onSave) onSave(id);
+            }}
+          >
+            <Bookmark className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} />
           </button>
           
           <div className="flex flex-col items-center">

@@ -1,8 +1,10 @@
 import { Search, Moon, Sun, Bell, Menu } from 'lucide-react';
 import { useThemeStore } from '../store/themeStore';
+import { useFilterStore } from '../store/filterStore';
 
 export default function TopNav() {
   const { theme, toggleTheme } = useThemeStore();
+  const { searchQuery, setSearchQuery } = useFilterStore();
 
   return (
     <header className="h-20 border-b border-border-color bg-card-color flex items-center justify-between px-6 lg:px-8 shrink-0">
@@ -16,6 +18,8 @@ export default function TopNav() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-11 pr-4 py-3 border-transparent rounded-xl bg-gray-100 dark:bg-gray-900/50 text-text-color placeholder-gray-500 focus:border-primary focus:bg-white dark:focus:bg-gray-900 focus:ring-1 focus:ring-primary transition-colors text-sm"
             placeholder="Search jobs, internships, hackathons, webinars..."
           />

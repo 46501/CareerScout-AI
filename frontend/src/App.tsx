@@ -1,16 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useThemeStore } from './store/themeStore';
-import DashboardLayout from './layouts/DashboardLayout';
+import { useAuthStore } from './store/authStore';
+import api from './api';
 
+import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import ResumeAnalyzer from './pages/ResumeAnalyzer';
+import Applications from './pages/Applications';
+import SavedOpportunities from './pages/SavedOpportunities';
+import Notifications from './pages/Notifications';
+import Settings from './pages/Settings';
 
 const Opportunities = () => <div>Opportunities</div>;
-const Saved = () => <div>Saved Opportunities</div>;
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
 
 function App() {
   const { theme } = useThemeStore();
+  const { isAuthenticated, updateUser } = useAuthStore();
+  const [loading, setLoading] = useState(true);
 
+  // Sync theme
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -19,13 +37,40 @@ function App() {
     }
   }, [theme]);
 
+  // Verify auth on mount
+  useEffect(() => {
+    const verifyAuth = async () => {
+      if (isAuthenticated) {
+        try {
+          const res = await api.get('/auth/me');
+          updateUser(res.data);
+        } catch (error) {
+          // api interceptor handles the logout redirect if 401
+          console.error('Session expired or invalid');
+        }
+      }
+      setLoading(false);
+    };
+    verifyAuth();
+  }, [isAuthenticated]);
+
+  if (loading) return null; // or a full-screen spinner
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DashboardLayout />}>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
+        
+        <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          <Route path="opportunities" element={<Opportunities />} />
-          <Route path="saved" element={<Saved />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="resume" element={<ResumeAnalyzer />} />
+          <Route path="opportunities" element={<Dashboard />} />
+          <Route path="saved" element={<SavedOpportunities />} />
+          <Route path="applications" element={<Applications />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
