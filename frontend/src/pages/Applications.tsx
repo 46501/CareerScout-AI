@@ -31,6 +31,31 @@ export default function Applications() {
     }
   };
 
+  const handleUpdate = async (id: string, status: string, notes: string) => {
+    try {
+      const res = await api.put(`/applications/${id}`, { status, notes });
+      setApplications(apps => apps.map(a => a._id === id ? res.data.application : a));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update application');
+    }
+  };
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+
+  const startEditing = (app: any) => {
+    setEditingId(app._id);
+    setEditStatus(app.status);
+    setEditNotes(app.notes || '');
+  };
+
+  const saveEditing = async (id: string) => {
+    await handleUpdate(id, editStatus, editNotes);
+    setEditingId(null);
+  };
+
   if (loading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
@@ -62,19 +87,56 @@ export default function Applications() {
                       <h3 className="font-semibold text-lg text-text-color">{app.opportunity?.title}</h3>
                       <div className="text-sm text-gray-600 dark:text-gray-400 font-medium mb-2">{app.opportunity?.organization}</div>
                       
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
                         <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{app.opportunity?.workMode}</div>
                         <div className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" />{app.opportunity?.type}</div>
-                        <div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />Applied: {new Date(app.appliedAt).toLocaleDateString()}</div>
+                        <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Applied: {new Date(app.appliedAt).toLocaleDateString()}</div>
                       </div>
+                      
+                      {editingId === app._id ? (
+                        <div className="mt-3 space-y-3">
+                          <select 
+                            value={editStatus} 
+                            onChange={(e) => setEditStatus(e.target.value)}
+                            className="bg-body-bg border border-border-color rounded px-2 py-1 text-sm text-text-color"
+                          >
+                            <option value="Applied">Applied</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Selected">Selected</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+                          <textarea 
+                            value={editNotes} 
+                            onChange={(e) => setEditNotes(e.target.value)} 
+                            placeholder="Add notes (e.g., Interview next Tuesday)"
+                            className="w-full bg-body-bg border border-border-color rounded p-2 text-sm text-text-color min-h-[60px]"
+                          />
+                          <div className="flex gap-2">
+                            <button onClick={() => saveEditing(app._id)} className="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary-hover">Save</button>
+                            <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded text-sm">Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                        app.notes && (
+                          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                            <strong>Notes:</strong> {app.notes}
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                   
                   <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${getStatusColor(app.status)}`}>
-                      {app.status}
-                    </span>
-                    <button className="text-sm font-medium text-primary hover:text-primary-hover">View Details</button>
+                    {editingId !== app._id && (
+                      <>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${getStatusColor(app.status)}`}>
+                          {app.status}
+                        </span>
+                        <button onClick={() => startEditing(app)} className="text-sm font-medium text-primary hover:text-primary-hover">Update Status</button>
+                        <a href={app.opportunity?.applicationUrl || '#'} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">Open Link</a>
+                      </>
+                    )}
                   </div>
                 </div>
               </li>

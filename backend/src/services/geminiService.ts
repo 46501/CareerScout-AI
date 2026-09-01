@@ -87,26 +87,39 @@ export const extractOpportunityData = async (rawOpportunity: any) => {
 };
 
 /**
- * Matches an opportunity against a user profile.
+ * Matches an opportunity against a user profile using specific weights.
  */
 export const matchOpportunity = async (userProfile: any, opportunity: any) => {
   if (!ai) {
-    return { matchScore: Math.floor(Math.random() * 20) + 80, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Fallback match' };
+    return { matchScore: 50, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Fallback match' };
   }
 
   try {
+    const promptText = `
+    Analyze the match between this user profile and this career opportunity.
+    Use the following exact weighting system for the match score (0-100):
+    - Skill Match: 40% (Only count skills the user ACTUALLY has in their profile)
+    - Role Match: 20%
+    - Experience Match: 15%
+    - Education Match: 10%
+    - Location Match: 10%
+    - Preference Match: 5%
+    
+    User Profile: ${JSON.stringify(userProfile)}
+    Opportunity: ${JSON.stringify(opportunity)}
+    
+    Return the total calculated matchScore, along with matchedSkills, missingSkills (skills in opportunity not in user profile), strengths, and a short recommendation.
+    `;
+
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: `Analyze the match between this user profile and this career opportunity.
-      User Profile: ${JSON.stringify(userProfile)}
-      Opportunity: ${JSON.stringify(opportunity)}
-      `,
+      contents: promptText,
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            matchScore: { type: Type.INTEGER, description: "A score from 0 to 100 representing how well the user matches the opportunity." },
+            matchScore: { type: Type.INTEGER, description: "A score from 0 to 100 calculated using the requested weights." },
             matchedSkills: { type: Type.ARRAY, items: { type: Type.STRING } },
             missingSkills: { type: Type.ARRAY, items: { type: Type.STRING } },
             strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
@@ -120,6 +133,6 @@ export const matchOpportunity = async (userProfile: any, opportunity: any) => {
     return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error('Gemini matchOpportunity error:', error);
-    return { matchScore: 85, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Error processing match.' };
+    return { matchScore: 50, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Error processing match.' };
   }
 };

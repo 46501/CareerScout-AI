@@ -6,13 +6,24 @@ const router = express.Router();
 // Get opportunities
 router.get('/', async (req, res) => {
   try {
-    const { type, search, sort } = req.query;
+    const { type, search, sort, location, experienceLevel } = req.query;
     
     let query: any = {};
     if (type && type !== 'All') {
-      query.type = type;
+      const types = (type as string).split(',');
+      if (types.length > 0) {
+        query.type = { $in: types };
+      }
     }
     
+    if (location && location !== 'All Locations') {
+      query.location = { $regex: location as string, $options: 'i' };
+    }
+
+    if (experienceLevel && experienceLevel !== 'All Levels') {
+      query.experienceLevel = experienceLevel;
+    }
+
     if (search) {
       query.$text = { $search: search as string };
     }

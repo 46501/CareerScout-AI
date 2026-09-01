@@ -16,16 +16,31 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [selectedOpp, setSelectedOpp] = useState<any>(null);
   
-  const { searchQuery } = useFilterStore();
+  const { searchQuery, types, location, experienceLevel } = useFilterStore();
 
   useEffect(() => {
     const fetchOpportunities = async () => {
       setLoading(true);
       setError('');
       try {
-        const typeParam = activeTab === 'All' ? '' : `?type=${activeTab}`;
+        const queryParams = new URLSearchParams();
+        
+        let typeList = [];
+        if (activeTab !== 'All' && activeTab !== 'More ⌄') typeList.push(activeTab);
+        if (types.length > 0) typeList.push(...types);
+        
+        if (typeList.length > 0) {
+          queryParams.append('type', Array.from(new Set(typeList)).join(','));
+        }
+
+        if (location && location !== 'All Locations') queryParams.append('location', location);
+        if (experienceLevel && experienceLevel !== 'All Levels') queryParams.append('experienceLevel', experienceLevel);
+        if (searchQuery) queryParams.append('search', searchQuery);
+
+        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+
         const [oppRes, savedRes] = await Promise.all([
-          api.get(`/opportunities${typeParam}`),
+          api.get(`/opportunities${queryString}`),
           api.get('/user/saved')
         ]);
         setOpportunities(oppRes.data);
@@ -40,7 +55,7 @@ export default function Dashboard() {
     };
 
     fetchOpportunities();
-  }, [activeTab]);
+  }, [activeTab, types, location, experienceLevel, searchQuery]);
 
   const handleApply = async (id: string) => {
     try {
@@ -74,17 +89,6 @@ export default function Dashboard() {
     if (opp) setSelectedOpp(opp);
   };
 
-  // Filter opportunities by search query
-  const filteredOpportunities = opportunities.filter(opp => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      opp.title.toLowerCase().includes(q) ||
-      opp.organization.toLowerCase().includes(q) ||
-      opp.skills.some((s: string) => s.toLowerCase().includes(q))
-    );
-  });
-
   return (
     <div className="p-6 lg:p-8 max-w-4xl mx-auto w-full">
       <div className="mb-8">
@@ -111,7 +115,7 @@ export default function Dashboard() {
 
       <div className="flex items-center justify-between mb-6">
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {loading ? 'Loading...' : `${filteredOpportunities.length} opportunities found`}
+          {loading ? 'Loading...' : `${opportunities.length} opportunities found`}
         </span>
         <button className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-text-color transition-colors">
           Sort by: <span className="font-medium text-text-color">Best Match</span>
@@ -127,12 +131,12 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredOpportunities.length === 0 ? (
+          {opportunities.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               No opportunities found for {activeTab}{searchQuery ? ` matching "${searchQuery}"` : ''}.
             </div>
           ) : (
-            filteredOpportunities.map((opp) => (
+            opportunities.map((opp) => (
               <OpportunityCard
                 key={opp._id}
                 id={opp._id}

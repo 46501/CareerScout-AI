@@ -2,9 +2,11 @@ import { ChevronDown, Check, Briefcase, Send, Bookmark, Bell, Loader2 } from 'lu
 import { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuthStore } from '../store/authStore';
+import { useFilterStore } from '../store/filterStore';
 
 export default function RightPanel() {
   const { user } = useAuthStore();
+  const { types, setTypes, location, setLocation, experienceLevel, setExperienceLevel } = useFilterStore();
   const [stats, setStats] = useState({ saved: 0, applied: 0, unreadNotifications: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -56,52 +58,67 @@ export default function RightPanel() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-text-color">Filters</h2>
-            <button className="text-xs text-primary hover:text-primary-hover font-medium">Clear all</button>
+            <button 
+              onClick={() => { setTypes([]); setLocation('All Locations'); setExperienceLevel('All Levels'); }}
+              className="text-xs text-primary hover:text-primary-hover font-medium"
+            >Clear all</button>
           </div>
           
           <div className="space-y-6">
             <div>
               <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Opportunity Type</h3>
               <div className="space-y-2.5">
-                {['Jobs', 'Internships', 'Hackathons', 'Webinars', 'Scholarships'].map((type) => (
-                  <label key={type} className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 group-hover:border-primary flex items-center justify-center transition-colors">
-                      <Check className="w-3 h-3 text-white opacity-0 transition-opacity" />
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">{type}</span>
-                  </label>
-                ))}
-                <button className="text-xs text-primary mt-1 font-medium">Show more ⌄</button>
+                {['Jobs', 'Internships', 'Hackathons', 'Webinars', 'Scholarships'].map((type) => {
+                  const isChecked = types.includes(type);
+                  return (
+                    <label key={type} className="flex items-center gap-3 cursor-pointer group">
+                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${isChecked ? 'bg-primary border-primary' : 'border-gray-300 dark:border-gray-600 group-hover:border-primary'}`}>
+                        <Check className={`w-3 h-3 text-white transition-opacity ${isChecked ? 'opacity-100' : 'opacity-0'}`} />
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        className="hidden" 
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) setTypes([...types, type]);
+                          else setTypes(types.filter(t => t !== type));
+                        }} 
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">{type}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
             <div>
               <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Experience Level</h3>
-              <button className="w-full flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 border border-border-color rounded-lg px-4 py-2.5 text-sm text-text-color text-left hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
-                All Levels
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
+              <select 
+                value={experienceLevel}
+                onChange={(e) => setExperienceLevel(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-gray-900/50 border border-border-color rounded-lg px-4 py-2.5 text-sm text-text-color hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+              >
+                <option value="All Levels">All Levels</option>
+                <option value="Entry Level">Entry Level</option>
+                <option value="Mid Level">Mid Level</option>
+                <option value="Senior Level">Senior Level</option>
+              </select>
             </div>
 
             <div>
               <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Location Preference</h3>
-              <button className="w-full flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 border border-border-color rounded-lg px-4 py-2.5 text-sm text-text-color text-left hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
-                All Locations
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
+              <select 
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-gray-900/50 border border-border-color rounded-lg px-4 py-2.5 text-sm text-text-color hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+              >
+                <option value="All Locations">All Locations</option>
+                <option value="Remote">Remote</option>
+                <option value="New York">New York</option>
+                <option value="San Francisco">San Francisco</option>
+                <option value="Online">Online</option>
+              </select>
             </div>
-
-            <div>
-              <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Availability</h3>
-              <button className="w-full flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 border border-border-color rounded-lg px-4 py-2.5 text-sm text-text-color text-left hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
-                Anytime
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
-
-            <button className="w-full py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-              Apply Filters
-            </button>
           </div>
         </div>
 

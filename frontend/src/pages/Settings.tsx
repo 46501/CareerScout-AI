@@ -15,14 +15,18 @@ export default function Settings() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Normally you'd hit an endpoint like /auth/password
     setSaving(true);
-    setTimeout(() => {
-      setMessage('Password updated (Mock)');
-      setSaving(false);
+    setMessage('');
+    try {
+      await api.put('/auth/password', { currentPassword: password, newPassword });
+      setMessage('Password updated successfully.');
       setPassword('');
       setNewPassword('');
-    }, 1000);
+    } catch (err: any) {
+      setMessage(err.response?.data?.error || 'Failed to update password');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

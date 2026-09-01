@@ -12,10 +12,10 @@ const agentLimiter = rateLimit({
   message: { error: 'You have exceeded the maximum allowed agent runs. Please try again later.' }
 });
 
-router.post('/run', authMiddleware, agentLimiter, async (req, res) => {
+router.post('/run', authMiddleware, agentLimiter, async (req: any, res) => {
   try {
     // In a full application, verify the user has permissions/credits to run the agent
-    const result = await runAgent();
+    const result = await runAgent(req.user.userId);
     res.json({ message: 'Agent run completed successfully.', result });
   } catch (error) {
     console.error('Agent run error:', error);
