@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [selectedOpp, setSelectedOpp] = useState<any>(null);
   
-  const { searchQuery, types, location, experienceLevel } = useFilterStore();
+  const { searchQuery, types, location, experienceLevel, sort, setSort } = useFilterStore();
 
   useEffect(() => {
     const fetchOpportunities = async () => {
@@ -36,6 +36,7 @@ export default function Dashboard() {
         if (location && location !== 'All Locations') queryParams.append('location', location);
         if (experienceLevel && experienceLevel !== 'All Levels') queryParams.append('experienceLevel', experienceLevel);
         if (searchQuery) queryParams.append('search', searchQuery);
+        if (sort && sort !== 'Best Match') queryParams.append('sort', sort);
 
         const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
 
@@ -55,7 +56,7 @@ export default function Dashboard() {
     };
 
     fetchOpportunities();
-  }, [activeTab, types, location, experienceLevel, searchQuery]);
+  }, [activeTab, types, location, experienceLevel, searchQuery, sort]);
 
   const handleApply = async (id: string) => {
     try {
@@ -117,10 +118,17 @@ export default function Dashboard() {
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {loading ? 'Loading...' : `${opportunities.length} opportunities found`}
         </span>
-        <button className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-text-color transition-colors">
-          Sort by: <span className="font-medium text-text-color">Best Match</span>
-          <ChevronDown className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          Sort by: 
+          <select 
+            value={sort} 
+            onChange={(e) => setSort(e.target.value)}
+            className="font-medium text-text-color bg-transparent cursor-pointer focus:outline-none"
+          >
+            <option value="Best Match">Best Match</option>
+            <option value="Newest">Newest</option>
+          </select>
+        </div>
       </div>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}

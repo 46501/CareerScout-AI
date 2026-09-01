@@ -1,10 +1,13 @@
 import { Search, Moon, Sun, Bell, Menu } from 'lucide-react';
 import { useThemeStore } from '../store/themeStore';
 import { useFilterStore } from '../store/filterStore';
+import { useAuthStore } from '../store/authStore';
+import { Link } from 'react-router-dom';
 
 export default function TopNav() {
   const { theme, toggleTheme } = useThemeStore();
   const { searchQuery, setSearchQuery } = useFilterStore();
+  const { user } = useAuthStore();
 
   return (
     <header className="h-20 border-b border-border-color bg-card-color flex items-center justify-between px-6 lg:px-8 shrink-0">
@@ -49,8 +52,8 @@ export default function TopNav() {
             alt="User avatar"
           />
           <div className="hidden lg:block text-left">
-            <p className="text-sm font-medium text-text-color">Om Kulkarni</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">View Profile ⌄</p>
+            <p className="text-sm font-medium text-text-color">{user?.name || 'User'}</p>
+            <Link to="/profile" className="text-xs text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">View Profile &rarr;</Link>
           </div>
         </button>
       </div>

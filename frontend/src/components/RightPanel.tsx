@@ -1,5 +1,6 @@
 import { ChevronDown, Check, Briefcase, Send, Bookmark, Bell, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store/authStore';
 import { useFilterStore } from '../store/filterStore';
@@ -48,9 +49,9 @@ export default function RightPanel() {
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add skills and preferences to get better matches</p>
               </div>
             </div>
-            <button className="w-full text-center text-sm text-gray-600 dark:text-gray-300 hover:text-primary transition-colors flex items-center justify-center gap-2">
+            <Link to="/profile" className="w-full text-center text-sm text-gray-600 dark:text-gray-300 hover:text-primary transition-colors flex items-center justify-center gap-2">
               Complete Profile <span aria-hidden="true">&rarr;</span>
-            </button>
+            </Link>
           </div>
         </div>
 

@@ -9,6 +9,8 @@ interface FilterState {
   setLocation: (location: string) => void;
   experienceLevel: string;
   setExperienceLevel: (level: string) => void;
+  sort: string;
+  setSort: (sort: string) => void;
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
@@ -19,5 +21,7 @@ export const useFilterStore = create<FilterState>((set) => ({
   location: 'All Locations',
   setLocation: (location) => set({ location }),
   experienceLevel: 'All Levels',
-  setExperienceLevel: (level) => set({ experienceLevel: level })
+  setExperienceLevel: (level) => set({ experienceLevel: level }),
+  sort: 'Best Match',
+  setSort: (sort) => set({ sort })
 }));
