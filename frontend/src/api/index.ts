@@ -20,11 +20,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      // Clear token and redirect to login if unauthorized
-      localStorage.removeItem('token');
-      localStorage.removeItem('auth-storage'); // clear zustand persist if needed
-      window.location.href = '/login';
+    if (error.response) {
+      if (
+        error.response.status === 401 || 
+        error.response.status === 403 ||
+        (error.response.status === 404 && (error.config.url === '/profile' || error.config.url === '/auth/me'))
+      ) {
+        // Clear token and redirect to login if unauthorized or user not found
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth-storage'); // clear zustand persist if needed
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
