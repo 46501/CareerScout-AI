@@ -19,6 +19,9 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     }
     
     const decoded = jwt.decode(token, secret);
+    // Backward compatibility for existing tokens
+    decoded.userId = decoded.userId || decoded.id;
+    decoded.id = decoded.id || decoded.userId;
     req.user = decoded;
     next();
   } catch (error) {
