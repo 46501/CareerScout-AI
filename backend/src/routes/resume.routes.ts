@@ -66,52 +66,24 @@ router.post('/upload', authMiddleware, upload.single('resume'), async (req: any,
     // Call Gemini to parse structured data
     const resumeData = await extractResumeData(extractedText);
 
-    // Update user profile in MongoDB
-    const user = await User.findById(req.user.userId);
+    // Save resume metadata to MongoDB without overwriting other profile fields
+    const user = await User.findById(req.user.userId || req.user.id);
     if (user) {
-      const updatedProfile = {
-        ...user.profile,
-        skills: Array.from(new Set([...(user.profile?.skills || []), ...(resumeData.skills || [])])),
-        languages: Array.from(new Set([...(user.profile?.languages || []), ...(resumeData.languages || [])])),
-        tools: Array.from(new Set([...(user.profile?.tools || []), ...(resumeData.tools || [])])),
-        education: resumeData.education?.length ? resumeData.education.map((e: string) => ({ institution: e, degree: '', year: '' })) : user.profile?.education,
-        experience: resumeData.experience?.length ? resumeData.experience.map((e: string) => ({ company: e, role: '', duration: '' })) : user.profile?.experience,
-      };
-
-      // Simple dynamic completion calculation
-      let completionPercentage = 0;
-      let completedFields = 0;
-      const totalFields = 10;
-      
-      if (updatedProfile.phone) completedFields++;
-      if (updatedProfile.location) completedFields++;
-      if (updatedProfile.bio) completedFields++;
-      if (updatedProfile.education?.length) completedFields++;
-      if (updatedProfile.experience?.length) completedFields++;
-      if (updatedProfile.projects?.length) completedFields++;
-      if (updatedProfile.skills?.length) completedFields++;
-      if (updatedProfile.languages?.length) completedFields++;
-      if (updatedProfile.tools?.length) completedFields++;
-      if (updatedProfile.preferences?.roles?.length || updatedProfile.preferences?.workMode) completedFields++;
-      
-      completionPercentage = Math.round((completedFields / totalFields) * 100);
-
-      await User.findByIdAndUpdate(req.user.userId, {
+      await User.findByIdAndUpdate(user._id, {
         $set: {
-          profile: updatedProfile,
-          completionPercentage,
-          profileCompleted: completionPercentage > 0
+          'profile.resume': {
+            filename: req.file.originalname,
+            path: req.file.filename,
+            uploadedAt: new Date()
+          }
         }
       });
     }
 
     res.json({ 
-      message: 'Resume analyzed successfully.', 
+      message: 'Resume uploaded and analyzed successfully.', 
       data: {
-        name: user?.name || 'User',
-        email: user?.email || '',
-        phone: user?.profile?.phone || '',
-        ...resumeData
+        extractedData: resumeData
       }
     });
 

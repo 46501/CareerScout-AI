@@ -20,34 +20,49 @@ router.put('/', authMiddleware, async (req: any, res) => {
   try {
     const { profile, settings } = req.body;
     
-    // Calculate completion percentage
+    // Mandatory fields check
     let completionPercentage = 0;
     let completedFields = 0;
-    const totalFields = 10; // phone, location, bio, education, experience, projects, skills, languages, tools, preferences
+    const totalFields = 11; // phone, location, country, education, careerGoal, opportunityTypes, workMode, preferredLocations, experienceLevel, skills, resume
+    
+    // We'll fetch the user first to check the existing resume since it's uploaded separately
+    const existingUser = await User.findById(req.user.userId || req.user.id);
     
     if (profile) {
-      if (profile.phone) completedFields++;
-      if (profile.location) completedFields++;
-      if (profile.bio) completedFields++;
-      if (profile.education?.length) completedFields++;
-      if (profile.experience?.length) completedFields++;
-      if (profile.projects?.length) completedFields++;
-      if (profile.skills?.length) completedFields++;
-      if (profile.languages?.length) completedFields++;
-      if (profile.tools?.length) completedFields++;
-      if (profile.preferences?.roles?.length || profile.preferences?.workMode) completedFields++;
+      if (profile.phone && profile.phone.trim()) completedFields++;
+      if (profile.location && profile.location.trim()) completedFields++;
+      if (profile.country && profile.country.trim()) completedFields++;
+      
+      // Academic
+      if (profile.education && profile.education.length > 0) {
+        const edu = profile.education[0];
+        if (edu.degree && edu.institution && edu.graduationYear) completedFields++;
+      }
+      
+      // Career Information
+      if (profile.careerGoal && profile.careerGoal.trim()) completedFields++;
+      if (profile.preferences?.opportunityTypes && profile.preferences.opportunityTypes.length > 0) completedFields++;
+      if (profile.preferences?.workMode && profile.preferences.workMode.trim()) completedFields++;
+      if (profile.preferences?.locations && profile.preferences.locations.length > 0) completedFields++;
+      if (profile.experienceLevel && profile.experienceLevel.trim()) completedFields++;
+      
+      // Skills
+      if (profile.skills && profile.skills.length > 0) completedFields++;
+      
+      // Resume (check existing user document since this is a separate upload endpoint)
+      if (existingUser?.profile?.resume?.filename || profile.resume?.filename) completedFields++;
       
       completionPercentage = Math.round((completedFields / totalFields) * 100);
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.user.userId,
+      req.user.userId || req.user.id,
       { 
         $set: { 
           profile, 
           settings,
           completionPercentage,
-          profileCompleted: completionPercentage > 0
+          profileCompleted: completionPercentage === 100
         } 
       },
       { new: true, runValidators: true }

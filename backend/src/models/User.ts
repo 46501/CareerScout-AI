@@ -36,10 +36,13 @@ const userSchema = new mongoose.Schema({
   profile: {
     phone: String,
     location: String,
+    country: String,
     bio: String,
     linkedin: String,
     github: String,
     portfolio: String,
+    careerGoal: String,
+    experienceLevel: String,
     
     education: [educationSchema],
     experience: [experienceSchema],
@@ -51,6 +54,13 @@ const userSchema = new mongoose.Schema({
     databases: [String],
     tools: [String],
     certifications: [String],
+    
+    // Resume metadata
+    resume: {
+      filename: String,
+      path: String,
+      uploadedAt: { type: Date, default: Date.now }
+    },
     
     // Preferences
     preferences: {
