@@ -56,6 +56,9 @@ if (!process.env.MONGODB_URI || process.env.MONGODB_URI.trim() === '') {
   console.error('======================================================\n');
   process.exit(1);
 }
+// Disable Mongoose buffering — operations fail immediately if DB is disconnected
+// instead of hanging for 10s (bufferTimeoutMS default), which was causing Axios timeouts
+mongoose.set('bufferCommands', false);
 
 // Start the HTTP server immediately so it's always responsive
 const server = app.listen(PORT, () => {
@@ -63,12 +66,13 @@ const server = app.listen(PORT, () => {
 });
 
 // Connect to MongoDB in the background with retry
-const connectWithRetry = async (retries = 3, delay = 5000) => {
+const connectWithRetry = async (retries = 5, delay = 5000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await mongoose.connect(process.env.MONGODB_URI!, {
         serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
+        socketTimeoutMS: 30000,
+        bufferCommands: false,
       });
       console.log('Successfully connected to MongoDB Atlas');
       startScheduler();
