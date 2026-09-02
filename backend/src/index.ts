@@ -58,7 +58,10 @@ if (!process.env.MONGODB_URI || process.env.MONGODB_URI.trim() === '') {
 }
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  })
   .then(() => {
     console.log('Successfully connected to MongoDB Atlas');
     // Start background jobs once DB is connected
