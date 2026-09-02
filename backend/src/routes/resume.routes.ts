@@ -5,7 +5,9 @@ import fs from 'fs';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { extractResumeData } from '../services/geminiService';
 import User from '../models/User';
-import { PDFParse } from 'pdf-parse';
+// Use require() for pdf-parse v2 to bypass ts-node type-checking issue (TS2349)
+// The module works correctly at runtime but its .d.cts types conflict with nodenext resolution
+const { PDFParse } = require('pdf-parse') as { PDFParse: any };
 import * as mammoth from 'mammoth';
 
 const router = express.Router();

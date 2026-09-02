@@ -57,31 +57,41 @@ if (!process.env.MONGODB_URI || process.env.MONGODB_URI.trim() === '') {
   process.exit(1);
 }
 
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-  })
-  .then(() => {
-    console.log('Successfully connected to MongoDB Atlas');
-    // Start background jobs once DB is connected
-    startScheduler();
-    
-    const server = app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+// Start the HTTP server immediately so it's always responsive
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-    // Graceful shutdown
-    process.on('SIGINT', async () => {
-      console.log('Shutting down server gracefully...');
-      await mongoose.connection.close();
-      server.close(() => {
-        console.log('Server and MongoDB connection closed.');
-        process.exit(0);
+// Connect to MongoDB in the background with retry
+const connectWithRetry = async (retries = 3, delay = 5000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI!, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
       });
-    });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
+      console.log('Successfully connected to MongoDB Atlas');
+      startScheduler();
+      return;
+    } catch (error: any) {
+      console.error(`MongoDB connection attempt ${attempt}/${retries} failed:`, error.message);
+      if (attempt < retries) {
+        console.log(`Retrying in ${delay / 1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+  console.error('All MongoDB connection attempts failed. Server is running but DB-dependent routes will return errors.');
+};
+
+connectWithRetry();
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down server gracefully...');
+  try { await mongoose.connection.close(); } catch {}
+  server.close(() => {
+    console.log('Server and MongoDB connection closed.');
+    process.exit(0);
   });
+});
