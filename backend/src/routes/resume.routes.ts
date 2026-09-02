@@ -5,8 +5,8 @@ import fs from 'fs';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { extractResumeData } from '../services/geminiService';
 import User from '../models/User';
-const pdf = require('pdf-parse');
-const mammoth = require('mammoth');
+import { PDFParse } from 'pdf-parse';
+import * as mammoth from 'mammoth';
 
 const router = express.Router();
 
@@ -52,8 +52,10 @@ router.post('/upload', authMiddleware, upload.single('resume'), async (req: any,
     let extractedText = '';
 
     if (req.file.mimetype === 'application/pdf') {
-      const pdfData = await pdf(fileBuffer);
+      const parser = new PDFParse({ data: fileBuffer });
+      const pdfData = await parser.getText();
       extractedText = pdfData.text;
+      await parser.destroy();
     } else {
       const docxData = await mammoth.extractRawText({ buffer: fileBuffer });
       extractedText = docxData.value;
@@ -90,8 +92,19 @@ router.post('/upload', authMiddleware, upload.single('resume'), async (req: any,
     // Optionally cleanup file to save space
     fs.unlinkSync(filePath);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Resume upload error:', error);
+    
+    // Handle invalid PDF files gracefully by returning a 400 instead of 500
+    if (error.name === 'InvalidPDFException' || error.message?.includes('Invalid PDF structure') || error.message?.includes('PDF')) {
+      return res.status(400).json({ error: 'Invalid PDF file. Please upload a valid document.' });
+    }
+    
+    // Handle mammoth errors
+    if (error.message?.includes('unzip')) {
+       return res.status(400).json({ error: 'Invalid DOCX file. Please upload a valid document.' });
+    }
+
     res.status(500).json({ error: 'Something went wrong during file upload or analysis. Please try again.' });
   }
 });

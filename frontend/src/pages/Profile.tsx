@@ -150,9 +150,9 @@ export default function Profile() {
         }));
       }
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setSubmitError('Failed to upload resume. Please try again.');
+      setSubmitError(err.response?.data?.error || 'Failed to upload resume. Please try again.');
     } finally {
       setUploadingResume(false);
       // Reset input
