@@ -17,7 +17,7 @@ interface OpportunityCardProps {
   matchScore: number;
   earlyApplicant?: boolean;
   isSaved?: boolean;
-  onApply: (id: string) => void;
+  onApply: (id: string, externalUrl?: string) => void;
   onSave?: (id: string) => void;
   onCardClick: (id: string) => void;
 }

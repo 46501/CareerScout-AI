@@ -3,7 +3,7 @@ import { X, ExternalLink } from 'lucide-react';
 interface OpportunityDetailProps {
   opp: any;
   onClose: () => void;
-  onApply: (id: string) => void;
+  onApply: (id: string, externalUrl?: string) => void;
 }
 
 export default function OpportunityDetail({ opp, onClose, onApply }: OpportunityDetailProps) {
@@ -67,7 +67,7 @@ export default function OpportunityDetail({ opp, onClose, onApply }: Opportunity
             Close
           </button>
           <button 
-            onClick={() => onApply(opp._id)}
+            onClick={() => onApply(opp._id, opp.applicationUrl)}
             className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors"
           >
             Apply Now

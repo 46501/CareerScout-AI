@@ -1,25 +1,16 @@
 import cron from 'node-cron';
-import { runAgent } from '../agent/agent';
-import User from '../models/User';
+import { fetchAndStoreOpportunities } from '../services/opportunityFetcher';
 
 export const startScheduler = () => {
   // Run every 24 hours at midnight
   cron.schedule('0 0 * * *', async () => {
-    console.log('Running 24-hour scheduled agent discovery...');
+    console.log('Running 24-hour scheduled opportunity discovery...');
     try {
-      const users = await User.find({});
-      for (const user of users) {
-        try {
-          console.log(`Running agent for user ${user._id}`);
-          await runAgent(user._id.toString());
-        } catch (err) {
-          console.error(`Failed agent run for user ${user._id}:`, err);
-        }
-      }
-      console.log('Scheduled agent run completed for all users.');
+      await fetchAndStoreOpportunities();
+      console.log('Scheduled discovery run completed.');
     } catch (error) {
-      console.error('Scheduled agent run failed:', error);
+      console.error('Scheduled discovery run failed:', error);
     }
   });
-  console.log('Scheduler started. Agent will run every 24 hours at midnight.');
+  console.log('Scheduler started. Opportunity discovery will run every 24 hours at midnight.');
 };
