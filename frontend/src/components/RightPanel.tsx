@@ -82,7 +82,7 @@ export default function RightPanel() {
             <div>
               <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Opportunity Type</h3>
               <div className="space-y-2.5">
-                {['Jobs', 'Internships', 'Hackathons', 'Webinars', 'Scholarships'].map((type) => {
+                {['Jobs', 'Internships', 'Hackathons', 'Coding Contests', 'Scholarships', 'Fellowships', 'Webinars', 'Tech Events'].map((type) => {
                   const isChecked = types.includes(type);
                   return (
                     <label key={type} className="flex items-center gap-3 cursor-pointer group">

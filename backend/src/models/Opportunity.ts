@@ -4,7 +4,7 @@ const opportunitySchema = new mongoose.Schema({
   title: { type: String, required: true },
   organization: { type: String, required: true },
   logo: { type: String },
-  type: { type: String, enum: ['Jobs', 'Internships', 'Hackathons', 'Webinars', 'Scholarships'], required: true },
+  type: { type: String, enum: ['Jobs', 'Internships', 'Hackathons', 'Coding Contests', 'Scholarships', 'Fellowships', 'Webinars', 'Tech Events'], required: true },
   description: { type: String, required: true },
   location: { type: String },
   workMode: { type: String }, // e.g., 'Work from home', 'On-site'
