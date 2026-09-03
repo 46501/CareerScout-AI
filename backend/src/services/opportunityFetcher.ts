@@ -4,7 +4,7 @@ import Opportunity from '../models/Opportunity';
 const fetchRemotiveJobs = async (): Promise<number> => {
   let newCount = 0;
   try {
-    const response = await axios.get('https://remotive.com/api/remote-jobs?category=software-dev&limit=50', { timeout: 15000 });
+    const response = await axios.get('https://remotive.com/api/remote-jobs?category=software-dev&limit=50', { timeout: 5000 });
     const jobs = response.data?.jobs || [];
     for (const job of jobs) {
       const existing = await Opportunity.findOne({
@@ -46,7 +46,7 @@ const fetchRemotiveJobs = async (): Promise<number> => {
 const fetchArbeitnowInternships = async (): Promise<number> => {
   let newCount = 0;
   try {
-    const response = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 15000 });
+    const response = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 5000 });
     const jobs = response.data?.data || [];
     const internships = jobs.filter((job: any) => job.title.toLowerCase().includes('intern'));
     
@@ -90,7 +90,7 @@ const fetchArbeitnowInternships = async (): Promise<number> => {
 const fetchKontests = async (): Promise<number> => {
   let newCount = 0;
   try {
-    const response = await axios.get('https://kontests.net/api/v1/all', { timeout: 15000 });
+    const response = await axios.get('https://kontests.net/api/v1/all', { timeout: 5000 });
     const contests = response.data || [];
     
     for (const contest of contests.slice(0, 50)) { // limit to 50
