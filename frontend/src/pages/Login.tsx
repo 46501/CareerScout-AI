@@ -139,7 +139,7 @@ export default function Login() {
           {/* Subtle Card Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-[50px] group-hover:bg-blue-500/20 transition-all duration-500 pointer-events-none"></div>
 
-          <div className="flex flex-col items-center mb-9 relative z-10">
+          <div className="flex flex-col items-center mb-7 relative z-10">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1c2340] to-[#0b1021] border border-white/10 flex items-center justify-center shadow-inner mb-5">
               <Award className="w-7 h-7 text-blue-400" />
             </div>
