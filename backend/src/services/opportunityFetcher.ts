@@ -172,13 +172,60 @@ const fetchKontests = async (): Promise<number> => {
   return newCount;
 };
 
+const fetchTheMuseInternships = async (): Promise<number> => {
+  let newCount = 0;
+  try {
+    const response = await axios.get('https://www.themuse.com/api/public/jobs?category=Software%20Engineering&category=Data%20Science&category=IT&level=Internship&page=1', { timeout: 5000 });
+    const internships = response.data?.results || [];
+    
+    for (const job of internships) {
+      const location = job.locations && job.locations.length > 0 ? job.locations[0].name : 'Remote';
+      if (!isRelevantOpportunity(job.name, job.contents || '', location)) continue;
+
+      const existing = await Opportunity.findOne({
+        $or: [{ applicationUrl: job.refs?.landing_page }, { source: 'The Muse', title: job.name }]
+      });
+      if (!existing) {
+        const skills = job.categories ? job.categories.map((c: any) => c.name).slice(0, 5) : [];
+        const newOpp = new Opportunity({
+          title: job.name,
+          organization: job.company?.name || 'Unknown',
+          logo: '', 
+          type: 'Internships',
+          description: job.contents || 'No description provided.',
+          location: location,
+          workMode: location.toLowerCase().includes('remote') ? 'Remote' : 'On-site',
+          paymentType: 'Paid',
+          salary: 'Not disclosed',
+          experienceLevel: 'Internship',
+          skills: skills,
+          deadline: null,
+          postedAt: job.publication_date ? new Date(job.publication_date) : new Date(),
+          source: 'The Muse',
+          applicationUrl: job.refs?.landing_page || '',
+          isVerified: true,
+          isNewOpp: true,
+          earlyApplicant: false
+        });
+        await newOpp.save();
+        newCount++;
+      }
+    }
+    console.log(`Fetched ${newCount} new Internships from The Muse.`);
+  } catch (error: any) {
+    console.error('Error fetching Internships from The Muse:', error.message);
+  }
+  return newCount;
+};
+
 export const fetchAndStoreOpportunities = async () => {
   console.log('Scouting for opportunities across all supported categories...');
   
   const results = await Promise.allSettled([
     fetchRemotiveJobs(),
     fetchArbeitnowInternships(),
-    fetchKontests()
+    fetchKontests(),
+    fetchTheMuseInternships()
   ]);
   
   let totalNew = 0;
