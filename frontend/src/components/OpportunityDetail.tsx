@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { X, ExternalLink } from 'lucide-react';
 
 interface OpportunityDetailProps {
@@ -7,7 +8,11 @@ interface OpportunityDetailProps {
 }
 
 export default function OpportunityDetail({ opp, onClose, onApply }: OpportunityDetailProps) {
+  const [imgError, setImgError] = useState(false);
+
   if (!opp) return null;
+
+  const cleanDescription = opp.description ? opp.description.replace(/<[^>]*>?/gm, '') : '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -22,8 +27,19 @@ export default function OpportunityDetail({ opp, onClose, onApply }: Opportunity
 
         <div className="p-6 overflow-y-auto flex-1 text-sm text-text-color space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl bg-gray-100 p-2 shrink-0">
-              <img src={opp.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(opp.organization)}&background=random`} alt={opp.organization} className="w-full h-full object-contain" />
+            <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-2 shrink-0 flex items-center justify-center">
+              {!imgError && opp.logo ? (
+                <img 
+                  src={opp.logo} 
+                  alt={opp.organization} 
+                  className="w-full h-full object-contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="font-bold text-gray-400 dark:text-gray-500 text-2xl">
+                  {opp.organization ? opp.organization.charAt(0).toUpperCase() : 'O'}
+                </span>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-bold">{opp.organization}</h3>
@@ -47,7 +63,7 @@ export default function OpportunityDetail({ opp, onClose, onApply }: Opportunity
 
           <div>
             <h4 className="font-semibold mb-2">Description</h4>
-            <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{opp.description}</p>
+            <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{cleanDescription}</p>
           </div>
 
           <div>

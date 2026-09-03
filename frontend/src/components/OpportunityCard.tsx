@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Bookmark, Clock, MapPin, DollarSign, Calendar, ExternalLink } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -43,10 +44,15 @@ export default function OpportunityCard({
   onCardClick
 }: OpportunityCardProps) {
   
+  const [imgError, setImgError] = useState(false);
+  
   // Calculate stroke dasharray for the circular progress (circumference = 2 * pi * r)
   const radius = 24;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (matchScore / 100) * circumference;
+
+  // Strip HTML tags for clean text rendering
+  const cleanDescription = description ? description.replace(/<[^>]*>?/gm, '') : '';
 
   return (
     <div 
@@ -55,8 +61,19 @@ export default function OpportunityCard({
     >
       <div className="flex justify-between items-start">
         <div className="flex gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-white border border-gray-100 flex-shrink-0">
-            <img src={logo} alt={organization} className="w-full h-full object-contain p-1" />
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex-shrink-0 flex items-center justify-center">
+            {!imgError && logo ? (
+              <img 
+                src={logo} 
+                alt={organization} 
+                className="w-full h-full object-contain p-1" 
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <span className="font-bold text-gray-400 dark:text-gray-500 text-lg">
+                {organization ? organization.charAt(0).toUpperCase() : 'O'}
+              </span>
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -130,7 +147,7 @@ export default function OpportunityCard({
       </div>
 
       <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4 pr-20">
-        {description}
+        {cleanDescription}
       </p>
 
       <div className="flex items-center gap-2 mb-5">
