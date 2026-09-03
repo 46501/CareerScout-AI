@@ -1,16 +1,23 @@
 import axios from 'axios';
 import Opportunity from '../models/Opportunity';
+import LanguageDetect from 'languagedetect';
+
+const lngDetector = new LanguageDetect();
 
 const isRelevantOpportunity = (title: string, description: string, location: string): boolean => {
-  const text = `${title} ${description}`.toLowerCase();
+  const text = `${title} ${description}`.substring(0, 1000);
   
-  // Filter out non-English (German/foreign focus)
-  const germanWords = [' und ', ' der ', ' die ', ' das ', ' mit ', ' zu ', ' von ', ' auf ', ' für ', ' ist ', ' nicht ', ' eine ', ' ein ', ' sich ', ' als ', ' auch ', ' es ', ' bei ', ' wir ', ' oder ', ' um '];
-  let germanCount = 0;
-  for (const word of germanWords) {
-    if (text.includes(word)) germanCount++;
+  if (text.trim().length > 20) {
+    const detectedLanguages = lngDetector.detect(text, 3);
+    if (detectedLanguages.length > 0) {
+      const topLanguage = detectedLanguages[0][0];
+      const rejectedLangs = ['german', 'french', 'spanish', 'dutch', 'italian', 'portuguese', 'polish'];
+      
+      if (rejectedLangs.includes(topLanguage)) {
+        return false;
+      }
+    }
   }
-  if (germanCount >= 3) return false;
 
   // Filter out purely local foreign jobs (if not remote)
   const loc = location ? location.toLowerCase() : '';
