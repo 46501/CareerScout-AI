@@ -134,13 +134,13 @@ export default function Login() {
       <div className="w-full lg:w-auto lg:max-w-[420px] xl:max-w-[460px] flex items-center justify-center relative z-10 shrink-0">
         
         {/* Glass Card */}
-        <div className="w-full p-8 sm:p-10 rounded-3xl backdrop-blur-xl bg-[#0b1021]/80 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-white/20 transition-all duration-500">
+        <div className="w-full pt-8 pb-10 px-8 sm:px-10 rounded-3xl backdrop-blur-xl bg-[#0b1021]/80 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-white/20 transition-all duration-500">
           
           {/* Subtle Card Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-[50px] group-hover:bg-blue-500/20 transition-all duration-500 pointer-events-none"></div>
 
-          <div className="flex flex-col items-center mb-8 relative z-10">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1c2340] to-[#0b1021] border border-white/10 flex items-center justify-center shadow-inner mb-6">
+          <div className="flex flex-col items-center mb-9 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1c2340] to-[#0b1021] border border-white/10 flex items-center justify-center shadow-inner mb-5">
               <Award className="w-7 h-7 text-blue-400" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">Welcome back!</h2>
