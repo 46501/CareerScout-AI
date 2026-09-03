@@ -46,11 +46,19 @@ export default function TopNav() {
         <div className="h-8 w-px bg-border-color hidden sm:block"></div>
 
         <button className="flex items-center gap-3">
-          <img
-            className="h-10 w-10 rounded-full object-cover border-2 border-transparent hover:border-primary transition-colors"
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt="User avatar"
-          />
+          {user?.avatar || user?.profile?.avatar ? (
+            <img
+              className="h-10 w-10 rounded-full object-cover border-2 border-transparent hover:border-primary transition-colors"
+              src={user.avatar || user.profile.avatar}
+              alt="User avatar"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-transparent hover:border-primary transition-colors flex items-center justify-center text-gray-500 dark:text-gray-400">
+              <span className="font-medium text-sm">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              </span>
+            </div>
+          )}
           <div className="hidden lg:block text-left">
             <p className="text-sm font-medium text-text-color">{user?.name || 'User'}</p>
             <Link to="/profile" className="text-xs text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">View Profile &rarr;</Link>
