@@ -26,6 +26,11 @@ export default function RightPanel() {
       fetchStats();
     }
   }, [user]);
+  const completionPercentage = user?.completionPercentage || 0;
+  const radius = 24;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (completionPercentage / 100) * circumference;
+
   return (
     <aside className="w-80 flex-shrink-0 border-l border-border-color bg-card-color hidden xl:flex flex-col h-full overflow-y-auto">
       <div className="p-6 space-y-8">
@@ -38,10 +43,18 @@ export default function RightPanel() {
               <div className="relative w-14 h-14">
                 <svg className="w-14 h-14 transform -rotate-90">
                   <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-gray-200 dark:text-gray-700" />
-                  <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray="150" strokeDashoffset="22" className="text-primary" />
+                  <circle 
+                    cx="28" cy="28" r="24" 
+                    stroke="currentColor" 
+                    strokeWidth="4" 
+                    fill="transparent" 
+                    strokeDasharray={circumference} 
+                    strokeDashoffset={strokeDashoffset} 
+                    className="text-primary transition-all duration-500 ease-in-out" 
+                  />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-text-color">
-                  {user?.completionPercentage || 0}%
+                  {completionPercentage}%
                 </div>
               </div>
               <div>
