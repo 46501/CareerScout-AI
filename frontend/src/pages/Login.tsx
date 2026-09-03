@@ -122,12 +122,21 @@ export default function Login() {
           </div>
 
           {/* Door Visual Column */}
-          <div className="hidden sm:flex relative md:w-1/2 lg:w-[55%] xl:w-1/2 justify-center items-center">
-            <div className="relative w-full max-w-[340px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] border border-white/10 group">
+          <div className="hidden sm:flex relative md:w-1/2 lg:w-[55%] xl:w-1/2 justify-center items-start -mt-10 xl:-mt-16">
+            
+            {/* Intense Radial Glow Behind the Door */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-blue-600/30 via-purple-600/30 to-fuchsia-600/30 blur-[60px] rounded-full pointer-events-none"></div>
+
+            <div className="relative w-full max-w-[380px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(168,85,247,0.4),0_0_120px_rgba(59,130,246,0.2)] border border-white/20 group z-10">
+               {/* Inner Border Glow */}
+               <div className="absolute inset-0 border-2 border-blue-400/30 rounded-2xl pointer-events-none z-20"></div>
+               
                <img src="/career_portal.jpg" alt="Career Path Portal" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-               <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent"></div>
-               <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/50 via-transparent to-transparent"></div>
-               <div className="absolute inset-0 bg-gradient-to-r from-[#050816]/50 via-transparent to-transparent"></div>
+               
+               {/* Smooth blending gradients */}
+               <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent z-10"></div>
+               <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/60 via-transparent to-transparent z-10"></div>
+               <div className="absolute inset-0 bg-gradient-to-r from-[#050816]/60 via-transparent to-transparent z-10"></div>
             </div>
           </div>
 
