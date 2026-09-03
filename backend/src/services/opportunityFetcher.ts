@@ -1,12 +1,38 @@
 import axios from 'axios';
 import Opportunity from '../models/Opportunity';
 
+const isRelevantOpportunity = (title: string, description: string, location: string): boolean => {
+  const text = `${title} ${description}`.toLowerCase();
+  
+  // Filter out non-English (German/foreign focus)
+  const germanWords = [' und ', ' der ', ' die ', ' das ', ' mit ', ' zu ', ' von ', ' auf ', ' für ', ' ist ', ' nicht ', ' eine ', ' ein ', ' sich ', ' als ', ' auch ', ' es ', ' bei ', ' wir ', ' oder ', ' um '];
+  let germanCount = 0;
+  for (const word of germanWords) {
+    if (text.includes(word)) germanCount++;
+  }
+  if (germanCount >= 3) return false;
+
+  // Filter out purely local foreign jobs (if not remote)
+  const loc = location ? location.toLowerCase() : '';
+  const isRemoteOrGlobal = loc.includes('remote') || loc.includes('anywhere') || loc.includes('global') || loc.includes('worldwide');
+  if (isRemoteOrGlobal) return true;
+  
+  const blockList = ['germany', 'berlin', 'munich', 'münchen', 'hamburg', 'frankfurt', 'france', 'paris', 'spain', 'madrid', 'barcelona', 'netherlands', 'amsterdam', 'switzerland', 'austria', 'vienna'];
+  for (const blocked of blockList) {
+    if (loc.includes(blocked)) return false;
+  }
+
+  return true;
+};
+
 const fetchRemotiveJobs = async (): Promise<number> => {
   let newCount = 0;
   try {
     const response = await axios.get('https://remotive.com/api/remote-jobs?category=software-dev&limit=50', { timeout: 5000 });
     const jobs = response.data?.jobs || [];
     for (const job of jobs) {
+      if (!isRelevantOpportunity(job.title, job.description || '', job.candidate_required_location || '')) continue;
+
       const existing = await Opportunity.findOne({
         $or: [{ applicationUrl: job.url }, { source: 'Remotive', title: job.title }]
       });
@@ -51,6 +77,8 @@ const fetchArbeitnowInternships = async (): Promise<number> => {
     const internships = jobs.filter((job: any) => job.title.toLowerCase().includes('intern'));
     
     for (const job of internships) {
+      if (!isRelevantOpportunity(job.title, job.description || '', job.location || '')) continue;
+
       const existing = await Opportunity.findOne({
         $or: [{ applicationUrl: job.url }, { source: 'Arbeitnow', title: job.title }]
       });
@@ -94,6 +122,8 @@ const fetchKontests = async (): Promise<number> => {
     const contests = response.data || [];
     
     for (const contest of contests.slice(0, 50)) { // limit to 50
+      if (!isRelevantOpportunity(contest.name, `Coding contest hosted on ${contest.site}`, 'Online')) continue;
+
       const existing = await Opportunity.findOne({
         $or: [{ applicationUrl: contest.url }, { source: 'Kontests', title: contest.name }]
       });
