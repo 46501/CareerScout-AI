@@ -18,14 +18,17 @@ const cleanDB = async () => {
       const text = `${opp.title} ${opp.description || ''}`.substring(0, 1000);
       if (text.trim().length > 20) {
         const detected = lngDetector.detect(text, 1);
-        if (detected.length > 0) {
-          const topLanguage = detected[0][0];
-          const rejectedLangs = ['german', 'french', 'spanish', 'dutch', 'italian', 'portuguese', 'polish'];
-          
-          if (rejectedLangs.includes(topLanguage)) {
-            console.log(`Deleting ${opp.title} (${topLanguage})`);
-            await Opportunity.findByIdAndDelete(opp._id);
-            deleted++;
+        if (detected && detected.length > 0) {
+          const firstMatch = detected[0];
+          if (firstMatch && firstMatch.length > 0) {
+            const topLanguage = firstMatch[0];
+            const rejectedLangs = ['german', 'french', 'spanish', 'dutch', 'italian', 'portuguese', 'polish'];
+            
+            if (rejectedLangs.includes(topLanguage as string)) {
+              console.log(`Deleting ${opp.title} (${topLanguage})`);
+              await Opportunity.findByIdAndDelete(opp._id);
+              deleted++;
+            }
           }
         }
       }

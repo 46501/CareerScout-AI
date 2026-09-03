@@ -9,12 +9,15 @@ const isRelevantOpportunity = (title: string, description: string, location: str
   
   if (text.trim().length > 20) {
     const detectedLanguages = lngDetector.detect(text, 3);
-    if (detectedLanguages.length > 0) {
-      const topLanguage = detectedLanguages[0][0];
-      const rejectedLangs = ['german', 'french', 'spanish', 'dutch', 'italian', 'portuguese', 'polish'];
-      
-      if (rejectedLangs.includes(topLanguage)) {
-        return false;
+    if (detectedLanguages && detectedLanguages.length > 0) {
+      const firstMatch = detectedLanguages[0];
+      if (firstMatch && firstMatch.length > 0) {
+        const topLanguage = firstMatch[0];
+        const rejectedLangs = ['german', 'french', 'spanish', 'dutch', 'italian', 'portuguese', 'polish'];
+        
+        if (rejectedLangs.includes(topLanguage as string)) {
+          return false;
+        }
       }
     }
   }

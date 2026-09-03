@@ -28,7 +28,7 @@ const test = async () => {
 
   // Test 3: Run the Agent
   console.log('\nTesting Agent Execution:');
-  const agentResult = await runAgent();
+  const agentResult = await runAgent([] as any);
   console.log('\nAgent matched opportunities:');
   console.log(JSON.stringify(agentResult.matchedOpportunities, null, 2));
 };
