@@ -63,31 +63,12 @@ export default function Login() {
           </p>
         </div>
 
-        {/* CSS/SVG Futuristic Centerpiece (Glowing Door Concept) */}
-        <div className="hidden sm:flex relative h-48 w-full max-w-md mb-12 items-end">
-          {/* Path */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-t from-purple-500/20 to-transparent blur-md transform [transform:perspective(500px)_rotateX(45deg)]"></div>
-          {/* Portal Door */}
-          <div className="relative mx-auto w-32 h-48 border-2 border-blue-400/50 rounded-t-xl bg-black/40 shadow-[0_0_30px_rgba(59,130,246,0.3)_inset,0_0_20px_rgba(168,85,247,0.4)] flex flex-col justify-end overflow-hidden group">
-             {/* Inner glow lines */}
-             <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent"></div>
-             {/* City silhouette illusion */}
-             <div className="w-full flex items-end justify-center gap-1 px-2 opacity-50">
-                <div className="w-3 h-12 bg-blue-300 rounded-t-sm"></div>
-                <div className="w-4 h-20 bg-purple-400 rounded-t-sm"></div>
-                <div className="w-5 h-24 bg-blue-400 rounded-t-sm"></div>
-                <div className="w-4 h-16 bg-purple-300 rounded-t-sm"></div>
-                <div className="w-3 h-10 bg-blue-200 rounded-t-sm"></div>
-             </div>
-             <div className="absolute bottom-0 w-full h-[1px] bg-white/50 shadow-[0_0_10px_#fff]"></div>
-          </div>
-          
-          {/* Floating icons on path */}
-          <div className="absolute bottom-8 left-[30%] w-8 h-8 rounded-full bg-blue-900/80 border border-blue-400/30 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] animate-pulse">
-            <Target className="w-4 h-4 text-blue-300" />
-          </div>
-          <div className="absolute bottom-16 right-[30%] w-8 h-8 rounded-full bg-purple-900/80 border border-purple-400/30 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.5)] animate-pulse" style={{ animationDelay: '1s' }}>
-            <Award className="w-4 h-4 text-purple-300" />
+        {/* Futuristic Centerpiece (Glowing Door Concept) */}
+        <div className="hidden sm:flex relative w-full max-w-lg mb-12 justify-center">
+          <div className="relative w-full max-w-[320px] aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-white/5">
+             <img src="/career_portal.jpg" alt="Career Path Portal" className="w-full h-full object-cover" />
+             {/* Fade gradient at the bottom to blend with background */}
+             <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/10 to-transparent"></div>
           </div>
         </div>
 
