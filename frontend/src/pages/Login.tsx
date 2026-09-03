@@ -38,10 +38,10 @@ export default function Login() {
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none transform translate-x-1/3 translate-y-1/3"></div>
 
       {/* LEFT COLUMN: BRANDING & MARKETING */}
-      <div className="lg:w-[55%] flex flex-col p-8 lg:p-16 xl:p-24 relative z-10">
+      <div className="lg:w-[60%] flex flex-col p-8 lg:p-12 xl:p-16 relative z-10 xl:pr-4">
         
         {/* Branding */}
-        <div className="flex items-center gap-3 mb-8 lg:mb-12">
+        <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
             <Award className="w-6 h-6 text-white" />
           </div>
@@ -52,72 +52,90 @@ export default function Login() {
         </div>
 
         {/* Main Headline */}
-        <div className="max-w-xl mb-8 lg:mb-12">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-6">
-            Discover opportunities that <br className="hidden sm:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">launch your future</span>
+        <div className="max-w-xl mb-10">
+          <h2 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.1] mb-6">
+            Discover opportunities<br />
+            that <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">launch your<br/>future</span>
           </h2>
-          <p className="text-lg text-slate-400 leading-relaxed font-medium">
+          <p className="text-base text-slate-400 leading-relaxed font-medium">
             AI-powered matching. Real-time opportunities.<br />
             Curated for your growth and success.
           </p>
         </div>
 
-        {/* Futuristic Centerpiece (Glowing Door Concept) */}
-        <div className="hidden sm:flex relative w-full max-w-lg mb-12 justify-center">
-          <div className="relative w-full max-w-[320px] aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-white/5">
-             <img src="/career_portal.jpg" alt="Career Path Portal" className="w-full h-full object-cover" />
-             {/* Fade gradient at the bottom to blend with background */}
-             <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/10 to-transparent"></div>
-          </div>
-        </div>
-
-        {/* Feature Blocks */}
-        <div className="hidden sm:grid sm:grid-cols-3 gap-6 max-w-2xl mb-12">
-          <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-              <Target className="w-4 h-4 text-blue-400" />
-            </div>
-            <h3 className="font-semibold text-sm text-slate-200">Smart Matching</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">AI finds the best opportunities tailored just for you.</p>
-          </div>
-          <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
-              <Zap className="w-4 h-4 text-purple-400" />
-            </div>
-            <h3 className="font-semibold text-sm text-slate-200">Real-time Updates</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Never miss new jobs, internships or contests.</p>
-          </div>
-          <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-            </div>
-            <h3 className="font-semibold text-sm text-slate-200">Career Growth</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Track, apply and grow with confidence.</p>
-          </div>
-        </div>
-
-        {/* Testimonial */}
-        <div className="hidden sm:block mt-auto max-w-sm p-5 rounded-2xl bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.05] backdrop-blur-sm relative">
-           <div className="text-3xl text-blue-500/40 absolute top-2 left-3 font-serif">"</div>
-           <p className="text-sm text-slate-300 italic relative z-10 pl-4 mb-4">
-             CareerScout AI helped me find the perfect internship that matched my skills.
-           </p>
-           <div className="flex items-center gap-3 pl-4">
-              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400 border border-slate-700">
-                AV
+        {/* Content Split: Features on Left, Door on Right */}
+        <div className="flex flex-col md:flex-row gap-8 lg:gap-4 xl:gap-8 items-stretch flex-1">
+          
+          {/* Features & Testimonial Column */}
+          <div className="flex flex-col justify-between gap-8 md:w-1/2 lg:w-[45%] xl:w-1/2">
+            
+            {/* Feature Blocks */}
+            <div className="flex flex-col gap-5">
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex-shrink-0 flex items-center justify-center border border-blue-500/30">
+                  <Target className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-slate-200 mb-1">Smart Matching</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">AI finds the best opportunities tailored just for you.</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-200">Aman Verma</p>
-                <p className="text-xs text-slate-500">Data Science Intern</p>
-              </div>
-           </div>
-        </div>
 
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex-shrink-0 flex items-center justify-center border border-purple-500/30">
+                  <Zap className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-slate-200 mb-1">Real-time Updates</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">Never miss new jobs, internships or contests.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex-shrink-0 flex items-center justify-center border border-emerald-500/30">
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-slate-200 mb-1">Career Growth</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">Track, apply and grow with confidence.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial */}
+            <div className="hidden sm:block mt-6 p-5 rounded-2xl bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.05] backdrop-blur-sm relative">
+               <div className="text-4xl text-blue-500/30 absolute -top-1 left-2 font-serif">"</div>
+               <p className="text-sm text-slate-300 italic relative z-10 pl-6 mb-4">
+                 CareerScout AI helped me find the perfect internship that matched my skills.
+               </p>
+               <div className="flex items-center gap-3 pl-6">
+                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400 border border-slate-700">
+                    AV
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-200">Aman Verma</p>
+                    <p className="text-xs text-slate-500">Data Science Intern</p>
+                  </div>
+               </div>
+            </div>
+
+          </div>
+
+          {/* Door Visual Column */}
+          <div className="hidden sm:flex relative md:w-1/2 lg:w-[55%] xl:w-1/2 justify-center items-center">
+            <div className="relative w-full max-w-[340px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] border border-white/10 group">
+               <img src="/career_portal.jpg" alt="Career Path Portal" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent"></div>
+               <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/50 via-transparent to-transparent"></div>
+               <div className="absolute inset-0 bg-gradient-to-r from-[#050816]/50 via-transparent to-transparent"></div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       {/* RIGHT COLUMN: LOGIN CARD */}
-      <div className="lg:w-[45%] flex items-center justify-center p-6 lg:p-12 relative z-10">
+      <div className="lg:w-[40%] flex items-center justify-center p-6 lg:p-12 relative z-10">
         
         {/* Glass Card */}
         <div className="w-full max-w-md p-8 sm:p-10 rounded-3xl backdrop-blur-xl bg-[#0b1021]/80 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-white/20 transition-all duration-500">
