@@ -84,7 +84,11 @@ const fetchArbeitnowInternships = async (): Promise<number> => {
   try {
     const response = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 5000 });
     const jobs = response.data?.data || [];
-    const internships = jobs.filter((job: any) => job.title.toLowerCase().includes('intern'));
+    const internships = jobs.filter((job: any) => {
+      const title = job.title.toLowerCase();
+      // Match whole words 'intern' or 'internship' to avoid matching 'international' or 'interne'
+      return /\b(intern|internship|interns)\b/.test(title);
+    });
     
     for (const job of internships) {
       if (!isRelevantOpportunity(job.title, job.description || '', job.location || '')) continue;
