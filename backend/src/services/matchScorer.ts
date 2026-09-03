@@ -7,7 +7,9 @@ export const calculateHeuristicMatchScore = (userProfile: any, opportunity: any)
   // 1. Skill Match (40 points)
   // Check how many of the opportunity's skills are in the user's skills
   const oppSkills = opportunity.skills || [];
-  const userSkillsStr = (userProfile.skills || '').toLowerCase();
+  const userSkillsStr = Array.isArray(userProfile.skills) 
+    ? userProfile.skills.join(' ').toLowerCase() 
+    : (userProfile.skills || '').toString().toLowerCase();
   
   if (oppSkills.length > 0) {
     let matchedSkills = 0;
