@@ -117,16 +117,16 @@ export default function Login() {
         {/* Intense Radial Glow Behind the Door */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[500px] aspect-square bg-gradient-to-tr from-blue-600/40 via-purple-600/40 to-fuchsia-600/40 blur-[80px] rounded-full pointer-events-none"></div>
 
-        <div className="relative w-full max-w-[420px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(168,85,247,0.5),0_0_150px_rgba(59,130,246,0.3)] border border-white/20 group">
+        <div className="relative w-full max-w-[420px] rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(168,85,247,0.5),0_0_150px_rgba(59,130,246,0.3)] border border-white/20 group">
            {/* Inner Border Glow */}
            <div className="absolute inset-0 border-[3px] border-blue-400/40 rounded-2xl pointer-events-none z-20"></div>
            
-           <img src="/career_portal.jpg" alt="Career Path Portal" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+           <img src="/career_portal_original.png" alt="Career Path Portal" className="w-full h-auto block transition-transform duration-700 group-hover:scale-105" />
            
-           {/* Smooth blending gradients */}
-           <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/10 to-transparent z-10 pointer-events-none"></div>
-           <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/80 via-transparent to-transparent z-10 pointer-events-none"></div>
-           <div className="absolute inset-0 bg-gradient-to-r from-[#050816]/80 via-transparent to-transparent z-10 pointer-events-none"></div>
+           {/* Smooth edge blending gradients (softened so they don't dim the image) */}
+           <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#050816] to-transparent z-10 pointer-events-none"></div>
+           <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#050816] to-transparent z-10 pointer-events-none"></div>
+           <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#050816] to-transparent z-10 pointer-events-none"></div>
         </div>
       </div>
 
