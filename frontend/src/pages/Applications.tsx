@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Briefcase, MapPin, Calendar, Clock } from 'lucide-react';
+import { Loader2, Briefcase, MapPin, Calendar } from 'lucide-react';
 import api from '../api';
 
 export default function Applications() {

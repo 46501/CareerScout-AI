@@ -271,7 +271,7 @@ export default function Profile() {
     }
   };
 
-  const getInputClass = (fieldName: string, isSelect = false) => {
+  const getInputClass = (fieldName: string) => {
     const base = `w-full px-3 py-2 border rounded-lg bg-body-bg text-text-color focus:ring-1 focus:ring-primary focus:border-primary`;
     if (validationErrors.includes(fieldName)) {
       return base + ` border-red-500`;
@@ -463,7 +463,7 @@ export default function Profile() {
             </div>
             <div className="scroll-mt-24" data-error-field="experienceLevel">
               <label className="block text-sm font-medium text-text-color mb-1">Experience Level <span className="text-red-500">*</span></label>
-              <select name="experienceLevel" value={formData.experienceLevel} onChange={handleChange} className={getInputClass('experienceLevel', true)}>
+              <select name="experienceLevel" value={formData.experienceLevel} onChange={handleChange} className={getInputClass('experienceLevel')}>
                 <option value="">Select Level</option>
                 <option value="Student">Student</option>
                 <option value="Fresher">Fresher / Graduate</option>
@@ -484,7 +484,7 @@ export default function Profile() {
             </div>
             <div className="scroll-mt-24" data-error-field="workMode">
               <label className="block text-sm font-medium text-text-color mb-1">Preferred Work Mode <span className="text-red-500">*</span></label>
-              <select name="workMode" value={formData.workMode} onChange={handleChange} className={getInputClass('workMode', true)}>
+              <select name="workMode" value={formData.workMode} onChange={handleChange} className={getInputClass('workMode')}>
                 <option value="Remote">Remote</option>
                 <option value="Hybrid">Hybrid</option>
                 <option value="On-site">On-site</option>

@@ -7,6 +7,9 @@ interface User {
   email: string;
   profileCompleted: boolean;
   completionPercentage: number;
+  avatar?: string;
+  profile?: any;
+  [key: string]: any;
 }
 
 interface AuthState {

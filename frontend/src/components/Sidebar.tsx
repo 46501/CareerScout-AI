@@ -3,87 +3,113 @@ import {
   LayoutDashboard,
   Briefcase,
   GraduationCap,
-  Code2,
-  Video,
-  Award,
-  Bookmark,
+  BookOpen,
   Send,
-  Bell,
-  User,
+  Bookmark,
   FileText,
+  LineChart,
+  Users,
   Settings,
+  LogOut,
+  Crown,
+  ArrowRight
 } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuthStore } from '../store/authStore';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Opportunities', path: '/opportunities', isHeader: true },
-  { name: 'Jobs', path: '/opportunities?type=jobs', icon: Briefcase },
-  { name: 'Internships', path: '/opportunities?type=internships', icon: GraduationCap },
-  { name: 'Hackathons', path: '/opportunities?type=hackathons', icon: Code2 },
-  { name: 'Webinars', path: '/opportunities?type=webinars', icon: Video },
-  { name: 'Scholarships', path: '/opportunities?type=scholarships', icon: Award },
-  { name: 'Personal', path: '/saved', isHeader: true },
+  { name: 'Find Jobs', path: '/opportunities?type=Jobs', icon: Briefcase },
+  { name: 'Internships', path: '/opportunities?type=Internships', icon: GraduationCap },
+  { name: 'Learning', path: '#', icon: BookOpen },
+  { name: 'My Applications', path: '/applications', icon: Send },
   { name: 'Saved', path: '/saved', icon: Bookmark },
-  { name: 'Applications', path: '/applications', icon: Send },
-  { name: 'Notifications', path: '/notifications', icon: Bell },
-  { name: 'Profile', path: '/profile', icon: User },
-  { name: 'Resume Analyzer', path: '/resume', icon: FileText },
-  { name: 'Settings', path: '/settings', icon: Settings },
+  { name: 'Resume', path: '/resume', icon: FileText },
+  { name: 'Career Insights', path: '#', icon: LineChart },
+  { name: 'Community', path: '#', icon: Users },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
+  const { logout } = useAuthStore();
 
   return (
-    <aside className="w-64 flex-shrink-0 border-r border-border-color bg-card-color flex flex-col h-full overflow-y-auto hidden md:flex">
+    <aside className="w-64 flex-shrink-0 border-r border-border-color bg-white flex flex-col h-full overflow-y-auto hidden md:flex">
+      {/* Logo */}
       <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-          <Award className="w-5 h-5 text-white" />
+        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+          <span className="text-white font-bold text-lg leading-none">A</span>
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-text-color">CareerScout AI</h1>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">CareerScout</h1>
       </div>
 
-      <nav className="flex-1 px-4 pb-6 space-y-1">
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-2 space-y-1">
         {navItems.map((item, index) => {
-          if (item.isHeader) {
-            return (
-              <div key={index} className="pt-6 pb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                {item.name}
-              </div>
-            );
+          const Icon = item.icon;
+          // Active state matching logic
+          let isActive = false;
+          if (item.path === '/') {
+            isActive = location.pathname === '/';
+          } else if (item.path !== '#') {
+            const [basePath, search] = item.path.split('?');
+            isActive = location.pathname.startsWith(basePath) && (!search || location.search.includes(search));
           }
-
-          const Icon = item.icon!;
-          const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path.split('?')[0]) && location.search === item.path.split('?')[1]);
 
           return (
             <Link
               key={index}
               to={item.path}
               className={clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
                 isActive
-                  ? 'bg-primary text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
               )}
             >
-              <Icon className={clsx('w-5 h-5', isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400')} />
+              <Icon className={clsx('w-5 h-5', isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600')} />
               {item.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 mx-4 mb-6 rounded-xl bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/50 dark:to-blue-950/50 border border-blue-100 dark:border-blue-900/50 flex flex-col items-center text-center">
-        <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mb-3">
-          <Award className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />
-        </div>
-        <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Unlock AI insights, advanced filters and apply tracker.</p>
-        <button className="w-full py-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors">
-          Upgrade Now
+      {/* Bottom Actions */}
+      <div className="px-4 py-2 space-y-1">
+        <Link
+          to="/settings"
+          className={clsx(
+            'flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
+            location.pathname === '/settings' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+          )}
+        >
+          <Settings className={clsx('w-5 h-5', location.pathname === '/settings' ? 'text-blue-600' : 'text-slate-400')} />
+          Settings
+        </Link>
+        <button
+          onClick={() => logout()}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
+        >
+          <LogOut className="w-5 h-5 text-slate-400" />
+          Logout
         </button>
+      </div>
+
+      {/* Upgrade Card */}
+      <div className="p-5 mx-5 mb-6 mt-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white relative overflow-hidden shadow-lg shadow-blue-500/20">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+        <div className="relative z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm">
+            <Crown className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+          </div>
+          <h3 className="font-bold text-[15px] mb-1.5">Upgrade to Pro</h3>
+          <p className="text-[12px] text-blue-100 mb-4 leading-relaxed">
+            Get premium features, early access and more.
+          </p>
+          <button className="w-full py-2 bg-white text-blue-600 text-[13px] font-bold rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+            View Plans <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </aside>
   );
