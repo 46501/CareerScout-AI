@@ -120,7 +120,7 @@ export default function Login() {
            {/* Inner Border Glow */}
            <div className="absolute inset-0 border-[3px] border-blue-400/40 rounded-2xl pointer-events-none z-20"></div>
            
-           <img src="/career_portal_original.png" alt="Career Path Portal" className="w-full h-auto block transition-transform duration-700 group-hover:scale-105 relative z-10" />
+           <img src="/clean_career_portal.jpg" alt="Career Path Portal" className="w-full h-auto block transition-transform duration-700 group-hover:scale-105 relative z-10" />
            
            {/* Smooth edge blending gradients */}
            <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#050816] to-transparent z-10 pointer-events-none"></div>
