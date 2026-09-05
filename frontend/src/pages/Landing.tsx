@@ -2,13 +2,24 @@ import {
   Sparkles, PlayCircle, Search, Compass, LineChart, BookOpen, 
   TrendingUp, Book, BarChart3, Users, ChevronRight
 } from 'lucide-react';
+import { useState } from 'react';
+import LoginModal from '../components/LoginModal';
 
 // Import the generated image asset
 import heroImage from '../assets/hero-student.jpg';
 
-export default function Landing() {
+interface LandingProps {
+  initialLoginOpen?: boolean;
+}
+
+export default function Landing({ initialLoginOpen = false }: LandingProps) {
+  const [isLoginOpen, setIsLoginOpen] = useState(initialLoginOpen);
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 overflow-x-hidden">
+      
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
       
       {/* Top Navigation */}
       <nav className="w-full flex items-center justify-between px-6 lg:px-12 py-4 bg-white border-b border-slate-100 relative z-50">
@@ -38,10 +49,10 @@ export default function Landing() {
               className="pl-9 pr-4 py-2 w-64 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
-          <button className="px-5 py-2 rounded-full border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <button onClick={() => setIsLoginOpen(true)} className="px-5 py-2 rounded-full border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
             Login
           </button>
-          <button className="px-5 py-2 rounded-full bg-blue-600 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition-colors">
+          <button onClick={() => setIsLoginOpen(true)} className="px-5 py-2 rounded-full bg-blue-600 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition-colors">
             Get Started →
           </button>
         </div>
@@ -70,7 +81,7 @@ export default function Landing() {
           </p>
           
           <div className="flex items-center gap-4 mb-14">
-            <button className="px-8 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2">
+            <button onClick={() => setIsLoginOpen(true)} className="px-8 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2">
               Get Started <ChevronRight className="w-4 h-4" />
             </button>
             <button className="px-8 py-3.5 rounded-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all flex items-center gap-2">
