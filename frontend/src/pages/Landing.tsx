@@ -110,10 +110,10 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
         </div>
 
         {/* Hero Right (Graphic) */}
-        <div className="w-full lg:w-[52%] relative flex justify-end z-10 lg:pr-10">
+        <div className="w-full lg:w-[52%] relative flex justify-center lg:justify-end z-10 lg:pr-16 mt-16 lg:mt-0">
           
           {/* Main Rounded Container */}
-          <div className="relative w-full max-w-[480px] h-[520px] ml-auto">
+          <div className="relative w-full max-w-[420px] lg:max-w-[440px] h-[520px] mx-auto lg:mx-0 lg:mr-4">
             
             {/* The Image itself with rounded corners */}
             <div className="absolute inset-0 bg-[#eef2f6] rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm">
@@ -121,12 +121,12 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
             </div>
             
             {/* Handwritten Text */}
-            <div className="absolute top-[-25px] right-[25%] -rotate-6 z-0">
+            <div className="absolute top-[-30px] right-[25%] -rotate-6 z-0 hidden lg:block">
               <h3 className="text-2xl font-medium text-slate-400" style={{ fontFamily: 'cursive' }}>Better<br/>skills</h3>
             </div>
 
-            {/* Floating UI: Personalized Menu */}
-            <div className="absolute top-[18%] -left-[12%] w-52 bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 z-30">
+            {/* Floating UI: Personalized Menu (Moved further left and down) */}
+            <div className="absolute top-[30%] lg:top-[25%] -left-[10%] lg:-left-[18%] w-48 lg:w-52 bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-slate-100 z-30">
               <h4 className="font-extrabold text-[#0f172a] text-[13px] mb-3 leading-tight">Personalized<br/>for Your Growth</h4>
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
@@ -148,8 +148,8 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
               </div>
             </div>
 
-            {/* Floating UI: Search Mockup */}
-            <div className="absolute top-[6%] -right-[8%] w-[270px] bg-white rounded-2xl p-3 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 z-20">
+            {/* Floating UI: Search Mockup (Moved UP and RIGHT to avoid face completely) */}
+            <div className="absolute -top-[5%] lg:-top-[10%] -right-[5%] lg:-right-[15%] w-[250px] lg:w-[280px] bg-white rounded-2xl p-3 shadow-[0_8px_30px_rgba(0,0,0,0.1)] border border-slate-100 z-40">
               <div className="flex gap-2 mb-2">
                 <div className="flex-1 bg-slate-50 border border-slate-100 rounded-full px-3 py-1 flex items-center">
                   <span className="text-[10px] text-slate-400">Find your next opportunity...</span>
@@ -165,9 +165,9 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
               </div>
             </div>
 
-            {/* Floating UI: Job Cards */}
-            <div className="absolute top-[32%] -right-[15%] w-64 flex flex-col gap-2.5 z-30">
-              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-slate-100 flex gap-2.5">
+            {/* Floating UI: Job Cards (Moved right and spaced out) */}
+            <div className="absolute top-[28%] lg:top-[30%] -right-[10%] lg:-right-[22%] w-60 lg:w-64 flex flex-col gap-3 z-30">
+              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-slate-100 flex gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
                   <span className="font-bold text-red-500 text-xs">G</span>
                 </div>
@@ -181,7 +181,7 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-slate-100 flex gap-2.5">
+              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-slate-100 flex gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
                   <span className="font-bold text-blue-500 text-xs">M</span>
                 </div>
@@ -195,7 +195,7 @@ export default function Landing({ initialLoginOpen = false }: LandingProps) {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-slate-100 flex gap-2.5">
+              <div className="bg-white rounded-xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-slate-100 flex gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
                   <span className="font-bold text-orange-500 text-xs">a</span>
                 </div>
