@@ -36,7 +36,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-2 space-y-1">
+      <nav className="flex-1 px-4 py-2 space-y-5">
         {navItems.map((item, index) => {
           const Icon = item.icon;
           // Active state matching logic
@@ -67,7 +67,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="px-4 py-2 space-y-1">
+      <div className="px-4 py-6 space-y-5 border-t border-slate-100">
         <Link
           to="/settings"
           className={clsx(
