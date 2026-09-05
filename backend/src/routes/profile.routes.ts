@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req: any, res) => {
 // Update profile
 router.put('/', authMiddleware, async (req: any, res) => {
   try {
-    const { profile, settings } = req.body;
+    const { profile, settings, name, email } = req.body;
     
     // Mandatory fields check
     let completionPercentage = 0;
@@ -55,16 +55,23 @@ router.put('/', authMiddleware, async (req: any, res) => {
       completionPercentage = Math.round((completedFields / totalFields) * 100);
     }
 
+    const updateObj: any = {};
+    if (name) updateObj.name = name;
+    if (email) updateObj.email = email;
+    if (settings) updateObj.settings = settings;
+
+    if (profile) {
+      for (const [key, value] of Object.entries(profile)) {
+        updateObj[`profile.${key}`] = value;
+      }
+    }
+
+    updateObj.completionPercentage = completionPercentage;
+    updateObj.profileCompleted = completionPercentage === 100;
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user.userId || req.user.id,
-      { 
-        $set: { 
-          profile, 
-          settings,
-          completionPercentage,
-          profileCompleted: completionPercentage === 100
-        } 
-      },
+      { $set: updateObj },
       { new: true, runValidators: true }
     ).select('-password');
 

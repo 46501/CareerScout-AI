@@ -43,7 +43,9 @@ function App() {
       if (isAuthenticated) {
         try {
           const res = await api.get('/auth/me');
-          updateUser(res.data);
+          if (res.data && res.data.user) {
+            updateUser(res.data.user);
+          }
         } catch (error: any) {
           // Only treat 401/403 as session expiry; ignore network/timeout/500 errors
           if (error.response && (error.response.status === 401 || error.response.status === 403)) {

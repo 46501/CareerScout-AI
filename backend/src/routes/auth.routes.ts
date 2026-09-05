@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
     if (!secret) throw new Error('JWT_SECRET is missing');
 
     const token = jwt.encode({ id: user._id }, secret);
-    res.json({ token, user: { name: user.name, email: user.email } });
+    res.json({ token, user: { _id: user._id, name: user.name, email: user.email, profileCompleted: user.profileCompleted, completionPercentage: user.completionPercentage } });
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Something went wrong during registration. Please try again.' });
@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
     if (!secret) throw new Error('JWT_SECRET is missing');
 
     const token = jwt.encode({ id: user._id }, secret);
-    res.json({ token, user: { name: user.name, email: user.email } });
+    res.json({ token, user: { _id: user._id, name: user.name, email: user.email, profileCompleted: user.profileCompleted, completionPercentage: user.completionPercentage } });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Something went wrong during login. Please try again.' });

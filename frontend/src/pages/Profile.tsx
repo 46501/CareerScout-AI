@@ -227,6 +227,8 @@ export default function Profile() {
 
     try {
       const payload = {
+        name: formData.name,
+        email: formData.email,
         profile: {
           phone: formData.phone,
           location: formData.location,
@@ -257,6 +259,8 @@ export default function Profile() {
       const res = await api.put('/profile', payload);
       
       updateUser({ 
+        name: res.data.user.name,
+        email: res.data.user.email,
         profileCompleted: res.data.user.profileCompleted, 
         completionPercentage: res.data.user.completionPercentage 
       });
