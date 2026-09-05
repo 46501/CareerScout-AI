@@ -53,9 +53,8 @@ export default function Login() {
 
         {/* Main Headline */}
         <div className="mb-8">
-          <h2 className="text-4xl sm:text-5xl xl:text-[3.5rem] font-extrabold tracking-tight leading-[1.15] mb-4">
-            Discover opportunities<br />
-            that <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">launch your future</span>
+          <h2 className="text-4xl sm:text-5xl xl:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-4">
+            Discover opportunities that <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">launch your future</span>
           </h2>
           <p className="text-sm xl:text-base text-slate-400 leading-relaxed font-medium">
             AI-powered matching. Real-time opportunities.<br />
@@ -117,13 +116,11 @@ export default function Login() {
         {/* Intense Radial Glow Behind the Door */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[500px] aspect-square bg-gradient-to-tr from-blue-600/40 via-purple-600/40 to-fuchsia-600/40 blur-[80px] rounded-full pointer-events-none"></div>
 
-        <div className="relative w-full max-w-[420px] rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(168,85,247,0.5),0_0_150px_rgba(59,130,246,0.3)] border border-white/20 group">
+        <div className="relative w-full max-w-[420px] rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(168,85,247,0.5),0_0_150px_rgba(59,130,246,0.3)] border border-white/20 group z-20">
            {/* Inner Border Glow */}
            <div className="absolute inset-0 border-[3px] border-blue-400/40 rounded-2xl pointer-events-none z-20"></div>
            
-           <div className="w-[116%] max-w-[116%] -ml-[8%] flex items-center justify-center">
-             <img src="/career_portal_original.png" alt="Career Path Portal" className="w-full h-auto block transition-transform duration-700 group-hover:scale-105" />
-           </div>
+           <img src="/career_portal_original.png" alt="Career Path Portal" className="w-full h-auto block transition-transform duration-700 group-hover:scale-105 relative z-10" />
            
            {/* Smooth edge blending gradients */}
            <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#050816] to-transparent z-10 pointer-events-none"></div>
