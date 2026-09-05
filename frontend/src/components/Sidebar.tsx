@@ -28,12 +28,12 @@ export default function Sidebar() {
   return (
     <aside className="w-64 flex-shrink-0 border-r border-border-color bg-white flex flex-col h-full overflow-y-auto hidden md:flex">
       {/* Logo */}
-      <div className="p-6 flex items-center gap-3">
+      <Link to="/" className="p-6 flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity duration-200">
         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
           <span className="text-white font-bold text-lg leading-none">A</span>
         </div>
         <h1 className="text-xl font-bold tracking-tight text-slate-900">CareerScout</h1>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-2 space-y-5">
