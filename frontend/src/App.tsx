@@ -16,7 +16,6 @@ import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 import Landing from './pages/Landing';
 
-const Opportunities = () => <div>Opportunities</div>;
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore();
