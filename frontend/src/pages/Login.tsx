@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, Sun, Search, BarChart3, Rocket, PlayCircle, Briefcase, ArrowRight, GraduationCap, LineChart, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Search, BarChart3, Rocket, PlayCircle, User } from 'lucide-react';
 import api from '../api';
 import { useAuthStore } from '../store/authStore';
 
@@ -37,29 +37,18 @@ export default function Login() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none transform -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none transform translate-x-1/3 translate-y-1/3"></div>
 
-      {/* Top Navigation */}
-      <nav className="w-full flex items-center justify-between py-6 relative z-30">
+      {/* Top Branding */}
+      <div className="w-full flex items-center py-6 relative z-30">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
             <User className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-xl font-bold tracking-tight">CareerScout AI</h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight leading-tight">CareerScout AI</h1>
+            <p className="text-[10px] text-blue-400/80 font-semibold tracking-wider uppercase">Your Personal AI Career Scout</p>
+          </div>
         </div>
-        
-        <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-300">
-          <Link to="#" className="text-white">Home</Link>
-          <Link to="#" className="hover:text-white transition-colors">Jobs</Link>
-          <Link to="#" className="hover:text-white transition-colors">Internships</Link>
-          <Link to="#" className="hover:text-white transition-colors">Learn</Link>
-          <Link to="#" className="hover:text-white transition-colors">Community</Link>
-          <Link to="#" className="hover:text-white transition-colors">About</Link>
-        </div>
-
-        <div className="flex items-center gap-4 text-sm font-medium text-slate-400">
-          <Sun className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
-          <span className="hidden sm:inline">Better Careers, Brighter Tomorrows</span>
-        </div>
-      </nav>
+      </div>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col lg:flex-row items-center justify-between pb-10">
@@ -152,66 +141,10 @@ export default function Login() {
           {/* Ambient Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[400px] aspect-square bg-gradient-to-tr from-blue-600/20 via-purple-600/20 to-transparent blur-[80px] rounded-full pointer-events-none"></div>
 
-          <div className="relative w-full max-w-[500px] h-[600px] flex items-center justify-center">
+          <div className="relative w-full max-w-[500px] h-[600px] flex items-center justify-center transition-transform duration-700" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(8deg) rotateY(-12deg)' }}>
             
-            {/* SVG Connecting Lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ filter: 'drop-shadow(0 0 4px rgba(59,130,246,0.3))' }}>
-               <path d="M 250 160 L 250 120" fill="none" stroke="rgba(148,163,184,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
-               <path d="M 150 300 L 100 300 L 100 270" fill="none" stroke="rgba(148,163,184,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
-               <path d="M 350 300 L 400 300 L 400 270" fill="none" stroke="rgba(148,163,184,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
-               
-               <circle cx="250" cy="120" r="3" fill="#60a5fa" />
-               <circle cx="100" cy="270" r="3" fill="#60a5fa" />
-               <circle cx="400" cy="270" r="3" fill="#60a5fa" />
-               
-               <circle cx="250" cy="160" r="3" fill="#60a5fa" />
-               <circle cx="150" cy="300" r="3" fill="#60a5fa" />
-               <circle cx="350" cy="300" r="3" fill="#60a5fa" />
-            </svg>
-
-            {/* Top Floating Card (Job Match) */}
-            <div className="absolute top-[12%] left-[50%] -translate-x-1/2 w-48 p-3 rounded-xl bg-[#0d142b]/90 backdrop-blur-xl border border-blue-500/40 shadow-[0_0_20px_rgba(59,130,246,0.2)] flex items-center gap-3 z-30">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <Briefcase className="w-4 h-4 text-blue-400" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-0.5">
-                  <p className="text-[11px] text-white font-medium">Job Match</p>
-                  <ArrowRight className="w-3 h-3 text-slate-500" />
-                </div>
-                <p className="text-[9px] text-slate-400">92% match</p>
-                <div className="w-full h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
-                  <div className="w-[92%] h-full bg-blue-400 rounded-full"></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Left Floating Card (Learn) */}
-            <div className="absolute top-[38%] left-[0%] w-[120px] p-3 rounded-xl bg-[#0d142b]/90 backdrop-blur-xl border border-white/10 shadow-lg flex flex-col gap-2 z-30">
-              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-slate-300" />
-              </div>
-              <div>
-                <p className="text-[11px] text-white font-medium">Learn</p>
-                <p className="text-[10px] text-slate-400">New Skills</p>
-              </div>
-              <ArrowRight className="w-3 h-3 text-slate-500 absolute top-3 right-3" />
-            </div>
-
-            {/* Right Floating Card (Track Progress) */}
-            <div className="absolute top-[38%] right-[0%] w-[120px] p-3 rounded-xl bg-[#0d142b]/90 backdrop-blur-xl border border-white/10 shadow-lg flex flex-col gap-2 z-30">
-              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                <LineChart className="w-4 h-4 text-slate-300" />
-              </div>
-              <div>
-                <p className="text-[11px] text-white font-medium">Track</p>
-                <p className="text-[10px] text-slate-400">Progress</p>
-              </div>
-              <ArrowRight className="w-3 h-3 text-slate-500 absolute bottom-3 right-3" />
-            </div>
-
             {/* Central Glowing Card */}
-            <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[180px] h-[240px] rounded-2xl bg-gradient-to-b from-[#161f42]/90 to-[#0a0f24]/90 backdrop-blur-2xl border-[2px] border-blue-400 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.5),inset_0_0_20px_rgba(59,130,246,0.3)] z-40 transform hover:-translate-y-2 transition-transform duration-500">
+            <div className="absolute top-[25%] left-1/2 w-[180px] h-[240px] rounded-2xl bg-gradient-to-b from-[#161f42]/90 to-[#0a0f24]/90 backdrop-blur-2xl border-[2px] border-blue-400 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.5),inset_0_0_20px_rgba(59,130,246,0.3)] z-40 transition-transform duration-500" style={{ transform: 'translateX(-50%) translateZ(40px)' }}>
               <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center mb-5 border border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                 <User className="w-7 h-7 text-white" />
               </div>
@@ -223,10 +156,9 @@ export default function Login() {
             </div>
 
             {/* Isometric Platform Container */}
-            <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[300px] h-[150px] z-20 pointer-events-none">
-              
+            <div className="absolute top-[60%] left-1/2 w-[300px] h-[150px] z-20 pointer-events-none" style={{ transform: 'translateX(-50%) translateZ(0px)', transformStyle: 'preserve-3d' }}>
               {/* Top Surface */}
-              <div className="absolute top-[30px] left-0 w-full h-[100px] bg-[#0d142b] border border-blue-500/30 transform origin-bottom [transform:rotateX(70deg)] shadow-[0_0_50px_rgba(59,130,246,0.2)] flex items-center justify-center">
+              <div className="absolute top-[30px] left-0 w-full h-[100px] bg-[#0d142b] border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.2)] flex items-center justify-center" style={{ transformOrigin: 'bottom', transform: 'rotateX(70deg)' }}>
                  <div className="w-[180px] h-[80px] bg-blue-500/10 blur-xl rounded-full"></div>
               </div>
               
@@ -243,15 +175,15 @@ export default function Login() {
             </div>
 
             {/* Futuristic Path extending downwards */}
-            <div className="absolute top-[75%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] overflow-hidden z-10 pointer-events-none">
+            <div className="absolute top-[75%] left-1/2 w-[400px] h-[150px] overflow-hidden z-10 pointer-events-none" style={{ transform: 'translateX(-50%) translateZ(10px)' }}>
                {/* 3D rotated floor path */}
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[300px] bg-gradient-to-b from-blue-500/10 via-purple-500/5 to-transparent [transform:perspective(200px)_rotateX(60deg)]"></div>
+               <div className="absolute top-0 left-1/2 w-[120px] h-[300px] bg-gradient-to-b from-blue-500/10 via-purple-500/5 to-transparent" style={{ transform: 'translateX(-50%) perspective(200px) rotateX(60deg)' }}></div>
                {/* Path borders */}
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[300px] border-l border-r border-blue-400/30 [transform:perspective(200px)_rotateX(60deg)] drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]"></div>
+               <div className="absolute top-0 left-1/2 w-[120px] h-[300px] border-l border-r border-blue-400/30 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" style={{ transform: 'translateX(-50%) perspective(200px) rotateX(60deg)' }}></div>
             </div>
 
             {/* Bottom Text */}
-            <div className="absolute bottom-[0%] left-1/2 -translate-x-1/2 text-center z-30">
+            <div className="absolute bottom-[0%] left-1/2 text-center z-30" style={{ transform: 'translateX(-50%) translateZ(30px)' }}>
               <p className="text-[10px] font-bold text-blue-400/80 tracking-[0.2em] uppercase leading-tight">Same You.<br/>Bigger Tomorrow.</p>
             </div>
             
@@ -267,12 +199,12 @@ export default function Login() {
             {/* Subtle Card Glow */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-[50px] pointer-events-none"></div>
 
-            <div className="flex flex-col items-center mb-8 relative z-10">
-              <h2 className="text-2xl sm:text-[28px] font-bold text-white mb-2 tracking-tight">Welcome back!</h2>
+            <div className="flex flex-col items-center mb-5 relative z-10">
+              <h2 className="text-2xl sm:text-[28px] font-bold text-white mb-1.5 tracking-tight">Welcome back!</h2>
               <p className="text-sm text-slate-400 text-center">Sign in to continue your journey</p>
             </div>
 
-            <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
+            <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm text-center font-medium">
                   {error}
