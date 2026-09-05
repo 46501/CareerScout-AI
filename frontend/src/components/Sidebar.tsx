@@ -59,13 +59,13 @@ export default function Sidebar() {
               key={index}
               to={item.path}
               className={clsx(
-                'flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
+                'group flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
                 isActive
                   ? 'bg-blue-50 text-blue-600'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'
               )}
             >
-              <Icon className={clsx('w-5 h-5', isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600')} />
+              <Icon className={clsx('w-5 h-5 transition-colors duration-200', isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600')} />
               {item.name}
             </Link>
           );
@@ -77,18 +77,18 @@ export default function Sidebar() {
         <Link
           to="/settings"
           className={clsx(
-            'flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
-            location.pathname === '/settings' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+            'group flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200',
+            location.pathname === '/settings' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'
           )}
         >
-          <Settings className={clsx('w-5 h-5', location.pathname === '/settings' ? 'text-blue-600' : 'text-slate-400')} />
+          <Settings className={clsx('w-5 h-5 transition-colors duration-200', location.pathname === '/settings' ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600')} />
           Settings
         </Link>
         <button
           onClick={() => logout()}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
+          className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200"
         >
-          <LogOut className="w-5 h-5 text-slate-400" />
+          <LogOut className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors duration-200" />
           Logout
         </button>
       </div>
