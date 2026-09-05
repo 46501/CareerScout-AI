@@ -3,12 +3,9 @@ import {
   LayoutDashboard,
   Briefcase,
   GraduationCap,
-  BookOpen,
   Send,
   Bookmark,
   FileText,
-  LineChart,
-  Users,
   Settings,
   LogOut
 } from 'lucide-react';
@@ -19,12 +16,9 @@ const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Find Jobs', path: '/opportunities?type=Jobs', icon: Briefcase },
   { name: 'Internships', path: '/opportunities?type=Internships', icon: GraduationCap },
-  { name: 'Learning', path: '#', icon: BookOpen },
   { name: 'My Applications', path: '/applications', icon: Send },
   { name: 'Saved', path: '/saved', icon: Bookmark },
   { name: 'Resume', path: '/resume', icon: FileText },
-  { name: 'Career Insights', path: '#', icon: LineChart },
-  { name: 'Community', path: '#', icon: Users },
 ];
 
 export default function Sidebar() {
