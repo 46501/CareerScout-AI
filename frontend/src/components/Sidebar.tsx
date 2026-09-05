@@ -10,9 +10,7 @@ import {
   LineChart,
   Users,
   Settings,
-  LogOut,
-  Crown,
-  ArrowRight
+  LogOut
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../store/authStore';
@@ -95,22 +93,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Upgrade Card */}
-      <div className="p-5 mx-5 mb-6 mt-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white relative overflow-hidden shadow-lg shadow-blue-500/20">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-        <div className="relative z-10">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm">
-            <Crown className="w-5 h-5 text-yellow-300 fill-yellow-300" />
-          </div>
-          <h3 className="font-bold text-[15px] mb-1.5">Upgrade to Pro</h3>
-          <p className="text-[12px] text-blue-100 mb-4 leading-relaxed">
-            Get premium features, early access and more.
-          </p>
-          <button className="w-full py-2 bg-white text-blue-600 text-[13px] font-bold rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
-            View Plans <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+
     </aside>
   );
 }
