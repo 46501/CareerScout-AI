@@ -14,6 +14,7 @@ import Applications from './pages/Applications';
 import SavedOpportunities from './pages/SavedOpportunities';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
+import Landing from './pages/Landing';
 
 const Opportunities = () => <div>Opportunities</div>;
 
@@ -63,6 +64,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/home" element={<Landing />} />
         <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
         
