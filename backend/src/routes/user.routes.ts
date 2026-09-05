@@ -29,6 +29,7 @@ router.post('/saved/:id', authMiddleware, async (req: any, res) => {
     await SavedOpportunity.create({ user: req.user.userId, opportunity: req.params.id });
     res.json({ message: 'Opportunity saved', isSaved: true });
   } catch (error) {
+    console.error('Failed to toggle save:', error);
     res.status(500).json({ error: 'Failed to toggle save' });
   }
 });
