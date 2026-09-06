@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Search, Bell, Menu, ChevronDown } from 'lucide-react';
 import { useFilterStore } from '../store/filterStore';
 import { useAuthStore } from '../store/authStore';
@@ -5,6 +6,15 @@ import { useAuthStore } from '../store/authStore';
 export default function TopNav() {
   const { searchQuery, setSearchQuery } = useFilterStore();
   const { user } = useAuthStore();
+
+  const getInitials = (name: string) => {
+    if (!name) return 'US';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
 
   return (
     <header className="h-20 bg-[#f8fafc] flex items-center justify-between px-6 lg:px-8 shrink-0">
@@ -36,20 +46,20 @@ export default function TopNav() {
           <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#f8fafc]" />
         </button>
 
-        <div className="flex items-center gap-3 cursor-pointer group">
+        <Link to="/profile" className="flex items-center gap-3 cursor-pointer group hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold shadow-sm overflow-hidden border-2 border-transparent group-hover:border-blue-200 transition-colors">
             {user?.avatar || user?.profile?.avatar ? (
               <img src={user.avatar || user.profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <span>{user?.name ? user.name.substring(0, 2).toUpperCase() : 'US'}</span>
+              <span>{getInitials(user?.name || '')}</span>
             )}
           </div>
           <div className="hidden lg:block text-left">
             <p className="text-[14px] font-bold text-slate-800 leading-tight">{user?.name || 'User Name'}</p>
-            <p className="text-[12px] text-slate-500">Student</p>
+            <p className="text-[12px] text-slate-500">{user?.profile?.careerGoal || user?.profile?.experienceLevel || 'Member'}</p>
           </div>
           <ChevronDown className="w-4 h-4 text-slate-400 hidden lg:block group-hover:text-slate-600 transition-colors" />
-        </div>
+        </Link>
       </div>
     </header>
   );
