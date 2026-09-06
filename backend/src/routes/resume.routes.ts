@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { authMiddleware } from '../middleware/auth.middleware';
-import { extractResumeData } from '../services/geminiService';
+import { extractResumeData, generateAdvancedResumeAnalysis } from '../services/geminiService';
 import User from '../models/User';
 // Use require() for pdf-parse v2 to bypass ts-node type-checking issue (TS2349)
 // The module works correctly at runtime but its .d.cts types conflict with nodenext resolution
@@ -43,11 +43,33 @@ const upload = multer({
   fileFilter
 });
 
+const calculateDeterministicScores = (extractedText: string, basicData: any) => {
+  const textLower = extractedText.toLowerCase();
+  
+  // ATS Readiness (Max 20)
+  let atsScore = 0;
+  if (textLower.includes('experience') || textLower.includes('work history')) atsScore += 5;
+  if (textLower.includes('education')) atsScore += 5;
+  if (textLower.includes('skills')) atsScore += 5;
+  if (textLower.includes('@') && /\d{10}/.test(textLower)) atsScore += 5; // Email + Phone roughly
+
+  // Structure Score (Max 20)
+  let structureScore = 0;
+  if (basicData.experience && basicData.experience.length > 0) structureScore += 5;
+  if (basicData.education && basicData.education.length > 0) structureScore += 5;
+  if (basicData.projects && basicData.projects.length > 0) structureScore += 5;
+  if (basicData.skills && basicData.skills.length > 0) structureScore += 5;
+
+  return { atsScore, structureScore };
+};
+
 router.post('/upload', authMiddleware, upload.single('resume'), async (req: any, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded or invalid file format.' });
     }
+
+    const { targetJobDescription } = req.body; // Optional field for job matching
 
     const filePath = path.join(__dirname, '../../uploads/', req.file.filename);
     const fileBuffer = fs.readFileSync(filePath);
@@ -69,17 +91,50 @@ router.post('/upload', authMiddleware, upload.single('resume'), async (req: any,
 
     // Call Gemini to parse structured data
     const resumeData = await extractResumeData(extractedText);
+    
+    // Call Gemini to generate advanced analysis
+    const advancedAnalysis = await generateAdvancedResumeAnalysis(extractedText, targetJobDescription);
+
+    // Calculate deterministic scores
+    const { atsScore, structureScore } = calculateDeterministicScores(extractedText, resumeData);
+
+    const overallScore = Math.round(
+      atsScore + 
+      structureScore + 
+      (advancedAnalysis.contentQualityScore || 0) + 
+      (advancedAnalysis.impactScore || 0) +
+      20 // Assuming skills score maxes at 20 deterministically for presence, can refine
+    );
+
+    const fullAnalysis = {
+      overallScore: Math.min(overallScore, 100),
+      breakdown: {
+        ats: atsScore,
+        structure: structureScore,
+        content: advancedAnalysis.contentQualityScore || 0,
+        impact: advancedAnalysis.impactScore || 0,
+        skills: 20
+      },
+      ...advancedAnalysis
+    };
 
     // Save resume metadata to MongoDB without overwriting other profile fields
     const user = await User.findById(req.user.userId || req.user.id);
     if (user) {
+      // Use Object.keys to dynamically set only the extracted data without wiping existing
+      const profileUpdates: any = {};
+      if (resumeData.skills?.length > 0) profileUpdates['profile.skills'] = resumeData.skills;
+      if (resumeData.languages?.length > 0) profileUpdates['profile.languages'] = resumeData.languages;
+      if (resumeData.tools?.length > 0) profileUpdates['profile.tools'] = resumeData.tools;
+
       await User.findByIdAndUpdate(user._id, {
         $set: {
-          'profile.resume': {
-            filename: req.file.originalname,
-            path: req.file.filename,
-            uploadedAt: new Date()
-          }
+          'profile.resume.filename': req.file.originalname,
+          'profile.resume.path': req.file.filename,
+          'profile.resume.uploadedAt': new Date(),
+          'profile.resume.extractedText': extractedText,
+          'profile.resume.analysis': fullAnalysis,
+          ...profileUpdates
         }
       });
     }
@@ -87,27 +142,84 @@ router.post('/upload', authMiddleware, upload.single('resume'), async (req: any,
     res.json({ 
       message: 'Resume uploaded and analyzed successfully.', 
       data: {
-        extractedData: resumeData
+        extractedData: resumeData,
+        analysis: fullAnalysis
       }
     });
 
-    // Optionally cleanup file to save space
+    // Cleanup file
     fs.unlinkSync(filePath);
 
   } catch (error: any) {
     console.error('Resume upload error:', error);
     
-    // Handle invalid PDF files gracefully by returning a 400 instead of 500
     if (error.name === 'InvalidPDFException' || error.message?.includes('Invalid PDF structure') || error.message?.includes('PDF')) {
       return res.status(400).json({ error: 'Invalid PDF file. Please upload a valid document.' });
     }
-    
-    // Handle mammoth errors
     if (error.message?.includes('unzip')) {
        return res.status(400).json({ error: 'Invalid DOCX file. Please upload a valid document.' });
     }
-
     res.status(500).json({ error: 'Something went wrong during file upload or analysis. Please try again.' });
+  }
+});
+
+router.post('/analyze-saved', authMiddleware, async (req: any, res) => {
+  try {
+    const { targetJobDescription } = req.body;
+    
+    const user = await User.findById(req.user.userId || req.user.id);
+    if (!user || !user.profile?.resume?.extractedText) {
+      return res.status(400).json({ error: 'No saved resume found. Please upload a resume first.' });
+    }
+
+    const extractedText = user.profile.resume.extractedText;
+
+    // Call Gemini to parse structured data
+    const resumeData = await extractResumeData(extractedText);
+    
+    // Call Gemini to generate advanced analysis
+    const advancedAnalysis = await generateAdvancedResumeAnalysis(extractedText, targetJobDescription);
+
+    // Calculate deterministic scores
+    const { atsScore, structureScore } = calculateDeterministicScores(extractedText, resumeData);
+
+    const overallScore = Math.round(
+      atsScore + 
+      structureScore + 
+      (advancedAnalysis.contentQualityScore || 0) + 
+      (advancedAnalysis.impactScore || 0) +
+      20 
+    );
+
+    const fullAnalysis = {
+      overallScore: Math.min(overallScore, 100),
+      breakdown: {
+        ats: atsScore,
+        structure: structureScore,
+        content: advancedAnalysis.contentQualityScore || 0,
+        impact: advancedAnalysis.impactScore || 0,
+        skills: 20
+      },
+      ...advancedAnalysis
+    };
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        'profile.resume.analysis': fullAnalysis
+      }
+    });
+
+    res.json({
+      message: 'Resume re-analyzed successfully.',
+      data: {
+        extractedData: resumeData,
+        analysis: fullAnalysis
+      }
+    });
+
+  } catch (error) {
+    console.error('Re-analyze error:', error);
+    res.status(500).json({ error: 'Failed to re-analyze resume.' });
   }
 });
 

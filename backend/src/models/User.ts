@@ -55,11 +55,13 @@ const userSchema = new mongoose.Schema({
     tools: [String],
     certifications: [String],
     
-    // Resume metadata
+    // Resume metadata & analysis
     resume: {
       filename: String,
       path: String,
-      uploadedAt: { type: Date, default: Date.now }
+      uploadedAt: { type: Date, default: Date.now },
+      extractedText: String,
+      analysis: { type: mongoose.Schema.Types.Mixed }
     },
     
     // Preferences

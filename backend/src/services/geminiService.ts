@@ -136,3 +136,97 @@ export const matchOpportunity = async (userProfile: any, opportunity: any) => {
     return { matchScore: 50, matchedSkills: [], missingSkills: [], strengths: [], recommendation: 'Error processing match.' };
   }
 };
+
+/**
+ * Generates an advanced, ATS-style analysis of a resume.
+ * Optionally compares against a target job description.
+ */
+export const generateAdvancedResumeAnalysis = async (resumeText: string, jobDescription?: string) => {
+  if (!ai) {
+    throw new Error('Gemini AI is not configured.');
+  }
+
+  let contents = `Analyze this resume in detail as an expert career coach and ATS system.
+Resume Text:
+"""
+${resumeText}
+"""
+`;
+
+  if (jobDescription) {
+    contents += `
+Target Job Description:
+"""
+${jobDescription}
+"""
+Include a detailed job match analysis.
+`;
+  }
+
+  const schemaProperties: any = {
+    contentQualityScore: { type: Type.INTEGER, description: 'Score from 0 to 20 assessing bullet point impact and actionable language.' },
+    impactScore: { type: Type.INTEGER, description: 'Score from 0 to 20 assessing measurable outcomes and metrics in the resume.' },
+    bulletQuality: {
+      type: Type.OBJECT,
+      properties: {
+        weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+        suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
+      }
+    },
+    skillStrength: {
+      type: Type.OBJECT,
+      properties: {
+        strong: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Skills with strong evidence.' },
+        moderate: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Skills with some evidence.' },
+        weak: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Skills merely mentioned.' }
+      }
+    },
+    strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Top 3-5 strengths of the resume.' },
+    weaknesses: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Top 3-5 weaknesses or areas for improvement.' },
+    topImprovements: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Top 3-5 prioritized actionable improvement steps.' },
+    roadmap: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'A 3-5 step career improvement roadmap.' },
+    keywords: {
+      type: Type.OBJECT,
+      properties: {
+        matched: { type: Type.ARRAY, items: { type: Type.STRING } },
+        missing: { type: Type.ARRAY, items: { type: Type.STRING } }
+      }
+    }
+  };
+
+  if (jobDescription) {
+    schemaProperties.jobMatch = {
+      type: Type.OBJECT,
+      properties: {
+        score: { type: Type.INTEGER, description: 'Match score from 0-100.' },
+        strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+        weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+        explanation: { type: Type.STRING }
+      },
+      required: ['score', 'strengths', 'weaknesses', 'explanation']
+    };
+  }
+
+  try {
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: schemaProperties,
+          required: [
+            'contentQualityScore', 'impactScore', 'bulletQuality', 'skillStrength',
+            'strengths', 'weaknesses', 'topImprovements', 'roadmap', 'keywords'
+          ]
+        }
+      }
+    });
+
+    return JSON.parse(response.text || '{}');
+  } catch (error) {
+    console.error('Gemini generateAdvancedResumeAnalysis error:', error);
+    throw new Error('Failed to generate advanced resume analysis.');
+  }
+};
