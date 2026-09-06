@@ -1,14 +1,25 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Bell, Menu, ChevronDown } from 'lucide-react';
 import { useFilterStore } from '../store/filterStore';
 import { useAuthStore } from '../store/authStore';
+import api from '../api';
 
 export default function TopNav() {
+  const [unreadCount, setUnreadCount] = useState(0);
   const { searchQuery, setSearchQuery } = useFilterStore();
   const { user } = useAuthStore();
 
+  useEffect(() => {
+    if (user) {
+      api.get('/user/stats')
+        .then(res => setUnreadCount(res.data.unreadNotifications || 0))
+        .catch(err => console.error('Failed to fetch stats', err));
+    }
+  }, [user]);
+
   const getInitials = (name: string) => {
-    if (!name) return 'US';
+    if (!name) return 'U';
     const parts = name.trim().split(/\s+/);
     if (parts.length > 1) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -43,7 +54,11 @@ export default function TopNav() {
       <div className="flex items-center gap-4 lg:gap-6">
         <button className="relative p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#f8fafc]" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-[#f8fafc]">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </button>
 
         <Link to="/profile" className="flex items-center gap-3 cursor-pointer group hover:opacity-80 transition-opacity">
@@ -55,8 +70,8 @@ export default function TopNav() {
             )}
           </div>
           <div className="hidden lg:block text-left">
-            <p className="text-[14px] font-bold text-slate-800 leading-tight">{user?.name || 'User Name'}</p>
-            <p className="text-[12px] text-slate-500">{user?.profile?.careerGoal || user?.profile?.experienceLevel || 'Member'}</p>
+            <p className="text-[14px] font-bold text-slate-800 leading-tight">{user?.name || 'User'}</p>
+            <p className="text-[12px] text-slate-500">{user?.profile?.careerGoal || user?.profile?.experienceLevel || 'Not provided'}</p>
           </div>
           <ChevronDown className="w-4 h-4 text-slate-400 hidden lg:block group-hover:text-slate-600 transition-colors" />
         </Link>

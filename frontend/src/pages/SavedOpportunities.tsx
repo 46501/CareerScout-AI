@@ -66,16 +66,16 @@ export default function SavedOpportunities() {
               id={opp._id}
               title={opp.title}
               organization={opp.organization}
-              logo={opp.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(opp.organization)}&background=random`}
+              logo={opp.logo || ''}
               isNew={false}
               isVerified={true}
-              workMode={opp.workMode || 'Remote'}
-              paymentType={opp.paymentType || 'Unspecified'}
-              duration={opp.duration || 'Unspecified'}
+              workMode={opp.workMode || 'Not specified'}
+              paymentType={opp.paymentType || 'Not specified'}
+              duration={opp.duration || 'Not specified'}
               description={opp.description}
               skills={opp.skills || []}
               postedTime={opp.postedAt ? new Date(opp.postedAt).toLocaleDateString() : 'Recently'}
-              matchScore={opp.matchScore || 50}
+              matchScore={opp.matchScore}
               isSaved={true}
               onApply={handleApply}
               onSave={handleSave}

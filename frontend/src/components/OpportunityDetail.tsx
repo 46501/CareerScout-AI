@@ -48,7 +48,9 @@ export default function OpportunityDetail({ opp, onClose, onApply }: Opportunity
           </div>
           
           <div>
-            <h4 className="font-semibold mb-2 text-primary">AI Match Analysis ({opp.matchScore}%)</h4>
+            <h4 className="font-semibold mb-2 text-primary">
+              AI Match Analysis {opp.matchScore !== undefined ? `(${opp.matchScore}%)` : '(Score unavailable)'}
+            </h4>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800 text-blue-900 dark:text-blue-100">
               <p>{opp.matchExplanation?.explanation || 'No detailed analysis available.'}</p>
               

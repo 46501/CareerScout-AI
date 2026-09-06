@@ -15,7 +15,7 @@ interface OpportunityCardProps {
   description: string;
   skills: string[];
   postedTime: string;
-  matchScore: number; // Kept for prop compatibility, but unused in new UI
+  matchScore?: number; // Kept for prop compatibility, but unused in new UI
   earlyApplicant?: boolean;
   isSaved?: boolean;
   onApply: (id: string, externalUrl?: string) => void;
