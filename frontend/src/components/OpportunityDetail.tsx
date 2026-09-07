@@ -98,7 +98,6 @@ export default function OpportunityDetail({ opp, inline = false, onClose, onAppl
         </div>
 
       </div>
-    </div>
   );
 
   if (inline) return content;
