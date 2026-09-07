@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { X, ExternalLink } from 'lucide-react';
+import clsx from 'clsx';
 
 interface OpportunityDetailProps {
   opp: any;
+  inline?: boolean;
   onClose: () => void;
   onApply: (id: string, externalUrl?: string) => void;
 }
 
-export default function OpportunityDetail({ opp, onClose, onApply }: OpportunityDetailProps) {
+export default function OpportunityDetail({ opp, inline = false, onClose, onApply }: OpportunityDetailProps) {
   const [imgError, setImgError] = useState(false);
 
   if (!opp) return null;
 
   const cleanDescription = opp.description ? opp.description.replace(/<[^>]*>?/gm, '') : '';
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-card-color w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+  const content = (
+    <div className={clsx(
+      "bg-card-color w-full flex flex-col",
+      inline ? "h-full rounded-2xl shadow-sm border border-slate-100" : "max-w-2xl rounded-2xl shadow-xl max-h-[90vh]"
+    )}>
         
         <div className="flex justify-between items-center p-6 border-b border-border-color">
           <h2 className="text-xl font-semibold text-text-color">{opp.title}</h2>
@@ -94,6 +98,14 @@ export default function OpportunityDetail({ opp, onClose, onApply }: Opportunity
         </div>
 
       </div>
+    </div>
+  );
+
+  if (inline) return content;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      {content}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Search, Briefcase, FileText, Bookmark, Award, ArrowRight } from 'lucide-react';
+import { Loader2, Search, Briefcase, FileText, Bookmark, Award, ArrowRight, Sparkles } from 'lucide-react';
 import OpportunityCard from '../components/OpportunityCard';
 import OpportunityDetail from '../components/OpportunityDetail';
 import api from '../api';
@@ -119,7 +119,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto w-full pb-20">
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto w-full pb-20">
       
       {/* Welcome Hero Card */}
       <div className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 mb-8 p-8 lg:p-10 flex flex-col md:flex-row items-center justify-between shadow-sm">
@@ -193,6 +193,21 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* AI Insights Banner */}
+      {user?.profile && (
+        <div className="mb-8 p-4 md:p-5 rounded-2xl bg-gradient-to-r from-blue-600/5 to-purple-600/5 border border-blue-100/50 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-[14px] font-bold text-slate-900 mb-1">AI Profile Insight</h3>
+            <p className="text-[13px] text-slate-600 leading-relaxed">
+              Based on your saved jobs and current skills, you have a strong match for <span className="font-semibold text-blue-700">Frontend and Full-stack roles</span>. Consider adding <span className="font-medium bg-white px-1.5 py-0.5 rounded border border-slate-200">Docker</span> or <span className="font-medium bg-white px-1.5 py-0.5 rounded border border-slate-200">AWS</span> to your skills to unlock more senior opportunities.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Recommended For You Header */}
       <div className="flex items-end justify-between mb-6">
         <div>
@@ -215,53 +230,79 @@ export default function Dashboard() {
 
       {error && <div className="p-4 bg-red-50 text-red-600 rounded-lg mb-6">{error}</div>}
 
-      {/* Opportunities List */}
-      <div className="space-y-4">
-        {loading || scouting ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-            <p className="font-medium text-sm">{scouting ? 'Scouting for opportunities...' : 'Loading recommendations...'}</p>
-          </div>
-        ) : opportunities.length === 0 ? (
-          <div className="text-center py-20 text-slate-500 bg-white rounded-2xl border border-slate-100">
-            <Search className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-base font-semibold text-slate-900 mb-2">No matching opportunities found.</h3>
-            <p className="text-[13px]">Try adjusting your search or click "Scout New".</p>
-          </div>
-        ) : (
-          opportunities.map((opp) => (
-            <OpportunityCard
-              key={opp._id}
-              id={opp._id}
-              title={opp.title}
-              organization={opp.organization}
-              logo={opp.logo || ''}
-              workMode={opp.workMode || 'Not specified'}
-              paymentType={opp.paymentType || 'Not specified'}
-              duration={opp.duration || 'Not specified'}
-              description={opp.description}
-              skills={opp.skills || []}
-              postedTime={opp.postedAt ? new Date(opp.postedAt).toLocaleDateString() : 'Recently'}
-              matchScore={opp.matchScore}
-              isSaved={savedIds.has(opp._id)}
-              onApply={() => handleApply(opp._id, opp.applicationUrl)}
-              onSave={handleSave}
-              onCardClick={(id) => {
-                const o = opportunities.find(x => x._id === id);
-                if (o) setSelectedOpp(o);
-              }}
+      {/* Split Pane Layout */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start relative">
+        
+        {/* Left List */}
+        <div className="lg:col-span-6 xl:col-span-5 space-y-4">
+          {loading || scouting ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
+              <p className="font-medium text-sm">{scouting ? 'Scouting for opportunities...' : 'Loading recommendations...'}</p>
+            </div>
+          ) : opportunities.length === 0 ? (
+            <div className="text-center py-20 text-slate-500 bg-white rounded-2xl border border-slate-100">
+              <Search className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-base font-semibold text-slate-900 mb-2">No matching opportunities found.</h3>
+              <p className="text-[13px]">Try adjusting your search or click "Scout New".</p>
+            </div>
+          ) : (
+            opportunities.map((opp) => (
+              <OpportunityCard
+                key={opp._id}
+                id={opp._id}
+                title={opp.title}
+                organization={opp.organization}
+                logo={opp.logo || ''}
+                workMode={opp.workMode || 'Not specified'}
+                paymentType={opp.paymentType || 'Not specified'}
+                duration={opp.duration || 'Not specified'}
+                description={opp.description}
+                skills={opp.skills || []}
+                postedTime={opp.postedAt ? new Date(opp.postedAt).toLocaleDateString() : 'Recently'}
+                matchScore={opp.matchScore}
+                isSaved={savedIds.has(opp._id)}
+                isActive={selectedOpp?._id === opp._id}
+                onApply={() => handleApply(opp._id, opp.applicationUrl)}
+                onSave={handleSave}
+                onCardClick={(id) => {
+                  const o = opportunities.find(x => x._id === id);
+                  if (o) setSelectedOpp(o);
+                }}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Right Sticky Detail (Desktop) */}
+        <div className="hidden lg:block lg:col-span-6 xl:col-span-7 sticky top-6 h-[calc(100vh-8rem)]">
+          {selectedOpp ? (
+            <OpportunityDetail
+              opp={selectedOpp}
+              inline={true}
+              onClose={() => setSelectedOpp(null)}
+              onApply={() => handleApply(selectedOpp._id, selectedOpp.applicationUrl)}
             />
-          ))
-        )}
+          ) : (
+            <div className="h-full rounded-2xl border-2 border-slate-200 border-dashed bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+              <Search className="w-12 h-12 mb-4 text-slate-300" />
+              <h3 className="text-lg font-semibold text-slate-600 mb-2">Select an opportunity</h3>
+              <p className="text-sm max-w-sm">Click on any job or internship card on the left to view full details and AI match insights here.</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {selectedOpp && (
-        <OpportunityDetail 
-          opp={selectedOpp} 
-          onClose={() => setSelectedOpp(null)} 
-          onApply={() => handleApply(selectedOpp._id, selectedOpp.applicationUrl)} 
-        />
-      )}
+      {/* Mobile Modal Detail */}
+      <div className="lg:hidden">
+        {selectedOpp && (
+          <OpportunityDetail 
+            opp={selectedOpp} 
+            onClose={() => setSelectedOpp(null)} 
+            onApply={() => handleApply(selectedOpp._id, selectedOpp.applicationUrl)} 
+          />
+        )}
+      </div>
     </div>
   );
 }

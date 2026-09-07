@@ -18,6 +18,7 @@ interface OpportunityCardProps {
   matchScore?: number; // Kept for prop compatibility, but unused in new UI
   earlyApplicant?: boolean;
   isSaved?: boolean;
+  isActive?: boolean;
   onApply: (id: string, externalUrl?: string) => void;
   onSave?: (id: string) => void;
   onCardClick: (id: string) => void;
@@ -34,6 +35,7 @@ export default function OpportunityCard({
   skills,
   postedTime,
   isSaved = false,
+  isActive = false,
   onSave,
   onCardClick
 }: OpportunityCardProps) {
@@ -42,7 +44,10 @@ export default function OpportunityCard({
 
   return (
     <div 
-      className="bg-white border border-slate-100 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer group flex items-start gap-4"
+      className={clsx(
+        "bg-white border rounded-2xl p-5 transition-all duration-300 cursor-pointer group flex items-start gap-4 transform hover:-translate-y-1 hover:shadow-md",
+        isActive ? "border-blue-500 shadow-md ring-1 ring-blue-500" : "border-slate-100 hover:border-blue-200 shadow-sm"
+      )}
       onClick={() => onCardClick(id)}
     >
       {/* Logo */}
