@@ -21,6 +21,8 @@ import savedOpportunityRoutes from './routes/savedOpportunity.routes';
 import applicationRoutes from './routes/application.routes';
 import notificationRoutes from './routes/notification.routes';
 
+import scoutRoutes from './routes/scout.routes';
+
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:5173', 'http://localhost:5174'],
@@ -40,6 +42,7 @@ app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/saved', savedOpportunityRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/scout', scoutRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, message: 'CareerScout API is healthy' });

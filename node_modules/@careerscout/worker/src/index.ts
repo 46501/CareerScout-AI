@@ -30,6 +30,11 @@ async function startWorker() {
         console.log('Running daily opportunity discovery...');
         await mockProvider.run();
         console.log('Discovery complete.');
+      } else if (job.name === 'personalizedOpportunityDiscovery') {
+        console.log(`Running personalized scout for user ${job.data.userId}`);
+        const { runPersonalizedScout } = await import('./services/scout.service');
+        await runPersonalizedScout(job.data.userId);
+        console.log(`Personalized scout complete for user ${job.data.userId}`);
       }
     }, { connection: redisConnection });
 

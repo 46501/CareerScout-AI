@@ -39,7 +39,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
         user: {
           id: user._id,
           email: user.email,
-          role: user.role
+          role: user.role,
+          scoutStatus: user.scoutStatus,
+          scoutSettings: user.scoutSettings
         }
       }
     });
@@ -81,7 +83,9 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         user: {
           id: user._id,
           email: user.email,
-          role: user.role
+          role: user.role,
+          scoutStatus: user.scoutStatus,
+          scoutSettings: user.scoutSettings
         }
       }
     });
@@ -109,7 +113,9 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
         user: {
           id: user._id,
           email: user.email,
-          role: user.role
+          role: user.role,
+          scoutStatus: user.scoutStatus,
+          scoutSettings: user.scoutSettings
         }
       }
     });

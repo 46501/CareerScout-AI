@@ -10,6 +10,8 @@ import { OpportunitiesList } from './pages/opportunities/OpportunitiesList';
 import { ApplicationTracker } from './pages/applications/ApplicationTracker';
 import { Assistant } from './pages/assistant/Assistant';
 import { ResumeUpload } from './pages/resume/ResumeUpload';
+import { Profile } from './pages/profile/Profile';
+import { Settings } from './pages/settings/Settings';
 import './index.css';
 
 const queryClient = new QueryClient();
@@ -77,6 +79,16 @@ function App() {
             <Route path="/resume" element={
               <ProtectedRoute>
                 <ResumeUpload />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } />
           </Routes>

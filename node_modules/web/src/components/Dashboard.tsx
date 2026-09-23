@@ -12,12 +12,14 @@ export const Dashboard = () => {
   const [stats, setStats] = useState({ saved: 0, applied: 0, interviews: 0 });
   const [matches, setMatches] = useState<any[]>([]);
 
+  const [isScouting, setIsScouting] = useState(false);
+
   useEffect(() => {
     // Fetch dashboard stats (mocked API call for now, since we haven't built the aggregate endpoint)
     // We'll just fetch a few opportunities to display as top matches
     const fetchDashboardData = async () => {
       try {
-        const oppsRes = await api.get('/opportunities?limit=3');
+        const oppsRes = await api.get('/opportunities?filter=recommended&limit=5');
         setMatches(oppsRes.data.data);
       } catch (e) {
         console.error(e);
@@ -25,6 +27,18 @@ export const Dashboard = () => {
     };
     fetchDashboardData();
   }, []);
+
+  const runScout = async () => {
+    try {
+      setIsScouting(true);
+      const res = await api.post('/scout/run');
+      alert(res.data.message);
+    } catch (err: any) {
+      alert(err.response?.data?.error?.message || 'Failed to run scout');
+    } finally {
+      setIsScouting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -50,6 +64,12 @@ export const Dashboard = () => {
           <Link to="/resume" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
             <FileText className="h-5 w-5 mr-3 text-gray-400" /> My Resume
           </Link>
+          <Link to="/profile" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
+            <User className="h-5 w-5 mr-3 text-gray-400" /> Profile
+          </Link>
+          <Link to="/settings" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
+            <Bot className="h-5 w-5 mr-3 text-gray-400" /> Settings
+          </Link>
         </nav>
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center">
@@ -70,8 +90,8 @@ export const Dashboard = () => {
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-semibold text-gray-900">Overview</h1>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" className="hidden sm:flex">
-              <Bot className="h-4 w-4 mr-2" /> Run AI Scout
+            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={runScout} disabled={isScouting || user?.scoutStatus === 'INCOMPLETE'}>
+              <Bot className="h-4 w-4 mr-2" /> {isScouting ? 'Scouting...' : 'Run AI Scout'}
             </Button>
             <button className="text-gray-400 hover:text-gray-500">
               <Bell className="h-6 w-6" />
@@ -120,7 +140,17 @@ export const Dashboard = () => {
               <CardContent className="p-5 flex items-center justify-between h-full">
                 <div>
                   <h3 className="text-sm font-medium text-primary-100 mb-1">AI Scout Status</h3>
-                  <p className="text-lg font-semibold flex items-center"><span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse" /> Active</p>
+                  <p className="text-lg font-semibold flex items-center">
+                    {user?.scoutStatus === 'ACTIVE' ? (
+                      <><span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse" /> Active</>
+                    ) : user?.scoutStatus === 'READY' ? (
+                      <><span className="w-2 h-2 rounded-full bg-blue-400 mr-2" /> Ready</>
+                    ) : user?.scoutStatus === 'PAUSED' ? (
+                      <><span className="w-2 h-2 rounded-full bg-yellow-400 mr-2" /> Paused</>
+                    ) : (
+                      <><span className="w-2 h-2 rounded-full bg-gray-400 mr-2" /> Incomplete</>
+                    )}
+                  </p>
                 </div>
                 <Bot className="h-10 w-10 text-primary-200 opacity-50" />
               </CardContent>
@@ -153,8 +183,24 @@ export const Dashboard = () => {
                             <h3 className="text-lg font-semibold text-gray-900">{match.title}</h3>
                             <p className="text-sm text-gray-500">{match.organization} • {match.location || match.remoteType}</p>
                           </div>
-                          <Badge variant="success">98% Match</Badge>
+                          {match.matchDetails && (
+                            <Badge variant={match.matchDetails.score >= 80 ? 'success' : 'default'}>
+                              {match.matchDetails.score}% Match
+                            </Badge>
+                          )}
                         </div>
+                        
+                        {match.matchDetails?.reasons && match.matchDetails.reasons.length > 0 && (
+                          <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            <strong>Why it matches:</strong>
+                            <ul className="list-disc pl-4 mt-1">
+                              {match.matchDetails.reasons.map((r: string, i: number) => (
+                                <li key={i}>{r}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
                         <div className="mt-4 flex flex-wrap gap-2">
                           {match.skills?.slice(0, 4).map((s: string) => (
                             <Badge key={s} variant="secondary">{s}</Badge>
