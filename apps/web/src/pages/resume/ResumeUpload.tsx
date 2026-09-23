@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Upload } from 'lucide-react';
 import { BackButton } from '../../components/ui/BackButton';

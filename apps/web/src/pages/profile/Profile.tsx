@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 
 import { BackButton } from '../../components/ui/BackButton';
 
 export const Profile = () => {
-  const { user } = useAuth();
   const [completion, setCompletion] = useState({ percentage: 0, isComplete: false, missingFields: [] as string[] });
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<any>({

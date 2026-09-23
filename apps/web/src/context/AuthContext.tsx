@@ -5,6 +5,8 @@ interface User {
   id: string;
   email: string;
   role: string;
+  scoutStatus?: string;
+  scoutSettings?: any;
 }
 
 interface AuthContextType {
