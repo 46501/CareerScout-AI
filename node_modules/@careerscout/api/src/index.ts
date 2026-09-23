@@ -21,7 +21,10 @@ import applicationRoutes from './routes/application.routes';
 import notificationRoutes from './routes/notification.routes';
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
