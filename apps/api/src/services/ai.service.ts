@@ -1,64 +1,77 @@
-import { GoogleGenAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { z } from 'zod';
 
-const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY || '' });
-
-const ResumeExtractionSchema = z.object({
-  skills: z.array(z.string()),
-  programmingLanguages: z.array(z.string()),
-  frameworks: z.array(z.string()),
-  databases: z.array(z.string()),
-  education: z.array(
-    z.object({
-      degree: z.string(),
-      university: z.string(),
-      graduationYear: z.number()
-    })
-  ),
-  experience: z.array(
-    z.object({
-      title: z.string(),
-      company: z.string(),
-      startDate: z.string(),
-      endDate: z.string().optional()
-    })
-  ),
-  projects: z.array(z.string()),
-  certifications: z.array(z.string()),
-  preferredRoles: z.array(z.string())
-});
+const ai = new GoogleGenerativeAI(process.env.AI_API_KEY || '');
 
 export const extractResumeData = async (resumeText: string) => {
   try {
-    // Basic implementation using Gemini structure (mock/placeholder logic here if API key is empty)
-    if (!process.env.AI_API_KEY) {
-      console.warn('AI_API_KEY not provided, using mock extraction data.');
+    if (!process.env.AI_API_KEY || process.env.AI_API_KEY.includes('your_gemini')) {
+      console.warn('AI_API_KEY not configured. Falling back to mock extraction.');
       return {
-        skills: ['JavaScript', 'TypeScript', 'Node.js'],
-        programmingLanguages: ['TypeScript'],
+        skills: ['JavaScript', 'TypeScript', 'Node.js', 'React'],
+        programmingLanguages: ['JavaScript', 'TypeScript'],
         frameworks: ['React', 'Express'],
-        databases: ['MongoDB'],
+        databases: ['MongoDB', 'PostgreSQL'],
         education: [{ degree: 'B.S. Computer Science', university: 'Mock University', graduationYear: 2024 }],
         experience: [{ title: 'Software Engineering Intern', company: 'Tech Corp', startDate: '2023-06-01', endDate: '2023-08-31' }],
         projects: ['AI Career Scout'],
-        certifications: [],
+        certifications: ['AWS Certified Developer'],
         preferredRoles: ['Software Engineer', 'Full Stack Developer']
       };
     }
 
-    // In a real scenario, use ai.models.generateContent with responseSchema
-    // For now, returning mock to ensure compilation and progress
-    return {
-      skills: ['JavaScript'],
-      programmingLanguages: ['JavaScript'],
-      frameworks: ['React'],
-      databases: ['MongoDB'],
-      education: [],
-      experience: [],
-      projects: [],
-      certifications: [],
-      preferredRoles: []
-    };
+    const model = ai.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            skills: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            programmingLanguages: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            frameworks: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            databases: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            education: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  degree: { type: SchemaType.STRING },
+                  university: { type: SchemaType.STRING },
+                  graduationYear: { type: SchemaType.NUMBER }
+                },
+                required: ['degree', 'university']
+              }
+            },
+            experience: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  title: { type: SchemaType.STRING },
+                  company: { type: SchemaType.STRING },
+                  startDate: { type: SchemaType.STRING },
+                  endDate: { type: SchemaType.STRING }
+                },
+                required: ['title', 'company', 'startDate']
+              }
+            },
+            projects: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            certifications: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            preferredRoles: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+          },
+          required: ['skills', 'programmingLanguages', 'frameworks', 'databases', 'education', 'experience', 'projects', 'certifications', 'preferredRoles']
+        }
+      }
+    });
+
+    const prompt = `Analyze the following resume text and extract all relevant technical skills, programming languages, frameworks, databases, education history, work experience, projects, certifications, and infer up to 3 preferred job roles based on the experience. Extract the data exactly according to the JSON schema provided.\n\nResume Text:\n${resumeText}`;
+    
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const json = JSON.parse(response.text());
+    
+    return json;
   } catch (error) {
     console.error('Failed to extract resume data', error);
     throw new Error('AI extraction failed');
