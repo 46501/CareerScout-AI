@@ -11,13 +11,13 @@ export const runScout = async (req: Request, res: Response, next: NextFunction):
   try {
     const userId = (req as any).user.id;
     
-    // Ensure profile is complete
-    const { isComplete, missingFields } = await calculateProfileCompletion(userId);
-    if (!isComplete) {
+    // Ensure profile is 100% complete
+    const { isComplete, missingFields, percentage } = await calculateProfileCompletion(userId);
+    if (percentage < 100) {
       res.status(403).json({ 
         success: false, 
-        error: { message: 'Profile incomplete. Please complete your profile to run CareerScout.' },
-        data: { missingFields }
+        error: { message: 'Profile must be 100% complete. Please complete your profile to run CareerScout.' },
+        data: { missingFields, percentage }
       });
       return;
     }

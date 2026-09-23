@@ -6,11 +6,13 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
+import { Header } from './Header';
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState({ saved: 0, applied: 0, interviews: 0 });
   const [matches, setMatches] = useState<any[]>([]);
+  const [completionData, setCompletionData] = useState<{ percentage: number, missingFields: string[] } | null>(null);
 
   const [isScouting, setIsScouting] = useState(false);
 
@@ -19,8 +21,14 @@ export const Dashboard = () => {
     // We'll just fetch a few opportunities to display as top matches
     const fetchDashboardData = async () => {
       try {
-        const oppsRes = await api.get('/opportunities?filter=recommended&limit=5');
+        const [oppsRes, compRes] = await Promise.all([
+          api.get('/opportunities?filter=recommended&limit=5'),
+          api.get('/profile/completion')
+        ]);
         setMatches(oppsRes.data.data);
+        if (compRes.data?.success) {
+          setCompletionData(compRes.data.data);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -87,17 +95,11 @@ export const Dashboard = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
         {/* Top header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Overview</h1>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={runScout} disabled={isScouting || user?.scoutStatus === 'INCOMPLETE'}>
-              <Bot className="h-4 w-4 mr-2" /> {isScouting ? 'Scouting...' : 'Run AI Scout'}
-            </Button>
-            <button className="text-gray-400 hover:text-gray-500">
-              <Bell className="h-6 w-6" />
-            </button>
-          </div>
-        </header>
+        <Header 
+          onRunScout={runScout} 
+          isScouting={isScouting} 
+          completionPercentage={completionData?.percentage || 0} 
+        />
 
         {/* Dashboard Grid */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
@@ -230,16 +232,28 @@ export const Dashboard = () => {
                   <CardTitle className="text-base">Profile Strength</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-2 flex justify-between items-center text-sm">
-                    <span className="font-medium text-gray-700">75% Complete</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-primary-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                  </div>
-                  <p className="mt-4 text-sm text-gray-600">
-                    Upload your latest resume to boost your match accuracy.
-                  </p>
-                  <Button variant="outline" size="sm" className="mt-4 w-full">Upload Resume</Button>
+                  <Link to="/profile" className="block group">
+                    <div className="mb-2 flex justify-between items-center text-sm">
+                      <span className="font-medium text-gray-700">{completionData?.percentage || 0}% Complete</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-primary-600 h-2 rounded-full" style={{ width: `${completionData?.percentage || 0}%` }}></div>
+                    </div>
+                    {completionData && !completionData.isComplete && completionData.missingFields.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-sm font-medium text-red-600 mb-1">Missing:</p>
+                        <ul className="text-sm text-gray-600 list-disc pl-4">
+                          {completionData.missingFields.slice(0, 3).map((field, idx) => (
+                            <li key={idx}>{field}</li>
+                          ))}
+                          {completionData.missingFields.length > 3 && (
+                            <li>+ {completionData.missingFields.length - 3} more</li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                    <Button variant="outline" size="sm" className="mt-4 w-full group-hover:bg-gray-50">Complete Profile</Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>

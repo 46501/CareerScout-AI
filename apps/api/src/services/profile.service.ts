@@ -49,14 +49,26 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
   if (profile.preferences?.preferredLocations && profile.preferences.preferredLocations.length > 0) score += 10;
   else missingFields.push('Preferred Locations');
 
+  const { Resume } = await import('../models/Resume');
+  const resume = await Resume.findOne({ userId, status: 'CONFIRMED' });
+  if (resume) score += 10;
+  else missingFields.push('Resume');
+
   const percentage = Math.min(score, maxScore);
-  const isComplete = percentage >= 70; // Configurable threshold
+  const isComplete = percentage === 100; // Requires 100%
 
   // Update user status if threshold is met and they are currently INCOMPLETE
   if (isComplete) {
     const user = await User.findById(userId);
     if (user && user.scoutStatus === 'INCOMPLETE') {
       user.scoutStatus = 'READY';
+      await user.save();
+    }
+  } else {
+    // If user deleted something and is no longer 100%
+    const user = await User.findById(userId);
+    if (user && user.scoutStatus !== 'INCOMPLETE') {
+      user.scoutStatus = 'INCOMPLETE';
       await user.save();
     }
   }
