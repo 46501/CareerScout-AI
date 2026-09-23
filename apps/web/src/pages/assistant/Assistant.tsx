@@ -3,6 +3,7 @@ import { Bot, Send } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent } from '../../components/ui/Card';
+import { BackButton } from '../../components/ui/BackButton';
 
 export function Assistant() {
   const [messages, setMessages] = useState([
@@ -22,6 +23,7 @@ export function Assistant() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 flex flex-col">
       <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
+        <BackButton fallback="/dashboard" label="Back to Dashboard" />
         <div className="mb-6 flex items-center">
           <Bot className="h-8 w-8 text-primary-600 mr-3" />
           <div>

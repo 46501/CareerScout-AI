@@ -4,6 +4,8 @@ import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 
+import { BackButton } from '../../components/ui/BackButton';
+
 export const Profile = () => {
   const { user } = useAuth();
   const [completion, setCompletion] = useState({ percentage: 0, isComplete: false, missingFields: [] as string[] });
@@ -65,6 +67,7 @@ export const Profile = () => {
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 pb-20">
+      <BackButton fallback="/dashboard" label="Back to Dashboard" />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Profile</h1>
         {!isEditing ? (

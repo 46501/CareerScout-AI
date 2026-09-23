@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { BackButton } from '../../components/ui/BackButton';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 
@@ -31,7 +32,8 @@ export const Settings = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+      <BackButton fallback="/dashboard" label="Back to Dashboard" />
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
       
       <Card className="mb-6">
