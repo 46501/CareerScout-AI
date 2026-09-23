@@ -18,7 +18,7 @@ export function Login() {
     try {
       setError('');
       await login({ email, password });
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error?.message || 'Login failed');
     }

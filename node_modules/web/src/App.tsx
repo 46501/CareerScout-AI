@@ -18,7 +18,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" replace />;
+  
+  return <>{children}</>;
+};
+
+const GuestRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (user) return <Navigate to="/dashboard" replace />;
   
   return <>{children}</>;
 };
@@ -30,8 +39,16 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            } />
+            <Route path="/register" element={
+              <GuestRoute>
+                <Register />
+              </GuestRoute>
+            } />
             <Route path="/onboarding" element={
               <ProtectedRoute>
                 <OnboardingWizard />

@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 // Load .env from monorepo root
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
@@ -26,6 +27,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan('dev'));
 
 // Static path for uploads

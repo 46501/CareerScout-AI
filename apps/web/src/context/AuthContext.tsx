@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../lib/api';
+import api, { setAccessToken } from '../lib/api';
 
 interface User {
   id: string;
@@ -38,16 +38,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (data: any) => {
     const response = await api.post('/auth/login', data);
+    const token = response.data?.data?.accessToken;
+    if (token) setAccessToken(token);
     setUser(response.data.data.user);
   };
 
   const register = async (data: any) => {
     const response = await api.post('/auth/register', data);
+    const token = response.data?.data?.accessToken;
+    if (token) setAccessToken(token);
     setUser(response.data.data.user);
   };
 
   const logout = async () => {
     await api.post('/auth/logout');
+    setAccessToken(null);
     setUser(null);
   };
 

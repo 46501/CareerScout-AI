@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -113,6 +113,28 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
         }
       }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+export const refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      res.status(401).json({ success: false, error: { message: 'Refresh token not found' } });
+      return;
+    }
+    
+    try {
+      const decoded = verifyRefreshToken(refreshToken);
+      const accessToken = generateAccessToken(decoded.id as any, decoded.role);
+      res.status(200).json({ success: true, data: { accessToken } });
+    } catch (err) {
+      res.status(401).json({ success: false, error: { message: 'Invalid refresh token' } });
+    }
   } catch (error) {
     next(error);
   }
