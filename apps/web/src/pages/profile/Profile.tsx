@@ -55,13 +55,26 @@ export const Profile = () => {
 
   const handleSave = async () => {
     try {
-      await api.put('/profile', profileData);
+      const res = await api.put('/profile', profileData);
+      
+      if (res.data?.success && res.data.data) {
+        const updated = res.data.data;
+        setProfileData({ 
+          personal: { ...DEFAULT_PROFILE_DATA.personal, ...updated.personal },
+          education: updated.education || [],
+          skills: { ...DEFAULT_PROFILE_DATA.skills, ...updated.skills },
+          experience: updated.experience || [],
+          careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...updated.careerGoals },
+          locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...updated.locationPreferences }
+        });
+      }
+
       alert('Profile updated successfully.');
       setIsEditing(false);
       fetchProfile(); // refresh completion status
     } catch (error) {
-      console.error(error);
-      alert('Failed to save profile');
+      console.error('Save profile error:', error);
+      alert('Unable to save profile. Please try again.');
     }
   };
 
