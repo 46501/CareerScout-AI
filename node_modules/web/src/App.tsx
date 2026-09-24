@@ -9,7 +9,6 @@ import { OnboardingWizard } from './pages/onboarding/OnboardingWizard';
 import { OpportunitiesList } from './pages/opportunities/OpportunitiesList';
 import { ApplicationTracker } from './pages/applications/ApplicationTracker';
 import { Assistant } from './pages/assistant/Assistant';
-import { ResumeUpload } from './pages/resume/ResumeUpload';
 import { Profile } from './pages/profile/Profile';
 import { Settings } from './pages/settings/Settings';
 import './index.css';
@@ -74,11 +73,6 @@ function App() {
             <Route path="/assistant" element={
               <ProtectedRoute>
                 <Assistant />
-              </ProtectedRoute>
-            } />
-            <Route path="/resume" element={
-              <ProtectedRoute>
-                <ResumeUpload />
               </ProtectedRoute>
             } />
             <Route path="/profile" element={

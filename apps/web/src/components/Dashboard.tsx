@@ -69,9 +69,6 @@ export const Dashboard = () => {
           <Link to="/assistant" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
             <Bot className="h-5 w-5 mr-3 text-gray-400" /> AI Assistant
           </Link>
-          <Link to="/resume" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
-            <FileText className="h-5 w-5 mr-3 text-gray-400" /> My Resume
-          </Link>
           <Link to="/profile" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900">
             <User className="h-5 w-5 mr-3 text-gray-400" /> Profile
           </Link>

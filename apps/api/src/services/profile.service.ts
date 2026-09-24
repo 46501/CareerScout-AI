@@ -8,7 +8,7 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
     return {
       percentage: 0,
       isComplete: false,
-      missingFields: ['CareerProfile']
+      missingFields: ['Basic Information'] // If no profile, everything is missing
     };
   }
 
@@ -16,43 +16,72 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
   let score = 0;
   const maxScore = 100;
 
-  // Personal Info (20%)
-  if (profile.personal?.fullName) score += 10;
-  else missingFields.push('Full Name');
-  
-  if (profile.personal?.phone) score += 10;
-  else missingFields.push('Phone Number');
+  // 1. Basic Information (15%)
+  if (profile.personal?.fullName && profile.personal?.currentCity) {
+    score += 15;
+  } else {
+    missingFields.push('Basic Information');
+  }
 
-  // Education (20%)
-  if (profile.education && profile.education.length > 0) score += 20;
-  else missingFields.push('Education History');
+  // 2. Education (15%)
+  if (profile.education && profile.education.length > 0) {
+    score += 15;
+  } else {
+    missingFields.push('Education');
+  }
 
-  // Skills (20%)
+  // 3. Technical Skills (15%)
   const hasSkills = 
-    profile.skills?.programmingLanguages?.length > 0 ||
-    profile.skills?.frameworks?.length > 0 ||
-    profile.skills?.databases?.length > 0 ||
-    profile.skills?.cloud?.length > 0 ||
-    profile.skills?.otherSkills?.length > 0;
+    (profile.skills?.programmingLanguages?.length > 0) ||
+    (profile.skills?.webDevelopment?.length > 0) ||
+    (profile.skills?.aiMachineLearning?.length > 0) ||
+    (profile.skills?.databases?.length > 0) ||
+    (profile.skills?.devopsCloud?.length > 0);
     
-  if (hasSkills) score += 20;
-  else missingFields.push('Skills');
+  if (hasSkills) {
+    score += 15;
+  } else {
+    missingFields.push('Technical Skills');
+  }
 
-  // Experience/Projects (20%)
-  if (profile.experience && profile.experience.length > 0) score += 20;
-  else missingFields.push('Experience or Projects');
+  // 4. Experience (15%)
+  if (profile.experience && profile.experience.length > 0) {
+    score += 15;
+  } else {
+    missingFields.push('Experience');
+  }
 
-  // Preferences (20%)
-  if (profile.preferences?.preferredRoles && profile.preferences.preferredRoles.length > 0) score += 10;
-  else missingFields.push('Preferred Roles');
+  // 5. Career Goals (15%)
+  const hasCareerGoals = 
+    (profile.careerGoals?.lookingFor?.length > 0) &&
+    (profile.careerGoals?.targetRoles?.length > 0) &&
+    (profile.careerGoals?.careerGoal);
   
-  if (profile.preferences?.preferredLocations && profile.preferences.preferredLocations.length > 0) score += 10;
-  else missingFields.push('Preferred Locations');
+  if (hasCareerGoals) {
+    score += 15;
+  } else {
+    missingFields.push('Career Goals');
+  }
 
+  // 6. Preferred Location (10%)
+  const hasLocationPrefs = 
+    (profile.locationPreferences?.preferredLocations?.length > 0) &&
+    (profile.locationPreferences?.workPreference?.length > 0);
+
+  if (hasLocationPrefs) {
+    score += 10;
+  } else {
+    missingFields.push('Preferred Location');
+  }
+
+  // 7. Resume (15%)
   const { Resume } = await import('../models/Resume');
   const resume = await Resume.findOne({ userId, status: 'CONFIRMED' });
-  if (resume) score += 10;
-  else missingFields.push('Resume');
+  if (resume) {
+    score += 15;
+  } else {
+    missingFields.push('Resume');
+  }
 
   const percentage = Math.min(score, maxScore);
   const isComplete = percentage === 100; // Requires 100%
