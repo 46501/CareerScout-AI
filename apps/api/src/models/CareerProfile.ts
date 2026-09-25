@@ -37,6 +37,7 @@ export interface ICareerProfile extends Document {
     description?: string;
     technologiesUsed: string[];
   }>;
+  hasNoExperience?: boolean;
   careerGoals: {
     lookingFor: string[];
     targetRoles: string[];
@@ -60,7 +61,7 @@ const CareerProfileSchema = new Schema<ICareerProfile>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     personal: {
-      fullName: { type: String, required: true },
+      fullName: { type: String },
       phone: { type: String },
       profilePhoto: { type: String },
       currentCity: { type: String },
@@ -70,11 +71,11 @@ const CareerProfileSchema = new Schema<ICareerProfile>(
     },
     education: [
       {
-        college: { type: String, required: true },
-        degree: { type: String, required: true },
-        branch: { type: String, required: true },
-        startYear: { type: Number, required: true },
-        graduationYear: { type: Number, required: true },
+        college: { type: String },
+        degree: { type: String },
+        branch: { type: String },
+        startYear: { type: Number },
+        graduationYear: { type: Number },
         cgpa: { type: String },
       },
     ],
@@ -87,10 +88,10 @@ const CareerProfileSchema = new Schema<ICareerProfile>(
     },
     experience: [
       {
-        company: { type: String, required: true },
-        title: { type: String, required: true },
+        company: { type: String },
+        title: { type: String },
         employmentType: { type: String, default: 'Full-time' },
-        startDate: { type: Date, required: true },
+        startDate: { type: Date },
         endDate: { type: Date },
         currentlyWorking: { type: Boolean, default: false },
         location: { type: String },
@@ -98,6 +99,7 @@ const CareerProfileSchema = new Schema<ICareerProfile>(
         technologiesUsed: [{ type: String }],
       },
     ],
+    hasNoExperience: { type: Boolean, default: false },
     careerGoals: {
       lookingFor: [{ type: String }],
       targetRoles: [{ type: String }],

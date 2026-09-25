@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Briefcase, Plus, Trash2 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 
-export const ExperienceSection = ({ data = [], onChange, isEditing }: any) => {
+export const ExperienceSection = ({ data = [], onChange, isEditing, hasNoExperience = false, onNoExperienceChange }: any) => {
   const addExperience = () => {
     onChange([...data, { company: '', title: '', employmentType: 'Full-time', startDate: '', endDate: '', currentlyWorking: false, location: '', description: '', technologiesUsed: [] }]);
   };
@@ -28,14 +28,31 @@ export const ExperienceSection = ({ data = [], onChange, isEditing }: any) => {
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="flex items-center"><Briefcase className="mr-2 h-5 w-5"/> Experience</CardTitle>
         {isEditing && (
-          <Button variant="outline" size="sm" onClick={addExperience}>
+          <Button variant="outline" size="sm" onClick={addExperience} disabled={hasNoExperience}>
             <Plus className="h-4 w-4 mr-1" /> Add Experience
           </Button>
         )}
       </CardHeader>
       <CardContent>
+        {isEditing && data.length === 0 && (
+          <div className="mb-4 flex items-center bg-gray-50 p-3 rounded-md">
+            <input 
+              type="checkbox" 
+              id="noExperience"
+              checked={hasNoExperience}
+              onChange={(e) => onNoExperienceChange(e.target.checked)}
+              className="mr-2 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
+            />
+            <label htmlFor="noExperience" className="text-sm font-medium text-gray-700 cursor-pointer">
+              I have no experience yet (Student / Fresher)
+            </label>
+          </div>
+        )}
+
         {data.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">No experience entries added yet.</p>
+          <p className="text-gray-500 text-sm text-center py-4">
+            {hasNoExperience ? 'No experience required.' : 'No experience entries added yet.'}
+          </p>
         ) : (
           <div className="space-y-6 mt-4">
             {data.map((exp: any, i: number) => (

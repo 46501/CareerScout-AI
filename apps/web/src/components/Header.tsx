@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
 
   const handleRunScout = () => {
     if (completionPercentage < 100) {
+      alert('Complete your profile before running CareerScout.');
       navigate('/profile');
     } else {
       onRunScout();

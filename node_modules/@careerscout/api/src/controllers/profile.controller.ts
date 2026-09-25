@@ -12,7 +12,24 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    res.status(200).json({ success: true, data: profile });
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+      return;
+    }
+    const completion = await calculateProfileCompletion(userId);
+
+    res.status(200).json({ 
+      success: true, 
+      data: {
+        profile,
+        profileCompletion: {
+          percentage: completion.percentage,
+          completedSections: completion.completedSections,
+          missingFields: completion.missingFields
+        }
+      } 
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: { message: 'Server error' } });
   }
@@ -33,7 +50,20 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
       { new: true, upsert: true, runValidators: true }
     );
 
-    res.status(200).json({ success: true, data: profile, message: 'Profile updated successfully' });
+    const completion = await calculateProfileCompletion(userId as string);
+
+    res.status(200).json({ 
+      success: true, 
+      message: 'Profile updated successfully',
+      data: {
+        profile,
+        profileCompletion: {
+          percentage: completion.percentage,
+          completedSections: completion.completedSections,
+          missingFields: completion.missingFields
+        }
+      }
+    });
   } catch (error) {
     console.error('Error updating profile:', error);
     res.status(500).json({ success: false, error: { message: 'Server error' } });

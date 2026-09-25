@@ -17,6 +17,7 @@ const DEFAULT_PROFILE_DATA = {
   education: [],
   skills: { programmingLanguages: [], webDevelopment: [], aiMachineLearning: [], databases: [], devopsCloud: [] },
   experience: [],
+  hasNoExperience: false,
   careerGoals: { lookingFor: [], targetRoles: [], interestedTechnologies: [], careerInterests: [], careerGoal: '' },
   locationPreferences: { preferredLocations: [], workPreference: [], willingToRelocate: false }
 };
@@ -28,24 +29,30 @@ export const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const [compRes, profRes] = await Promise.all([
-        api.get('/profile/completion'),
-        api.get('/profile')
-      ]);
-      if (compRes.data?.success) setCompletion(compRes.data.data);
+      const profRes = await api.get('/profile');
       if (profRes.data?.success && profRes.data.data) {
-        // Merge with defaults to prevent missing objects
+        const { profile, profileCompletion } = profRes.data.data;
+        if (profileCompletion) setCompletion(profileCompletion);
+        
         setProfileData({ 
-          personal: { ...DEFAULT_PROFILE_DATA.personal, ...profRes.data.data.personal },
-          education: profRes.data.data.education || [],
-          skills: { ...DEFAULT_PROFILE_DATA.skills, ...profRes.data.data.skills },
-          experience: profRes.data.data.experience || [],
-          careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...profRes.data.data.careerGoals },
-          locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...profRes.data.data.locationPreferences }
+          personal: { ...DEFAULT_PROFILE_DATA.personal, ...profile?.personal },
+          education: profile?.education || [],
+          skills: { ...DEFAULT_PROFILE_DATA.skills, ...profile?.skills },
+          experience: profile?.experience || [],
+          hasNoExperience: profile?.hasNoExperience || false,
+          careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...profile?.careerGoals },
+          locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...profile?.locationPreferences }
         });
       }
-    } catch (err) {
-      console.error('Failed to fetch profile', err);
+    } catch (err: any) {
+      // If 404, we don't need to throw an error since they just might be a new user.
+      if (err.response?.status !== 404) {
+        console.error('Failed to fetch profile', err);
+      }
+      
+      // In either case, attempt to fallback to /profile/completion to ensure completion data loads for 0%
+      const compRes = await api.get('/profile/completion').catch(() => null);
+      if (compRes?.data?.success) setCompletion(compRes.data.data);
     }
   };
 
@@ -71,7 +78,6 @@ export const Profile = () => {
 
       alert('Profile updated successfully.');
       setIsEditing(false);
-      fetchProfile(); // refresh completion status
     } catch (error) {
       console.error('Save profile error:', error);
       alert('Unable to save profile. Please try again.');
@@ -146,7 +152,13 @@ export const Profile = () => {
         <BasicInfoSection data={profileData.personal} onChange={handleSectionChange('personal')} isEditing={isEditing} />
         <EducationSection data={profileData.education} onChange={handleSectionChange('education')} isEditing={isEditing} />
         <SkillsSection data={profileData.skills} onChange={handleSectionChange('skills')} isEditing={isEditing} />
-        <ExperienceSection data={profileData.experience} onChange={handleSectionChange('experience')} isEditing={isEditing} />
+        <ExperienceSection 
+          data={profileData.experience} 
+          onChange={handleSectionChange('experience')} 
+          isEditing={isEditing} 
+          hasNoExperience={profileData.hasNoExperience}
+          onNoExperienceChange={(val: boolean) => setProfileData((prev: any) => ({ ...prev, hasNoExperience: val }))}
+        />
         <CareerGoalsSection data={profileData.careerGoals} onChange={handleSectionChange('careerGoals')} isEditing={isEditing} />
         <LocationPrefsSection data={profileData.locationPreferences} onChange={handleSectionChange('locationPreferences')} isEditing={isEditing} />
         <ResumeSection isEditing={isEditing} fetchProfile={fetchProfile} />

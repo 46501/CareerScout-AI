@@ -8,29 +8,32 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
     return {
       percentage: 0,
       isComplete: false,
-      missingFields: ['Basic Information'] // If no profile, everything is missing
+      completedSections: [],
+      missingFields: ['Basic Information', 'Education', 'Technical Skills', 'Experience', 'Career Goals', 'Preferred Location', 'Resume']
     };
   }
 
+  const completedSections: string[] = [];
   const missingFields: string[] = [];
-  let score = 0;
-  const maxScore = 100;
-
-  // 1. Basic Information (15%)
-  if (profile.personal?.fullName && profile.personal?.currentCity) {
-    score += 15;
+  
+  // 1. Basic Information
+  if (profile.personal?.fullName && profile.personal?.phone && profile.personal?.currentCity) {
+    completedSections.push('Basic Information');
   } else {
     missingFields.push('Basic Information');
   }
 
-  // 2. Education (15%)
-  if (profile.education && profile.education.length > 0) {
-    score += 15;
+  // 2. Education
+  const hasValidEducation = profile.education?.some(edu => 
+    edu.college && edu.degree && edu.branch && edu.graduationYear
+  );
+  if (hasValidEducation) {
+    completedSections.push('Education');
   } else {
     missingFields.push('Education');
   }
 
-  // 3. Technical Skills (15%)
+  // 3. Technical Skills
   const hasSkills = 
     (profile.skills?.programmingLanguages?.length > 0) ||
     (profile.skills?.webDevelopment?.length > 0) ||
@@ -39,52 +42,52 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
     (profile.skills?.devopsCloud?.length > 0);
     
   if (hasSkills) {
-    score += 15;
+    completedSections.push('Technical Skills');
   } else {
     missingFields.push('Technical Skills');
   }
 
-  // 4. Experience (15%)
-  if (profile.experience && profile.experience.length > 0) {
-    score += 15;
+  // 4. Experience
+  const hasExperience = (profile.experience && profile.experience.length > 0);
+  if (hasExperience || profile.hasNoExperience) {
+    completedSections.push('Experience');
   } else {
     missingFields.push('Experience');
   }
 
-  // 5. Career Goals (15%)
+  // 5. Career Goals
   const hasCareerGoals = 
-    (profile.careerGoals?.lookingFor?.length > 0) &&
     (profile.careerGoals?.targetRoles?.length > 0) &&
     (profile.careerGoals?.careerGoal);
   
   if (hasCareerGoals) {
-    score += 15;
+    completedSections.push('Career Goals');
   } else {
     missingFields.push('Career Goals');
   }
 
-  // 6. Preferred Location (10%)
+  // 6. Preferred Location
   const hasLocationPrefs = 
     (profile.locationPreferences?.preferredLocations?.length > 0) &&
     (profile.locationPreferences?.workPreference?.length > 0);
 
   if (hasLocationPrefs) {
-    score += 10;
+    completedSections.push('Preferred Location');
   } else {
     missingFields.push('Preferred Location');
   }
 
-  // 7. Resume (15%)
+  // 7. Resume
   const { Resume } = await import('../models/Resume');
   const resume = await Resume.findOne({ userId, status: 'CONFIRMED' });
   if (resume) {
-    score += 15;
+    completedSections.push('Resume');
   } else {
     missingFields.push('Resume');
   }
 
-  const percentage = Math.min(score, maxScore);
-  const isComplete = percentage === 100; // Requires 100%
+  const percentage = Math.round((completedSections.length / 7) * 100);
+  const isComplete = completedSections.length === 7;
 
   // Update user status if threshold is met and they are currently INCOMPLETE
   if (isComplete) {
@@ -105,6 +108,7 @@ export const calculateProfileCompletion = async (userId: mongoose.Types.ObjectId
   return {
     percentage,
     isComplete,
+    completedSections,
     missingFields
   };
 };
