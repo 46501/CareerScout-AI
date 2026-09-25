@@ -1,9 +1,10 @@
+import { NextFunction } from 'express';
 import { Response } from 'express';
 // Trigger tsx watch restart
 import { CareerProfile } from '../models/CareerProfile';
 import { AuthRequest } from '../middleware/auth.middleware';
 
-export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const profile = await CareerProfile.findOne({ userId: req.user?.id });
     
@@ -31,11 +32,11 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
       } 
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };
 
-export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user?.id;
     const profileData = req.body;
@@ -66,13 +67,13 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     });
   } catch (error) {
     console.error('Error updating profile:', error);
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };
 
 import { calculateProfileCompletion } from '../services/profile.service';
 
-export const getProfileCompletion = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getProfileCompletion = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -83,6 +84,6 @@ export const getProfileCompletion = async (req: AuthRequest, res: Response): Pro
     const completion = await calculateProfileCompletion(userId);
     res.status(200).json({ success: true, data: completion });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };

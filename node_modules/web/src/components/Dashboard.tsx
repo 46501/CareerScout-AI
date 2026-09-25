@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Bot, LayoutDashboard, User, FileText, Bell, Search, Star, Clock, CheckCircle, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card';
+import { Briefcase, Bot, LayoutDashboard, User, Search, Star, Clock, CheckCircle, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAuth } from '../context/AuthContext';
@@ -10,9 +10,9 @@ import { Header } from './Header';
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
-  const [stats, setStats] = useState({ saved: 0, applied: 0, interviews: 0 });
+  const [stats] = useState({ saved: 0, applied: 0, interviews: 0 });
   const [matches, setMatches] = useState<any[]>([]);
-  const [completionData, setCompletionData] = useState<{ percentage: number, missingFields: string[] } | null>(null);
+  const [completionData, setCompletionData] = useState<{ percentage: number, missingFields: string[], isComplete?: boolean } | null>(null);
 
   const [isScouting, setIsScouting] = useState(false);
 

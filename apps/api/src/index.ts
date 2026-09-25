@@ -44,9 +44,13 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/scout', scoutRoutes);
 
+import { errorHandler } from './middleware/error.middleware';
+
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, message: 'CareerScout API is healthy' });
 });
+
+app.use(errorHandler);
 
 async function startServer() {
   try {

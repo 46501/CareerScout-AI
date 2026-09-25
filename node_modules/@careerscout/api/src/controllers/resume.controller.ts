@@ -1,12 +1,13 @@
+import { NextFunction } from 'express';
 import { Response } from 'express';
 import { Resume } from '../models/Resume';
 import { AuthRequest } from '../middleware/auth.middleware';
 import fs from 'fs/promises';
 import path from 'path';
-import pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 import { extractResumeData } from '../services/ai.service';
 
-export const uploadResume = async (req: AuthRequest, res: Response): Promise<void> => {
+export const uploadResume = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ success: false, error: { message: 'No file uploaded' } });
@@ -61,11 +62,11 @@ export const uploadResume = async (req: AuthRequest, res: Response): Promise<voi
 
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };
 
-export const getResume = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getResume = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const resume = await Resume.findOne({ userId: req.user?.id }).sort({ createdAt: -1 });
     
@@ -76,11 +77,11 @@ export const getResume = async (req: AuthRequest, res: Response): Promise<void> 
 
     res.status(200).json({ success: true, data: resume });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };
 
-export const confirmResumeExtraction = async (req: AuthRequest, res: Response): Promise<void> => {
+export const confirmResumeExtraction = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { parsedData } = req.body;
     
@@ -97,6 +98,6 @@ export const confirmResumeExtraction = async (req: AuthRequest, res: Response): 
 
     res.status(200).json({ success: true, data: resume, message: 'Resume extraction confirmed' });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };

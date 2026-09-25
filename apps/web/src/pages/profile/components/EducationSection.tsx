@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
-import { GraduationCap, Plus, Trash2, Edit2 } from 'lucide-react';
+import { GraduationCap, Plus, Trash2 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 
 export const EducationSection = ({ data = [], onChange, isEditing }: any) => {

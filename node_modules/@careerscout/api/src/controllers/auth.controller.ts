@@ -94,7 +94,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   }
 };
 
-export const logout = async (req: Request, res: Response): Promise<void> => {
+export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   res.clearCookie('refreshToken');
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 };

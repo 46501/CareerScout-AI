@@ -1,7 +1,8 @@
+import { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { Opportunity } from '../models/Opportunity';
 
-export const getOpportunities = async (req: Request, res: Response): Promise<void> => {
+export const getOpportunities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { page = 1, limit = 20, type, location, skills, filter } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
@@ -74,11 +75,11 @@ export const getOpportunities = async (req: Request, res: Response): Promise<voi
       }
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };
 
-export const getOpportunityById = async (req: Request, res: Response): Promise<void> => {
+export const getOpportunityById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const opportunity = await Opportunity.findById(req.params.id);
     
@@ -89,6 +90,6 @@ export const getOpportunityById = async (req: Request, res: Response): Promise<v
 
     res.status(200).json({ success: true, data: opportunity });
   } catch (error) {
-    res.status(500).json({ success: false, error: { message: 'Server error' } });
+    next(error);
   }
 };

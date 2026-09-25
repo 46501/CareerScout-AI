@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
+// @ts-ignore
 import { Opportunity } from '../../api/src/models/Opportunity';
+// @ts-ignore
 import { CareerProfile } from '../../api/src/models/CareerProfile';
+// @ts-ignore
 import { UserOpportunityMatch } from '../../api/src/models/UserOpportunityMatch';
 
 export const runPersonalizedScout = async (userId: string) => {
@@ -10,7 +13,7 @@ export const runPersonalizedScout = async (userId: string) => {
   // Step 1: Generate personalized query rules
   const targetRoles = profile.careerGoals?.targetRoles || [];
   
-  const extractSkills = (skillCat: any[]) => skillCat ? skillCat.map(s => s.name) : [];
+  const extractSkills = (skillCat: any[]) => skillCat ? skillCat.map((s: any) => s.name) : [];
   
   const targetSkills = [
     ...extractSkills(profile.skills?.programmingLanguages || []),
@@ -34,7 +37,7 @@ export const runPersonalizedScout = async (userId: string) => {
     if (opp.skills && opp.skills.length > 0) {
       let skillHits = 0;
       for (const skill of opp.skills) {
-        if (targetSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase())) {
+        if (targetSkills.map((s: string) => s.toLowerCase()).includes(skill.toLowerCase())) {
           skillHits++;
           matchedSkills.push(skill);
         } else {
@@ -57,7 +60,7 @@ export const runPersonalizedScout = async (userId: string) => {
 
     // Evaluate Role Match (Weight: 20%)
     if (targetRoles.length > 0) {
-      const isRoleMatch = targetRoles.some(role => opp.title.toLowerCase().includes(role.toLowerCase()));
+      const isRoleMatch = targetRoles.some((role: string) => opp.title.toLowerCase().includes(role.toLowerCase()));
       if (isRoleMatch) {
         score += 20;
         matchReasons.push(`Title matches your preferred role`);
@@ -68,13 +71,13 @@ export const runPersonalizedScout = async (userId: string) => {
 
     // Evaluate Location/Remote (Weight: 15%)
     let locScore = 0;
-    const workPrefs = profile.locationPreferences?.workPreference?.map(p => p.toLowerCase()) || [];
-    const locPrefs = profile.locationPreferences?.preferredLocations?.map(p => p.toLowerCase()) || [];
+    const workPrefs = profile.locationPreferences?.workPreference?.map((p: string) => p.toLowerCase()) || [];
+    const locPrefs = profile.locationPreferences?.preferredLocations?.map((p: string) => p.toLowerCase()) || [];
     
     if (opp.remoteType === 'REMOTE' && workPrefs.includes('remote')) {
       locScore = 15;
       matchReasons.push('Matches your remote work preference');
-    } else if (locPrefs.some(loc => opp.location?.toLowerCase().includes(loc))) {
+    } else if (locPrefs.some((loc: string) => opp.location?.toLowerCase().includes(loc))) {
       locScore = 15;
       matchReasons.push(`Matches your preferred location (${opp.location})`);
     } else {
@@ -84,7 +87,7 @@ export const runPersonalizedScout = async (userId: string) => {
 
     // Evaluate Type (Weight: 15%)
     let typeScore = 0;
-    const lookingFor = profile.careerGoals?.lookingFor?.map(l => l.toLowerCase()) || [];
+    const lookingFor = profile.careerGoals?.lookingFor?.map((l: string) => l.toLowerCase()) || [];
     
     if (opp.type === 'JOB' && lookingFor.includes('job')) {
       typeScore = 15;
