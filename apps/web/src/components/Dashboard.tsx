@@ -213,7 +213,9 @@ export const Dashboard = () => {
                         <div className="flex text-sm text-gray-500">
                           <Clock className="h-4 w-4 mr-1" /> 2 days left
                         </div>
-                        <Button className="mt-4 sm:mt-0">Apply Now</Button>
+                        <Button className="mt-4 sm:mt-0" onClick={() => window.open(match.applicationUrl, '_blank', 'noopener,noreferrer')}>
+                          Apply Now
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

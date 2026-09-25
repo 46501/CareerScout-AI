@@ -1,6 +1,10 @@
 import { Response } from 'express';
 import { Resume } from '../models/Resume';
 import { AuthRequest } from '../middleware/auth.middleware';
+import fs from 'fs/promises';
+import path from 'path';
+import pdfParse from 'pdf-parse';
+import { extractResumeData } from '../services/ai.service';
 
 export const uploadResume = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -9,19 +13,54 @@ export const uploadResume = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    // Abstract storage (we use local file path here for development)
     const fileUrl = `/uploads/${req.file.filename}`;
     
-    const resume = await Resume.create({
-      userId: req.user?.id,
-      fileUrl,
-      fileName: req.file.originalname,
-      fileType: req.file.mimetype,
-      status: 'PENDING'
-    });
+    // Create initial resume record
+    let resume = await Resume.findOneAndUpdate(
+      { userId: req.user?.id },
+      {
+        fileUrl,
+        fileName: req.file.originalname,
+        fileType: req.file.mimetype,
+        status: 'PROCESSING'
+      },
+      { upsert: true, new: true, sort: { createdAt: -1 } }
+    );
 
-    res.status(201).json({ success: true, data: resume, message: 'Resume uploaded successfully' });
+    res.status(201).json({ success: true, data: resume, message: 'Resume uploaded and processing started' });
+
+    // Process asynchronously
+    try {
+      const filePath = path.join(process.cwd(), 'uploads', req.file.filename);
+      const dataBuffer = await fs.readFile(filePath);
+      
+      let text = '';
+      if (req.file.mimetype === 'application/pdf') {
+        const data = await pdfParse(dataBuffer);
+        text = data.text;
+      } else {
+        // Fallback for docx or other formats if needed, for MVP we'll just extract raw text if possible
+        text = dataBuffer.toString('utf-8');
+      }
+
+      const extractedData = await extractResumeData(text);
+      
+      await Resume.findByIdAndUpdate(resume._id, {
+        parsedData: extractedData,
+        status: 'EXTRACTED',
+        aiDetected: {
+          skillsCount: extractedData.skills?.length || 0,
+          eduCount: extractedData.education?.length || 0,
+          expCount: extractedData.experience?.length || 0
+        }
+      });
+    } catch (processErr) {
+      console.error('Resume processing error:', processErr);
+      await Resume.findByIdAndUpdate(resume._id, { status: 'FAILED' });
+    }
+
   } catch (error) {
+    console.error('Upload error:', error);
     res.status(500).json({ success: false, error: { message: 'Server error' } });
   }
 };

@@ -8,22 +8,22 @@ export const runPersonalizedScout = async (userId: string) => {
   if (!profile) throw new Error('Career profile not found for user');
 
   // Step 1: Generate personalized query rules
-  // In a real application, we would call Gemini to generate complex boolean logic
-  // For this optimized MVP, we'll use deterministic mapping
-  const targetRoles = profile.preferences?.preferredRoles || [];
+  const targetRoles = profile.careerGoals?.targetRoles || [];
+  
+  const extractSkills = (skillCat: any[]) => skillCat ? skillCat.map(s => s.name) : [];
+  
   const targetSkills = [
-    ...(profile.skills?.programmingLanguages || []),
-    ...(profile.skills?.frameworks || []),
-    ...(profile.skills?.databases || []),
-    ...(profile.skills?.cloud || [])
+    ...extractSkills(profile.skills?.programmingLanguages || []),
+    ...extractSkills(profile.skills?.webDevelopment || []),
+    ...extractSkills(profile.skills?.aiMachineLearning || []),
+    ...extractSkills(profile.skills?.databases || []),
+    ...extractSkills(profile.skills?.devopsCloud || [])
   ];
 
   // Step 2: Fetch broad matches from DB
-  // Optimize: query only active opportunities created recently or where source matches
   const broadMatches = await Opportunity.find({ isActive: true });
 
   // Step 3: Compute localized match score
-  // We'll iterate through opportunities and calculate a deterministic score
   for (const opp of broadMatches) {
     let score = 0;
     const matchedSkills: string[] = [];
@@ -56,18 +56,25 @@ export const runPersonalizedScout = async (userId: string) => {
     }
 
     // Evaluate Role Match (Weight: 20%)
-    const isRoleMatch = targetRoles.some(role => opp.title.toLowerCase().includes(role.toLowerCase()));
-    if (isRoleMatch) {
-      score += 20;
-      matchReasons.push(`Title matches your preferred role`);
+    if (targetRoles.length > 0) {
+      const isRoleMatch = targetRoles.some(role => opp.title.toLowerCase().includes(role.toLowerCase()));
+      if (isRoleMatch) {
+        score += 20;
+        matchReasons.push(`Title matches your preferred role`);
+      }
+    } else {
+      score += 10;
     }
 
     // Evaluate Location/Remote (Weight: 15%)
     let locScore = 0;
-    if (opp.remoteType === 'REMOTE' && profile.preferences?.remotePreference !== 'ONSITE') {
+    const workPrefs = profile.locationPreferences?.workPreference?.map(p => p.toLowerCase()) || [];
+    const locPrefs = profile.locationPreferences?.preferredLocations?.map(p => p.toLowerCase()) || [];
+    
+    if (opp.remoteType === 'REMOTE' && workPrefs.includes('remote')) {
       locScore = 15;
-      matchReasons.push('Matches your remote preference');
-    } else if (profile.preferences?.preferredLocations?.some(loc => opp.location?.toLowerCase().includes(loc.toLowerCase()))) {
+      matchReasons.push('Matches your remote work preference');
+    } else if (locPrefs.some(loc => opp.location?.toLowerCase().includes(loc))) {
       locScore = 15;
       matchReasons.push(`Matches your preferred location (${opp.location})`);
     } else {
@@ -77,21 +84,22 @@ export const runPersonalizedScout = async (userId: string) => {
 
     // Evaluate Type (Weight: 15%)
     let typeScore = 0;
-    if (opp.type === 'JOB' && profile.preferences?.jobPreference) {
+    const lookingFor = profile.careerGoals?.lookingFor?.map(l => l.toLowerCase()) || [];
+    
+    if (opp.type === 'JOB' && lookingFor.includes('job')) {
       typeScore = 15;
-      matchReasons.push('Matches your job preference');
-    } else if (opp.type === 'INTERNSHIP' && profile.preferences?.internshipPreference) {
+      matchReasons.push('Matches your preference for full-time jobs');
+    } else if (opp.type === 'INTERNSHIP' && lookingFor.includes('internship')) {
       typeScore = 15;
-      matchReasons.push('Matches your internship preference');
-    } else {
-      typeScore = 5;
+      matchReasons.push('Matches your preference for internships');
+    } else if (lookingFor.length === 0) {
+      typeScore = 7;
     }
     score += typeScore;
 
     score = Math.min(Math.round(score), 100);
 
     // Step 4: Upsert UserOpportunityMatch
-    // We only care about opportunities scoring reasonably well (e.g. > 30%)
     if (score >= 30) {
       await UserOpportunityMatch.findOneAndUpdate(
         { userId, opportunityId: opp._id },

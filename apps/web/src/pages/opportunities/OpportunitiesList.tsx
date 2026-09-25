@@ -98,7 +98,7 @@ export function OpportunitiesList() {
                         <Clock className="h-3 w-3 mr-1" />
                         {new Date(opp.postedAt).toLocaleDateString()}
                       </div>
-                      <Button className="w-full">Apply</Button>
+                      <Button className="w-full" onClick={(e) => { e.stopPropagation(); window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); }}>Apply</Button>
                     </div>
                   </div>
                 </CardContent>

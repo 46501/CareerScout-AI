@@ -6,18 +6,7 @@ const ai = new GoogleGenerativeAI(process.env.AI_API_KEY || '');
 export const extractResumeData = async (resumeText: string) => {
   try {
     if (!process.env.AI_API_KEY || process.env.AI_API_KEY.includes('your_gemini')) {
-      console.warn('AI_API_KEY not configured. Falling back to mock extraction.');
-      return {
-        skills: ['JavaScript', 'TypeScript', 'Node.js', 'React'],
-        programmingLanguages: ['JavaScript', 'TypeScript'],
-        frameworks: ['React', 'Express'],
-        databases: ['MongoDB', 'PostgreSQL'],
-        education: [{ degree: 'B.S. Computer Science', university: 'Mock University', graduationYear: 2024 }],
-        experience: [{ title: 'Software Engineering Intern', company: 'Tech Corp', startDate: '2023-06-01', endDate: '2023-08-31' }],
-        projects: ['AI Career Scout'],
-        certifications: ['AWS Certified Developer'],
-        preferredRoles: ['Software Engineer', 'Full Stack Developer']
-      };
+      throw new Error('AI_API_KEY is not configured in the environment variables.');
     }
 
     const model = ai.getGenerativeModel({
@@ -82,44 +71,59 @@ export const calculateMatchScore = (profile: any, opportunity: any) => {
   // Simple deterministic hybrid matching
   let score = 0;
   
+  const extractSkills = (skillCat: any[]) => skillCat ? skillCat.map(s => s.name.toLowerCase()) : [];
+  
+  const targetSkills = new Set([
+    ...extractSkills(profile.skills?.programmingLanguages),
+    ...extractSkills(profile.skills?.webDevelopment),
+    ...extractSkills(profile.skills?.aiMachineLearning),
+    ...extractSkills(profile.skills?.databases),
+    ...extractSkills(profile.skills?.devopsCloud)
+  ]);
+
   // 1. Skill Match (35%)
-  const profileSkills = new Set([...(profile.skills.programmingLanguages || []), ...(profile.skills.frameworks || [])]);
   let matchingSkills = 0;
-  opportunity.skills.forEach((s: string) => {
-    if (profileSkills.has(s)) matchingSkills++;
+  (opportunity.skills || []).forEach((s: string) => {
+    if (targetSkills.has(s.toLowerCase())) matchingSkills++;
   });
-  const skillRatio = opportunity.skills.length ? matchingSkills / opportunity.skills.length : 1;
+  const skillRatio = (opportunity.skills && opportunity.skills.length) ? matchingSkills / opportunity.skills.length : 1;
   score += skillRatio * 35;
 
   // 2. Role Match (25%)
-  const preferredRoles = profile.preferences.preferredRoles || [];
-  if (preferredRoles.some((r: string) => opportunity.title.toLowerCase().includes(r.toLowerCase()))) {
+  const targetRoles = profile.careerGoals?.targetRoles || [];
+  if (targetRoles.some((r: string) => opportunity.title?.toLowerCase().includes(r.toLowerCase()))) {
     score += 25;
   }
 
   // 3. Location Match (10%)
-  const preferredLocations = profile.preferences.preferredLocations || [];
-  if (opportunity.remoteType === 'REMOTE' && profile.preferences.remotePreference === 'REMOTE') {
+  const workPrefs = profile.locationPreferences?.workPreference?.map((p: string) => p.toLowerCase()) || [];
+  const locPrefs = profile.locationPreferences?.preferredLocations?.map((p: string) => p.toLowerCase()) || [];
+  
+  if (opportunity.remoteType === 'REMOTE' && workPrefs.includes('remote')) {
     score += 10;
-  } else if (preferredLocations.includes(opportunity.location)) {
+  } else if (locPrefs.some((loc: string) => opportunity.location?.toLowerCase().includes(loc))) {
     score += 10;
   }
 
   // 4. Experience Match (15%)
-  // Mock logic
-  score += 15;
+  if (profile.hasNoExperience && (opportunity.title?.toLowerCase().includes('intern') || opportunity.title?.toLowerCase().includes('junior') || opportunity.title?.toLowerCase().includes('entry'))) {
+    score += 15;
+  } else if (!profile.hasNoExperience) {
+    score += 15; // Placeholder generic check
+  }
 
   // 5. Preferences (15%)
-  if (opportunity.type === 'INTERNSHIP' && profile.preferences.internshipPreference) {
+  const lookingFor = profile.careerGoals?.lookingFor?.map((l: string) => l.toLowerCase()) || [];
+  if (opportunity.type === 'INTERNSHIP' && lookingFor.includes('internship')) {
     score += 15;
-  } else if (opportunity.type === 'JOB' && profile.preferences.jobPreference) {
+  } else if (opportunity.type === 'JOB' && lookingFor.includes('job')) {
     score += 15;
   }
 
   return {
     score: Math.min(100, Math.round(score)),
     reasons: [
-      `You match ${matchingSkills} of the ${opportunity.skills.length} listed technical skills.`,
+      `You match ${matchingSkills} of the ${(opportunity.skills || []).length} listed technical skills.`,
       `This role aligns with your preferences.`
     ]
   };

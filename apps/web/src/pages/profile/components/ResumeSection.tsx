@@ -41,46 +41,81 @@ export const ResumeSection = ({ isEditing, fetchProfile }: any) => {
     if (!file) return;
 
     setUploadStatus('uploading');
+    setProgress(10);
     
-    // Simulating file upload & processing & AI analysis
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 5;
-      setProgress(p);
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
       
-      if (p === 30) setUploadStatus('processing');
-      if (p === 60) setUploadStatus('analyzing');
-      if (p >= 100) {
-        clearInterval(interval);
-        setUploadStatus('completed');
-        // Mocking a successful backend save
-        setResumeData({
-          fileName: file.name,
-          uploadDate: new Date().toISOString(),
-          status: 'PENDING_REVIEW', // User needs to review
-          aiDetected: {
-            skillsCount: 12,
-            eduCount: 1,
-            expCount: 2
+      const res = await api.post('/resume/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || file.size));
+          if (percentCompleted < 100) setProgress(percentCompleted);
+        }
+      });
+      
+      setProgress(100);
+      setUploadStatus('processing');
+      setResumeData(res.data.data);
+
+      // Start polling for extraction status
+      pollStatus();
+    } catch (error) {
+      console.error('Upload failed', error);
+      setUploadStatus('idle');
+      alert('Upload failed. Please try again.');
+    }
+  };
+
+  const pollStatus = () => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get('/resume');
+        const updatedResume = res.data?.data;
+        if (updatedResume) {
+          setResumeData(updatedResume);
+          
+          if (updatedResume.status === 'EXTRACTED') {
+            clearInterval(interval);
+            setUploadStatus('completed');
+            setResumeData({ ...updatedResume, status: 'PENDING_REVIEW' });
+          } else if (updatedResume.status === 'FAILED') {
+            clearInterval(interval);
+            setUploadStatus('idle');
+            alert('AI Resume extraction failed. Please try again.');
+          } else if (updatedResume.status === 'PROCESSING') {
+             setUploadStatus('analyzing');
           }
-        });
+        }
+      } catch (err) {
+        clearInterval(interval);
       }
-    }, 150);
+    }, 2000);
   };
 
   const handleConfirm = async () => {
-    // In a real app, this would hit the backend to confirm the parsed data
-    setResumeData({ ...resumeData, status: 'CONFIRMED' });
-    alert('Resume analysis confirmed and merged into profile (Mock)');
-    fetchProfile(); // Refresh completion
+    try {
+      await api.post('/resume/confirm', { parsedData: resumeData.parsedData });
+      setResumeData({ ...resumeData, status: 'CONFIRMED' });
+      alert('Resume analysis confirmed and merged into profile');
+      fetchProfile(); // Refresh completion
+    } catch (err) {
+      alert('Failed to confirm resume data');
+    }
   };
 
-  const handleDelete = () => {
-    // Mock delete
-    setResumeData(null);
-    setUploadStatus('idle');
-    setProgress(0);
-    fetchProfile();
+  const handleDelete = async () => {
+    try {
+      // Not fully implemented on backend, but we can clear local for MVP, or just call delete
+      // await api.delete('/resume');
+      setResumeData(null);
+      setUploadStatus('idle');
+      setProgress(0);
+      fetchProfile();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (loading) return null;

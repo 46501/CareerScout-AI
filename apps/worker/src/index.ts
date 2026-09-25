@@ -3,7 +3,7 @@ import IORedis from 'ioredis';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
-import { DevMockProvider } from './providers/DevMockProvider';
+import { RemotiveProvider } from './providers/RemotiveProvider';
 
 // Load .env from monorepo root
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
@@ -18,17 +18,17 @@ async function startWorker() {
       console.log('MongoDB connected');
     }
 
-    const mockProvider = new DevMockProvider();
+    const provider = new RemotiveProvider();
     
-    // Seed on startup for local UI development
-    await mockProvider.run();
+    // Seed on startup with real jobs
+    await provider.run();
 
     const worker = new Worker('opportunity-discovery', async job => {
       console.log(`Processing job ${job.id} of type ${job.name}`);
       
       if (job.name === 'dailyOpportunityDiscovery') {
         console.log('Running daily opportunity discovery...');
-        await mockProvider.run();
+        await provider.run();
         console.log('Discovery complete.');
       } else if (job.name === 'personalizedOpportunityDiscovery') {
         console.log(`Running personalized scout for user ${job.data.userId}`);
