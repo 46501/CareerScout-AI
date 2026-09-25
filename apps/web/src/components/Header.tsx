@@ -3,7 +3,7 @@ import { Bot, Bell, User as UserIcon, Settings, LogOut, FileText } from 'lucide-
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
-import api from '../lib/api';
+
 
 interface HeaderProps {
   onRunScout: () => void;
