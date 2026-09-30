@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { Bot, Bell, User as UserIcon, Settings, LogOut, FileText } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
 
+
+import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 
 interface HeaderProps {
   onRunScout: () => void;
   isScouting: boolean;
   completionPercentage: number;
+  missingFields?: string[];
 }
 
-export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completionPercentage }) => {
+export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completionPercentage, missingFields = [] }) => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleRunScout = () => {
     if (completionPercentage < 100) {
-      alert('Complete your profile before running CareerScout.');
-      navigate('/profile');
+      setIsModalOpen(true);
     } else {
       onRunScout();
     }
@@ -34,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
   const hasPhoto = false; 
 
   return (
+    <>
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-semibold text-gray-900">Overview</h1>
       <div className="flex items-center space-x-4">
@@ -104,5 +107,12 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
         </div>
       </div>
     </header>
+    <ProfileCompletionModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      completionPercentage={completionPercentage}
+      missingFields={missingFields}
+    />
+    </>
   );
 };

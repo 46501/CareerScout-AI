@@ -11,6 +11,7 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import api from '../lib/api';
 import heroImg from '../assets/hero.png';
+import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
@@ -23,6 +24,7 @@ export const Dashboard = () => {
   const [completionData, setCompletionData] = useState<{ percentage: number, missingFields: string[], isComplete?: boolean } | null>(null);
   const [isScouting, setIsScouting] = useState(false);
   const [activeTab, setActiveTab] = useState('All');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -45,12 +47,25 @@ export const Dashboard = () => {
   }, []);
 
   const runScout = async () => {
+    if (completionData && completionData.percentage < 100) {
+      setIsModalOpen(true);
+      return;
+    }
+    
     try {
       setIsScouting(true);
       const res = await api.post('/scout/run');
-      alert(res.data.message);
+      // Only alert if we successfully run scout (though toast would be better, requirement was specifically profile-completion alerts)
+      if (res.data?.message) {
+        alert(res.data.message);
+      }
     } catch (err: any) {
-      alert(err.response?.data?.error?.message || 'Failed to run scout');
+      const errMsg = err.response?.data?.error?.message;
+      if (errMsg && errMsg.toLowerCase().includes('profile must be 100% complete')) {
+        setIsModalOpen(true);
+      } else {
+        alert(errMsg || 'Failed to run scout');
+      }
     } finally {
       setIsScouting(false);
     }
@@ -507,6 +522,13 @@ export const Dashboard = () => {
           </div>
         </main>
       </div>
+
+      <ProfileCompletionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        completionPercentage={completionData?.percentage || 0}
+        missingFields={completionData?.missingFields || []}
+      />
     </div>
   );
 };
