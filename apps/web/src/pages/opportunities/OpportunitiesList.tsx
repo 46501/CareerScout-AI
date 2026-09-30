@@ -72,10 +72,10 @@ export function OpportunitiesList() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h2 className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">{opp.title}</h2>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                            <span className="font-medium text-gray-900">{opp.organization}</span>
-                            <span className="flex items-center"><MapPin className="h-3 w-3 mr-1"/> {opp.location || opp.remoteType}</span>
-                            {opp.salary && <span className="flex items-center"><DollarSign className="h-3 w-3 mr-1"/> {opp.salary}</span>}
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-1">
+                            <span className="font-medium text-gray-900 truncate">{opp.organization}</span>
+                            <span className="flex items-center truncate"><MapPin className="h-3 w-3 mr-1 shrink-0"/> {opp.location || opp.remoteType}</span>
+                            {opp.salary && <span className="flex items-center truncate"><DollarSign className="h-3 w-3 mr-1 shrink-0"/> {opp.salary}</span>}
                           </div>
                         </div>
                         <Button variant="ghost" size="icon" className="text-gray-400 hover:text-yellow-500">
@@ -92,13 +92,15 @@ export function OpportunitiesList() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col justify-between items-end shrink-0 md:w-32 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
-                      <Badge variant="outline" className="mb-4">{opp.type}</Badge>
-                      <div className="text-xs text-gray-500 flex items-center mb-4">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {new Date(opp.postedAt).toLocaleDateString()}
+                    <div className="flex md:flex-col justify-between items-center md:items-end w-full md:w-32 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 shrink-0 mt-4 md:mt-0 gap-4 md:gap-0">
+                      <div className="flex flex-col md:items-end">
+                        <Badge variant="outline" className="mb-2 md:mb-4 w-fit">{opp.type}</Badge>
+                        <div className="text-xs text-gray-500 flex items-center mb-0 md:mb-4">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {new Date(opp.postedAt).toLocaleDateString()}
+                        </div>
                       </div>
-                      <Button className="w-full" onClick={(e) => { e.stopPropagation(); window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); }}>Apply</Button>
+                      <Button className="w-auto md:w-full" onClick={(e) => { e.stopPropagation(); window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); }}>Apply</Button>
                     </div>
                   </div>
                 </CardContent>

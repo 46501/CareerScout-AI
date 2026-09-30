@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
+
 import { Briefcase, Zap, Target, Search } from 'lucide-react';
 
 export function LandingPage() {
@@ -34,11 +34,11 @@ export function LandingPage() {
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
             Stop searching for jobs. Let our advanced AI match your unique profile, skills, and experience with perfect opportunities across the web.
           </p>
-          <div className="flex justify-center space-x-4">
-            <Link to="/register" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors">
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full px-4 sm:px-0">
+            <Link to="/register" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors w-full sm:w-auto">
               Start Scouting Now
             </Link>
-            <Link to="/login" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium border border-gray-300 bg-transparent hover:bg-gray-100 text-gray-900 rounded-md transition-colors">
+            <Link to="/login" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium border border-gray-300 bg-transparent hover:bg-gray-100 text-gray-900 rounded-md transition-colors w-full sm:w-auto">
               View Demo
             </Link>
           </div>

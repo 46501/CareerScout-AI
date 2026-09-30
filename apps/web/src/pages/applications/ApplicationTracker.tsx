@@ -46,10 +46,10 @@ export function ApplicationTracker() {
           <div className="space-y-4">
             {applications.map(app => (
               <Card key={app._id}>
-                <CardContent className="p-5 flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{app.opportunity?.title || 'Unknown Role'}</h3>
-                    <p className="text-sm text-gray-500">{app.opportunity?.organization || 'Unknown Company'}</p>
+                <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+                  <div className="w-full sm:w-auto overflow-hidden">
+                    <h3 className="text-lg font-semibold text-gray-900 truncate">{app.opportunity?.title || 'Unknown Role'}</h3>
+                    <p className="text-sm text-gray-500 truncate">{app.opportunity?.organization || 'Unknown Company'}</p>
                     {app.appliedAt && (
                       <p className="text-xs text-gray-400 mt-1">
                         Applied: {new Date(app.appliedAt).toLocaleDateString()}
@@ -60,7 +60,7 @@ export function ApplicationTracker() {
                     app.status === 'REJECTED' ? 'destructive' :
                     app.status === 'OFFER' ? 'success' :
                     'default'
-                  }>
+                  } className="w-fit">
                     {app.status}
                   </Badge>
                 </CardContent>

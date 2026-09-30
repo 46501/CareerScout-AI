@@ -94,14 +94,14 @@ export const Profile = () => {
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 pb-20">
       <BackButton fallback="/dashboard" label="Back to Dashboard" />
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
         ) : (
-          <div className="space-x-3">
-            <Button variant="outline" onClick={() => { setIsEditing(false); fetchProfile(); }}>Cancel</Button>
-            <Button onClick={handleSave}>Save Changes</Button>
+          <div className="flex space-x-3 w-full sm:w-auto">
+            <Button variant="outline" className="flex-1 sm:flex-none" onClick={() => { setIsEditing(false); fetchProfile(); }}>Cancel</Button>
+            <Button className="flex-1 sm:flex-none shadow-sm" onClick={handleSave}>Save Changes</Button>
           </div>
         )}
       </div>

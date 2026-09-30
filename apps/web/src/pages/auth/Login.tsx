@@ -41,9 +41,9 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#F4F7F9] font-sans">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F4F7F9] font-sans">
       {/* LEFT SIDE - BRANDING & HERO (55%) */}
-      <div className="w-full md:w-[55%] relative flex flex-col justify-between overflow-hidden bg-white hidden md:flex border-r border-gray-100">
+      <div className="w-full lg:w-[55%] relative flex flex-col justify-between overflow-hidden bg-white border-b lg:border-b-0 lg:border-r border-gray-100 min-h-[400px] lg:min-h-screen">
         
         {/* Soft Background Gradients */}
         <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-blue-50/80 rounded-full blur-3xl pointer-events-none"></div>
@@ -70,7 +70,7 @@ export function Login() {
           <path d="M 80 -10 C 60 0, 40 -10, 30 10 C 20 30, 40 40, 50 60 C 60 80, 80 70, 80 90 Z" fill="currentColor"/>
         </svg>
 
-        <div className="p-10 lg:p-14 z-10 flex flex-col h-full relative">
+        <div className="p-6 sm:p-10 lg:p-14 z-10 flex flex-col h-full relative">
           {/* Top Left Branding */}
           <div className="flex items-center mb-12">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mr-3.5 shadow-sm">
@@ -95,7 +95,7 @@ export function Login() {
           </div>
 
           {/* Feature List */}
-          <div className="flex flex-col gap-y-6 max-w-sm mb-auto">
+          <div className="hidden sm:flex flex-col gap-y-6 max-w-sm mb-auto">
             <div className="flex items-start group">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 flex-shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-blue-100 group-hover:bg-blue-100 transition-colors">
                 <Search className="h-4 w-4 text-blue-600 stroke-[2.5]" />
@@ -139,7 +139,7 @@ export function Login() {
         </div>
 
         {/* Student Illustration (Bottom Right) */}
-        <div className="absolute right-0 bottom-0 w-[70%] max-w-[600px] h-[50%] z-0 flex items-end justify-end pointer-events-none">
+        <div className="hidden sm:flex absolute right-0 bottom-0 w-[70%] max-w-[600px] h-[50%] z-0 items-end justify-end pointer-events-none">
            {/* Fade out to the left to blend image */}
            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/50 to-transparent z-10 w-[40%]"></div>
            <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent z-10 h-[20%] bottom-0"></div>
@@ -147,8 +147,8 @@ export function Login() {
         </div>
 
         {/* Trust Statistics Card (Bottom Left) */}
-        <div className="absolute left-10 lg:left-14 bottom-8 z-20">
-          <div className="bg-white/90 backdrop-blur-md border border-white p-5 px-7 rounded-2xl shadow-[0_12px_40px_rgb(0,0,0,0.06)] flex gap-7 items-center">
+        <div className="absolute left-6 sm:left-10 lg:left-14 bottom-6 sm:bottom-8 z-20 hidden sm:block">
+          <div className="bg-white/90 backdrop-blur-md border border-white p-4 sm:p-5 px-5 sm:px-7 rounded-2xl shadow-[0_12px_40px_rgb(0,0,0,0.06)] flex gap-4 sm:gap-7 items-center overflow-x-auto hide-scrollbar max-w-[calc(100vw-3rem)]">
             <div className="text-center">
               <div className="flex justify-center mb-1 text-blue-500"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
               <p className="text-[20px] font-black text-gray-900 leading-tight">10K+</p>
@@ -171,7 +171,7 @@ export function Login() {
       </div>
 
       {/* RIGHT SIDE - LOGIN CARD (45%) */}
-      <div className="w-full md:w-[45%] flex flex-col justify-center items-center p-6 sm:p-10 relative overflow-hidden">
+      <div className="w-full lg:w-[45%] flex flex-col justify-center items-center p-4 sm:p-10 relative overflow-hidden flex-1 lg:min-h-screen">
         
         {/* Subtle Background Shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/40 rounded-bl-[100px] pointer-events-none blur-2xl"></div>
@@ -186,7 +186,7 @@ export function Login() {
         <div className="w-full max-w-[460px] bg-white p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 relative z-10">
           
           {/* Mobile Logo Fallback */}
-          <div className="md:hidden flex items-center mb-10 justify-center">
+          <div className="lg:hidden flex items-center mb-10 justify-center hidden">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mr-3.5 shadow-sm">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
@@ -316,7 +316,7 @@ export function Login() {
               </div>
             </div>
 
-            <div className="mt-7 grid grid-cols-3 gap-4">
+            <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <button type="button" className="flex justify-center items-center py-3 px-4 border border-gray-200 rounded-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                 <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -325,19 +325,19 @@ export function Login() {
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
-                <span className="ml-2 font-bold text-[13px] text-gray-700 hidden lg:block">Google</span>
+                <span className="ml-2 font-bold text-[13px] text-gray-700 sm:hidden lg:block">Google</span>
               </button>
               <button type="button" className="flex justify-center items-center py-3 px-4 border border-gray-200 rounded-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                 <svg className="h-[20px] w-[20px] text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
                 </svg>
-                <span className="ml-2 font-bold text-[13px] text-gray-700 hidden lg:block">GitHub</span>
+                <span className="ml-2 font-bold text-[13px] text-gray-700 sm:hidden lg:block">GitHub</span>
               </button>
               <button type="button" className="flex justify-center items-center py-3 px-4 border border-gray-200 rounded-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                 <svg className="h-[20px] w-[20px] text-[#0A66C2]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                 </svg>
-                <span className="ml-2 font-bold text-[13px] text-gray-700 hidden lg:block">LinkedIn</span>
+                <span className="ml-2 font-bold text-[13px] text-gray-700 sm:hidden lg:block">LinkedIn</span>
               </button>
             </div>
           </div>

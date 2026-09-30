@@ -41,7 +41,7 @@ export const Settings = () => {
           <CardTitle>CareerScout Automation</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between py-4 border-b">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 border-b gap-4 sm:gap-0">
             <div>
               <h3 className="font-medium text-gray-900">Daily Scout</h3>
               <p className="text-sm text-gray-500">Automatically discover opportunities every 24 hours.</p>
@@ -54,7 +54,7 @@ export const Settings = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 gap-4 sm:gap-0">
             <div>
               <h3 className="font-medium text-gray-900">Scout Status</h3>
               <p className="text-sm text-gray-500">Current status: <span className="font-bold">{scoutStatus}</span></p>
@@ -63,6 +63,7 @@ export const Settings = () => {
               variant={scoutStatus === 'PAUSED' ? 'default' : 'outline'}
               onClick={togglePause}
               disabled={scoutStatus === 'INCOMPLETE'}
+              className="w-full sm:w-auto"
             >
               {scoutStatus === 'PAUSED' ? 'Resume Scout' : 'Pause Scout'}
             </Button>
