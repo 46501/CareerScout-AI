@@ -14,12 +14,12 @@ export function LandingPage() {
               <span className="text-xl font-bold text-gray-900">CareerScout AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/login">
-                <Button variant="ghost">Sign In</Button>
-              </Link>
-              <Link to="/register">
-                <Button>Get Started</Button>
-              </Link>
+              <Button variant="ghost" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/register">Get Started</Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -35,16 +35,12 @@ export function LandingPage() {
             Stop searching for jobs. Let our advanced AI match your unique profile, skills, and experience with perfect opportunities across the web.
           </p>
           <div className="flex justify-center space-x-4">
-            <Link to="/register">
-              <Button size="lg" className="text-lg px-8">
-                Start Scouting Now
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline" size="lg" className="text-lg px-8">
-                View Demo
-              </Button>
-            </Link>
+            <Button size="lg" className="text-lg px-8" asChild>
+              <Link to="/register">Start Scouting Now</Link>
+            </Button>
+            <Button variant="outline" size="lg" className="text-lg px-8" asChild>
+              <Link to="/login">View Demo</Link>
+            </Button>
           </div>
         </div>
 

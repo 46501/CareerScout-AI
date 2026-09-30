@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   GraduationCap, LayoutDashboard, Search, FileText, Bot, User, 
   BookOpen, Folder, PieChart, Settings, Bell, ChevronDown, 
@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
-import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import heroImg from '../assets/hero.png';
 import { 
@@ -17,7 +16,6 @@ import {
 } from 'recharts';
 
 export const Dashboard = () => {
-  const { user } = useAuth();
   
   // Using static for now to match the screenshot, but keeping the actual user values for structure
   const [stats] = useState({ saved: 12, applied: 5, interviews: 2, shortlisted: 1 });
