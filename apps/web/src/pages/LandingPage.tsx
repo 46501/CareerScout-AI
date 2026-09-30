@@ -14,12 +14,12 @@ export function LandingPage() {
               <span className="text-xl font-bold text-gray-900">CareerScout AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/register">Get Started</Link>
-              </Button>
+              <Link to="/login" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors">
+                Sign In
+              </Link>
+              <Link to="/register" className="px-4 py-2 text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors">
+                Get Started
+              </Link>
             </div>
           </div>
         </div>
@@ -35,12 +35,12 @@ export function LandingPage() {
             Stop searching for jobs. Let our advanced AI match your unique profile, skills, and experience with perfect opportunities across the web.
           </p>
           <div className="flex justify-center space-x-4">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <Link to="/register">Start Scouting Now</Link>
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8" asChild>
-              <Link to="/login">View Demo</Link>
-            </Button>
+            <Link to="/register" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors">
+              Start Scouting Now
+            </Link>
+            <Link to="/login" className="inline-flex items-center justify-center whitespace-nowrap text-lg px-8 py-4 h-14 font-medium border border-gray-300 bg-transparent hover:bg-gray-100 text-gray-900 rounded-md transition-colors">
+              View Demo
+            </Link>
           </div>
         </div>
 
