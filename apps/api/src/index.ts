@@ -22,6 +22,7 @@ import applicationRoutes from './routes/application.routes';
 import notificationRoutes from './routes/notification.routes';
 
 import scoutRoutes from './routes/scout.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 app.use(helmet());
 app.use(cors({
@@ -43,6 +44,7 @@ app.use('/api/saved', savedOpportunityRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/scout', scoutRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 import { errorHandler } from './middleware/error.middleware';
 

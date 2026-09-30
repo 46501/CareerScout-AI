@@ -15,36 +15,61 @@ import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
 
 export const Dashboard = () => {
-  
-  // Using static for now to match the screenshot, but keeping the actual user values for structure
-  const [stats] = useState({ saved: 12, applied: 5, interviews: 2, shortlisted: 1 });
-  const [matches, setMatches] = useState<any[]>([]);
-  const [completionData, setCompletionData] = useState<{ percentage: number, missingFields: string[], isComplete?: boolean } | null>(null);
-  const [isScouting, setIsScouting] = useState(false);
   const [activeTab, setActiveTab] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScouting, setIsScouting] = useState(false);
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => api.get('/profile').then(res => res.data.data)
+  });
+
+  const { data: completionData } = useQuery({
+    queryKey: ['profileCompletion'],
+    queryFn: () => api.get('/profile/completion').then(res => res.data.data)
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ['dashboardStats'],
+    queryFn: () => api.get('/dashboard/stats').then(res => res.data.data)
+  });
+
+  const { data: trends } = useQuery({
+    queryKey: ['dashboardTrends'],
+    queryFn: () => api.get('/dashboard/trends').then(res => res.data.data)
+  });
+
+  const { data: skillsData } = useQuery({
+    queryKey: ['dashboardSkills'],
+    queryFn: () => api.get('/dashboard/skills').then(res => res.data.data)
+  });
+
+  const { data: matches } = useQuery({
+    queryKey: ['recommendedOpportunities', activeTab],
+    queryFn: () => api.get(`/opportunities?filter=recommended&limit=5${activeTab !== 'All' ? `&type=${activeTab}` : ''}`).then(res => res.data.data)
+  });
+
+  const { data: recentOpportunities } = useQuery({
+    queryKey: ['recentOpportunities'],
+    queryFn: () => api.get('/opportunities?limit=4').then(res => res.data.data)
+  });
+
+  const { data: scoutStatus, refetch: refetchScoutStatus } = useQuery({
+    queryKey: ['scoutStatus'],
+    queryFn: () => api.get('/scout/status').then(res => res.data.data),
+    refetchInterval: isScouting ? 3000 : false
+  });
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [oppsRes, compRes] = await Promise.all([
-          api.get('/opportunities?filter=recommended&limit=5'),
-          api.get('/profile/completion')
-        ]);
-        if (oppsRes.data?.data) {
-          setMatches(oppsRes.data.data);
-        }
-        if (compRes.data?.success) {
-          setCompletionData(compRes.data.data);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchDashboardData();
-  }, []);
+    if (scoutStatus?.status === 'Running' || scoutStatus?.status === 'Queued') {
+      setIsScouting(true);
+    } else {
+      setIsScouting(false);
+    }
+  }, [scoutStatus]);
 
   const runScout = async () => {
     if (completionData && completionData.percentage < 100) {
@@ -55,10 +80,10 @@ export const Dashboard = () => {
     try {
       setIsScouting(true);
       const res = await api.post('/scout/run');
-      // Only alert if we successfully run scout (though toast would be better, requirement was specifically profile-completion alerts)
       if (res.data?.message) {
         alert(res.data.message);
       }
+      refetchScoutStatus();
     } catch (err: any) {
       const errMsg = err.response?.data?.error?.message;
       if (errMsg && errMsg.toLowerCase().includes('profile must be 100% complete')) {
@@ -66,19 +91,17 @@ export const Dashboard = () => {
       } else {
         alert(errMsg || 'Failed to run scout');
       }
-    } finally {
       setIsScouting(false);
     }
   };
 
-  const chartData = [
-    { name: 'Apr', Jobs: 40, Internships: 24, Competitions: 24, Hackathons: 20 },
-    { name: 'May', Jobs: 30, Internships: 13, Competitions: 22, Hackathons: 20 },
-    { name: 'Jun', Jobs: 20, Internships: 48, Competitions: 22, Hackathons: 20 },
-    { name: 'Jul', Jobs: 27, Internships: 39, Competitions: 20, Hackathons: 20 },
-    { name: 'Aug', Jobs: 18, Internships: 48, Competitions: 21, Hackathons: 20 },
-    { name: 'Sep', Jobs: 23, Internships: 38, Competitions: 25, Hackathons: 20 },
+  const firstName = profile?.fullName?.split(' ')[0] || 'there';
+  const fullName = profile?.fullName || 'User';
+
+  const defaultChartData = [
+    { name: 'Apr', Jobs: 0, Internships: 0, Competitions: 0, Hackathons: 0 },
   ];
+  const finalChartData = (trends && trends.length > 0) ? trends : defaultChartData;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex font-sans text-gray-900">
@@ -151,9 +174,17 @@ export const Dashboard = () => {
               type="text" 
               placeholder="Search for internships, jobs, hackathons, competitions..." 
               className="w-full pl-9 pr-16 py-2 bg-gray-50/50 border border-gray-200 rounded-full text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-shadow text-gray-700 placeholder-gray-400 font-medium"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const target = e.target as HTMLInputElement;
+                  if (target.value.trim()) {
+                    window.location.href = `/opportunities?search=${encodeURIComponent(target.value.trim())}`;
+                  }
+                }
+              }}
             />
             <div className="absolute right-3 flex items-center space-x-1">
-              <span className="text-[10px] font-semibold text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded shadow-sm">Ctrl K</span>
+              <span className="text-[10px] font-semibold text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded shadow-sm">Enter</span>
             </div>
           </div>
           
@@ -168,8 +199,8 @@ export const Dashboard = () => {
                 <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" className="h-full w-full object-cover" />
               </div>
               <div className="hidden md:block text-left mr-2">
-                <p className="text-[13px] font-bold text-gray-900 leading-tight">Om Kulkarni</p>
-                <p className="text-[11px] font-medium text-gray-500">Student • LPU</p>
+                <p className="text-[13px] font-bold text-gray-900 leading-tight">{fullName}</p>
+                <p className="text-[11px] font-medium text-gray-500">{profile?.education?.[0]?.institution || 'Student'}</p>
               </div>
               <ChevronDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
             </div>
@@ -196,13 +227,17 @@ export const Dashboard = () => {
                 
                 <div className="relative z-10 max-w-lg py-6">
                   <p className="text-[13px] font-semibold text-gray-600 mb-1 tracking-wide">Good Afternoon, 👋</p>
-                  <h2 className="text-[32px] font-extrabold text-gray-900 mb-2 tracking-tight leading-none">Om Kulkarni <span className="inline-block animate-wave">👋</span></h2>
+                  <h2 className="text-[32px] font-extrabold text-gray-900 mb-2 tracking-tight leading-none">{firstName} <span className="inline-block animate-wave">👋</span></h2>
                   <p className="text-[13px] text-gray-600 mb-5 font-medium max-w-sm leading-relaxed">"The right opportunity can be the start of something amazing."</p>
                   
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-bold border border-blue-200/50 shadow-sm">AI/ML Enthusiast</span>
-                    <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-bold border border-blue-200/50 shadow-sm">Full Stack Developer</span>
-                    <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-bold border border-blue-200/50 shadow-sm">LPU CSE 2024–28</span>
+                    {profile?.skills && profile.skills.length > 0 ? (
+                      profile.skills.slice(0, 3).map((skill: string) => (
+                        <span key={skill} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-bold border border-blue-200/50 shadow-sm">{skill}</span>
+                      ))
+                    ) : (
+                      <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-bold border border-blue-200/50 shadow-sm">Complete profile for tags</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -216,8 +251,7 @@ export const Dashboard = () => {
                   <div>
                     <h3 className="text-[12px] font-semibold text-gray-500 mb-0.5">Saved</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-gray-900">{stats.saved}</p>
-                      <span className="text-[10px] font-bold text-green-500 bg-green-50 px-1.5 py-0.5 rounded">↑ 3 this week</span>
+                      <p className="text-xl font-bold text-gray-900">{stats?.saved || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -229,8 +263,7 @@ export const Dashboard = () => {
                   <div>
                     <h3 className="text-[12px] font-semibold text-gray-500 mb-0.5">Applied</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-gray-900">{stats.applied}</p>
-                      <span className="text-[10px] font-bold text-green-500 bg-green-50 px-1.5 py-0.5 rounded">↑ 2 this week</span>
+                      <p className="text-xl font-bold text-gray-900">{stats?.applied || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -242,8 +275,7 @@ export const Dashboard = () => {
                   <div>
                     <h3 className="text-[12px] font-semibold text-gray-500 mb-0.5">Interviews</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-gray-900">{stats.interviews}</p>
-                      <span className="text-[10px] font-bold text-green-500 bg-green-50 px-1.5 py-0.5 rounded">↑ 1 this week</span>
+                      <p className="text-xl font-bold text-gray-900">{stats?.interviews || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -255,8 +287,7 @@ export const Dashboard = () => {
                   <div>
                     <h3 className="text-[12px] font-semibold text-gray-500 mb-0.5">Shortlisted</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-gray-900">{stats.shortlisted}</p>
-                      <span className="text-[10px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded">Great job!</span>
+                      <p className="text-xl font-bold text-gray-900">{stats?.shortlisted || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -288,59 +319,23 @@ export const Dashboard = () => {
 
               {/* Opportunity Cards */}
               <div className="space-y-4">
-                {matches.length === 0 ? (
-                  // Fallback Mock Data matching screenshot if backend empty
-                  <>
-                    <OpportunityCard 
-                      logo="N"
-                      title="Research Intern (AI/ML)" 
-                      company="NVIDIA" 
-                      location="Bengaluru, India"
-                      type="Internship" 
-                      skills={['Python', 'Machine Learning', 'Deep Learning', 'Research']} 
-                      deadline="Apply by 15 Oct 2026" 
-                      applicants="320 applicants" 
-                      match="95" 
-                      logoColor="bg-[#76B900]"
-                    />
-                    <OpportunityCard 
-                      logo="G"
-                      title="Software Engineering Intern" 
-                      company="Google" 
-                      location="Bengaluru, India"
-                      type="Internship" 
-                      skills={['JavaScript', 'React', 'Node.js', 'System Design']} 
-                      deadline="Apply by 10 Oct 2026" 
-                      applicants="1.2k applicants" 
-                      match="92" 
-                      logoColor="bg-[#EA4335]"
-                    />
-                    <OpportunityCard 
-                      logo="M"
-                      title="AI Research Intern" 
-                      company="Microsoft" 
-                      location="Hyderabad, India"
-                      type="Internship" 
-                      skills={['Python', 'NLP', 'LLMs', 'Data Analysis']} 
-                      deadline="Apply by 30 Sep 2026" 
-                      applicants="2.4k applicants" 
-                      match="88" 
-                      logoColor="bg-[#00A4EF]"
-                    />
-                  </>
+                {(!matches || matches.length === 0) ? (
+                  <div className="p-8 text-center bg-gray-50 rounded-2xl border border-gray-100">
+                    <p className="text-gray-500 font-medium">No personalized opportunities yet. Complete your profile or run AI Scout.</p>
+                  </div>
                 ) : (
-                  matches.map(match => (
+                  matches.map((match: any) => (
                     <OpportunityCard 
                       key={match._id}
                       logo={match.organization?.charAt(0) || 'C'}
                       title={match.title} 
                       company={match.organization} 
                       location={match.location || 'Remote'}
-                      type={match.type || 'Internship'} 
+                      type={match.type || 'Job'} 
                       skills={match.skills?.slice(0, 4) || []} 
-                      deadline={`Apply by ${new Date(match.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`} 
-                      applicants="Be the first" 
-                      match={match.matchDetails?.score || 85} 
+                      deadline={match.deadline ? `Apply by ${new Date(match.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}` : 'Deadline not specified'} 
+                      applicants={match.applicantsCount ? `${match.applicantsCount} applicants` : 'Applicants: N/A'} 
+                      match={match.matchDetails?.score || 0} 
                       logoColor="bg-blue-600"
                     />
                   ))
@@ -358,19 +353,25 @@ export const Dashboard = () => {
                     </div>
                   </div>
                   <div className="h-52 w-full relative -ml-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 500 }} dy={10} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 500 }} />
-                        <RechartsTooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)', fontSize: '12px', fontWeight: 500 }} />
-                        <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 500, paddingTop: '15px' }} />
-                        <Line type="monotone" dataKey="Jobs" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 3, fill: '#0ea5e9', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5 }} />
-                        <Line type="monotone" dataKey="Internships" stroke="#22c55e" strokeWidth={2} dot={{ r: 3, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }} />
-                        <Line type="monotone" dataKey="Competitions" stroke="#a855f7" strokeWidth={2} dot={{ r: 3, fill: '#a855f7', strokeWidth: 2, stroke: '#fff' }} />
-                        <Line type="monotone" dataKey="Hackathons" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b', strokeWidth: 2, stroke: '#fff' }} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    {trends && trends.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={finalChartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 500 }} dy={10} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 500 }} />
+                          <RechartsTooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)', fontSize: '12px', fontWeight: 500 }} />
+                          <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 500, paddingTop: '15px' }} />
+                          <Line type="monotone" dataKey="Jobs" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 3, fill: '#0ea5e9', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5 }} />
+                          <Line type="monotone" dataKey="Internships" stroke="#22c55e" strokeWidth={2} dot={{ r: 3, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }} />
+                          <Line type="monotone" dataKey="Competitions" stroke="#a855f7" strokeWidth={2} dot={{ r: 3, fill: '#a855f7', strokeWidth: 2, stroke: '#fff' }} />
+                          <Line type="monotone" dataKey="Hackathons" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b', strokeWidth: 2, stroke: '#fff' }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <p className="text-gray-400 text-sm font-medium">Not enough data yet.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -383,12 +384,15 @@ export const Dashboard = () => {
                     </Link>
                   </div>
                   <div className="space-y-4 flex-1 flex flex-col justify-between">
-                    <SkillBar name="Python" percent={90} color="bg-blue-600" />
-                    <SkillBar name="Machine Learning" percent={85} color="bg-green-500" />
-                    <SkillBar name="JavaScript" percent={72} color="bg-yellow-400" />
-                    <SkillBar name="React" percent={68} color="bg-blue-400" />
-                    <SkillBar name="System Design" percent={60} color="bg-red-400" />
-                    <SkillBar name="SQL" percent={55} color="bg-gray-400" />
+                    {skillsData && skillsData.length > 0 ? (
+                      skillsData.map((skill: any, i: number) => (
+                        <SkillBar key={skill.name} name={skill.name} percent={skill.percent} color={['bg-blue-600', 'bg-green-500', 'bg-yellow-400', 'bg-blue-400', 'bg-red-400', 'bg-gray-400'][i % 6]} />
+                      ))
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <p className="text-gray-400 text-sm font-medium">No skill-demand data available yet.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -411,32 +415,41 @@ export const Dashboard = () => {
                   <div className="relative w-[130px] h-[130px] flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="42" fill="none" stroke="#f1f5f9" strokeWidth="12" />
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="#22c55e" strokeWidth="12" strokeDasharray="264" strokeDashoffset={264 - (264 * (completionData?.percentage || 72)) / 100} className="transition-all duration-1000 ease-out" strokeLinecap="round" />
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="#22c55e" strokeWidth="12" strokeDasharray="264" strokeDashoffset={264 - (264 * (completionData?.percentage || 0)) / 100} className="transition-all duration-1000 ease-out" strokeLinecap="round" />
                     </svg>
-                    <div className="absolute text-[28px] font-extrabold text-gray-900">{completionData?.percentage || 72}%</div>
+                    <div className="absolute text-[28px] font-extrabold text-gray-900">{completionData?.percentage || 0}%</div>
                   </div>
                 </div>
 
                 <div className="space-y-2.5 mb-6 pl-1">
-                  <ProfileStep name="Basic Information" completed={true} />
-                  <ProfileStep name="Education" completed={true} />
-                  <ProfileStep name="Technical Skills" completed={true} />
-                  <ProfileStep name="Experience" completed={true} />
-                  <ProfileStep name="Career Goals" completed={false} />
-                  <ProfileStep name="Preferred Location" completed={false} />
-                  <ProfileStep name="Resume" completed={false} />
+                  {['Basic Information', 'Education', 'Technical Skills', 'Experience', 'Career Goals', 'Preferred Location', 'Resume'].map((field) => (
+                    <ProfileStep key={field} name={field} completed={!(completionData?.missingFields || []).includes(field)} />
+                  ))}
                 </div>
 
-                <div className="bg-amber-50 rounded-xl p-3.5 flex items-start mb-0">
-                  <div className="mt-0.5 mr-2">
-                    <span className="flex h-5 w-5 rounded-full bg-amber-100 items-center justify-center text-amber-500">
-                      <Star className="h-3 w-3 fill-amber-500" />
-                    </span>
+                {completionData?.percentage === 100 ? (
+                  <div className="bg-green-50 rounded-xl p-3.5 flex items-start mb-0">
+                    <div className="mt-0.5 mr-2">
+                      <span className="flex h-5 w-5 rounded-full bg-green-100 items-center justify-center text-green-600">
+                        <CheckCircle className="h-3 w-3 fill-green-600 text-white" />
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-green-900 font-medium leading-relaxed pr-2">
+                      Your profile is complete. You're ready for personalized opportunities.
+                    </p>
                   </div>
-                  <p className="text-[12px] text-amber-900 font-medium leading-relaxed pr-2">
-                    Complete your profile to get more relevant opportunities.
-                  </p>
-                </div>
+                ) : (
+                  <div className="bg-amber-50 rounded-xl p-3.5 flex items-start mb-0">
+                    <div className="mt-0.5 mr-2">
+                      <span className="flex h-5 w-5 rounded-full bg-amber-100 items-center justify-center text-amber-500">
+                        <Star className="h-3 w-3 fill-amber-500" />
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-amber-900 font-medium leading-relaxed pr-2">
+                      Complete your profile to get more relevant opportunities.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* AI Scout Card */}
@@ -453,6 +466,7 @@ export const Dashboard = () => {
                     <Bot className="h-[26px] w-[26px] text-blue-600" />
                   </div>
                   <p className="text-[12px] text-gray-600 font-medium leading-relaxed">
+                    Status: <span className="font-bold text-blue-600">{scoutStatus?.status || 'Ready'}</span><br/>
                     Let AI find the best opportunities based on your profile, skills and goals.
                   </p>
                 </div>
@@ -487,34 +501,27 @@ export const Dashboard = () => {
                 </div>
                 
                 <div className="space-y-5">
-                  <RecentOpp 
-                    logo="N" bg="bg-[#76B900]"
-                    title="Research Intern (AI/ML)" 
-                    company="NVIDIA" type="Internship"
-                    tags={['Remote', 'AI/ML']} 
-                    time="2 hours ago" 
-                  />
-                  <RecentOpp 
-                    logo="G" bg="bg-[#EA4335]"
-                    title="Software Engineering Intern" 
-                    company="Google" type="Internship"
-                    tags={['On-site', 'SDE']} 
-                    time="5 hours ago" 
-                  />
-                  <RecentOpp 
-                    logo="M" bg="bg-[#00A4EF]"
-                    title="AI Research Intern" 
-                    company="Microsoft" type="Internship"
-                    tags={['Hybrid', 'Research']} 
-                    time="1 day ago" 
-                  />
-                  <RecentOpp 
-                    logo="A" bg="bg-[#FF0000]"
-                    title="ML Engineer Intern" 
-                    company="Adobe" type="Internship"
-                    tags={['On-site', 'ML']} 
-                    time="1 day ago" 
-                  />
+                  {recentOpportunities && recentOpportunities.length > 0 ? (
+                    recentOpportunities.map((opp: any, i: number) => {
+                      const colors = ['bg-[#76B900]', 'bg-[#EA4335]', 'bg-[#00A4EF]', 'bg-[#FF0000]'];
+                      return (
+                        <RecentOpp 
+                          key={opp._id}
+                          logo={opp.organization?.charAt(0) || 'C'} 
+                          bg={colors[i % colors.length]}
+                          title={opp.title} 
+                          company={opp.organization} 
+                          type={opp.type || 'Job'}
+                          tags={opp.skills?.slice(0, 2) || []} 
+                          time={new Date(opp.postedAt).toLocaleDateString()} 
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-gray-400 text-sm font-medium">No recent opportunities found.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

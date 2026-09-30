@@ -45,3 +45,32 @@ export const runScout = async (req: Request, res: Response, next: NextFunction):
     next(error);
   }
 };
+
+export const getScoutStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = (req as any).user.id;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      res.status(404).json({ success: false, error: { message: 'User not found' }});
+      return;
+    }
+    
+    // Status can be ACTIVE, PAUSED, IDLE. Map to states user requested if needed, or return raw
+    // The user request expects: Ready, Queued, Running, Completed, Failed, Profile Incomplete
+    
+    const { percentage } = await calculateProfileCompletion(userId);
+    let displayStatus = 'Ready';
+    if (percentage < 100) {
+      displayStatus = 'Profile Incomplete';
+    } else if (user.scoutStatus === 'ACTIVE') {
+      displayStatus = 'Running';
+    } else if (user.scoutStatus === 'PAUSED') {
+      displayStatus = 'Paused';
+    }
+    
+    res.status(200).json({ success: true, data: { status: displayStatus, rawStatus: user.scoutStatus } });
+  } catch (error) {
+    next(error);
+  }
+};
