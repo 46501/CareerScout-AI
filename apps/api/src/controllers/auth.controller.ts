@@ -5,10 +5,10 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { fullName, email, password } = req.body;
     
-    if (!email || !password) {
-      res.status(400).json({ success: false, error: { message: 'Email and password are required' } });
+    if (!email || !password || !fullName) {
+      res.status(400).json({ success: false, error: { message: 'Full name, email, and password are required' } });
       return;
     }
 
@@ -20,6 +20,13 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email, passwordHash });
+
+    await import('../models/CareerProfile').then(m => {
+      return m.CareerProfile.create({
+        userId: user._id,
+        personal: { fullName }
+      });
+    });
 
     const accessToken = generateAccessToken(user._id as any, user.role);
     const refreshToken = generateRefreshToken(user._id as any, user.role);

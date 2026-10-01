@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Briefcase } from 'lucide-react';
 
 export function Register() {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,7 +23,7 @@ export function Register() {
     }
     try {
       setError('');
-      await register({ email, password });
+      await register({ fullName, email, password });
       navigate('/onboarding');
     } catch (err: any) {
       setError(err.response?.data?.error?.message || 'Registration failed');
@@ -54,6 +55,18 @@ export function Register() {
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               {error && <div className="text-red-500 text-sm">{error}</div>}
               <div className="space-y-4">
+                <div>
+                  <label htmlFor="full-name" className="sr-only">Full Name</label>
+                  <Input
+                    id="full-name"
+                    name="fullName"
+                    type="text"
+                    required
+                    placeholder="Full Name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </div>
                 <div>
                   <label htmlFor="email-address" className="sr-only">Email address</label>
                   <Input

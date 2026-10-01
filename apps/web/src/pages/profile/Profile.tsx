@@ -65,14 +65,19 @@ export const Profile = () => {
       const res = await api.put('/profile', profileData);
       
       if (res.data?.success && res.data.data) {
-        const updated = res.data.data;
+        const updated = res.data.data.profile;
+        if (res.data.data.profileCompletion) {
+          setCompletion(res.data.data.profileCompletion);
+        }
+        
         setProfileData({ 
-          personal: { ...DEFAULT_PROFILE_DATA.personal, ...updated.personal },
-          education: updated.education || [],
-          skills: { ...DEFAULT_PROFILE_DATA.skills, ...updated.skills },
-          experience: updated.experience || [],
-          careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...updated.careerGoals },
-          locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...updated.locationPreferences }
+          personal: { ...DEFAULT_PROFILE_DATA.personal, ...updated?.personal },
+          education: updated?.education || [],
+          skills: { ...DEFAULT_PROFILE_DATA.skills, ...updated?.skills },
+          experience: updated?.experience || [],
+          hasNoExperience: updated?.hasNoExperience || false,
+          careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...updated?.careerGoals },
+          locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...updated?.locationPreferences }
         });
       }
 
