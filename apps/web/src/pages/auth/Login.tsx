@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { 
-  GraduationCap, 
   Search, 
   BarChart2, 
   BookOpen, 
@@ -73,13 +72,7 @@ export function Login() {
         <div className="p-6 sm:p-10 lg:p-14 z-10 flex flex-col h-full relative">
           {/* Top Left Branding */}
           <div className="flex items-center mb-12">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mr-3.5 shadow-sm">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <span className="text-[19px] font-extrabold text-gray-900 leading-none block tracking-tight">CareerScout AI</span>
-              <span className="text-[11px] text-gray-500 font-semibold tracking-wide uppercase mt-1 block">Discover • Prepare • Grow</span>
-            </div>
+            <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-10 w-auto object-contain" />
           </div>
 
           {/* Hero Heading & Description */}
@@ -186,11 +179,8 @@ export function Login() {
         <div className="w-full max-w-[460px] bg-white p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 relative z-10">
           
           {/* Mobile Logo Fallback */}
-          <div className="lg:hidden flex items-center mb-10 justify-center hidden">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mr-3.5 shadow-sm">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-[20px] font-extrabold text-gray-900 leading-none tracking-tight">CareerScout AI</span>
+          <div className="lg:hidden flex items-center mb-10 justify-center">
+            <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-8 w-auto object-contain" />
           </div>
 
           <div className="mb-8">

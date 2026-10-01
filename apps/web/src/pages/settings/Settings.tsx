@@ -28,7 +28,7 @@ export const Settings = () => {
     // In a real app we'd call an endpoint to update scoutStatus to PAUSED/ACTIVE
     const newStatus = scoutStatus === 'PAUSED' ? 'ACTIVE' : 'PAUSED';
     setScoutStatus(newStatus);
-    alert(`CareerScout is now ${newStatus}`);
+    alert(`CareerScout AI is now ${newStatus}`);
   };
 
   return (
@@ -38,7 +38,7 @@ export const Settings = () => {
       
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>CareerScout Automation</CardTitle>
+          <CardTitle>CareerScout AI Automation</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 border-b gap-4 sm:gap-0">

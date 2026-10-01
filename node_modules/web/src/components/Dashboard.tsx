@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  GraduationCap, LayoutDashboard, Search, FileText, Bot, User, 
+  LayoutDashboard, Search, FileText, Bot, User, 
   BookOpen, Folder, PieChart, Settings, Bell, ChevronDown, 
   Briefcase, Bookmark, Users, 
   ArrowRight, Sparkles, Trophy, CheckCircle, 
@@ -119,13 +119,7 @@ export const Dashboard = () => {
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 h-screen transition-transform duration-300 ease-in-out lg:transform-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-50 pt-2 pb-2">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
-              <GraduationCap className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <span className="text-[17px] font-bold text-gray-900 leading-none block tracking-tight">CareerScout AI</span>
-              <span className="text-[10px] text-gray-500 font-medium">Discover • Prepare • Grow</span>
-            </div>
+            <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-8 w-auto object-contain" />
           </div>
           <button className="lg:hidden text-gray-500 hover:text-gray-700" onClick={() => setIsMobileMenuOpen(false)}>
             <X className="h-5 w-5" />
@@ -212,7 +206,7 @@ export const Dashboard = () => {
             
             {/* Mobile Header Title */}
             <div className="md:hidden flex items-center">
-              <span className="text-[17px] font-bold text-gray-900 tracking-tight">CareerScout AI</span>
+              <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-6 w-auto object-contain" />
             </div>
           </div>
           

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import { Briefcase, Zap, Target, Search } from 'lucide-react';
+import { Zap, Target, Search } from 'lucide-react';
 
 export function LandingPage() {
   return (
@@ -9,9 +9,8 @@ export function LandingPage() {
       <nav className="border-b border-gray-100 bg-white/50 backdrop-blur-md fixed w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-2">
-              <Briefcase className="h-8 w-8 text-primary-600" />
-              <span className="text-xl font-bold text-gray-900">CareerScout AI</span>
+            <div className="flex items-center">
+              <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-8 w-auto object-contain" />
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/login" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors">
