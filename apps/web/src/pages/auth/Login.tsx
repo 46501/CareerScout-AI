@@ -13,7 +13,6 @@ import {
   Mail,
   Send
 } from 'lucide-react';
-import heroImg from '../../assets/hero.png';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -71,8 +70,13 @@ export function Login() {
 
         <div className="p-6 sm:p-10 lg:p-14 z-10 flex flex-col h-full relative">
           {/* Top Left Branding */}
-          <div className="flex items-center mb-12">
-            <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-10 w-auto object-contain" />
+          <div className="flex flex-col mb-12">
+            <div className="flex items-center">
+              <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-10 w-auto object-contain" />
+            </div>
+            <p className="text-[14px] text-gray-500 font-medium tracking-wide mt-1.5 ml-1 flex gap-2">
+              <span>Discover</span> &bull; <span>Prepare</span> &bull; <span>Grow</span>
+            </p>
           </div>
 
           {/* Hero Heading & Description */}
@@ -132,11 +136,12 @@ export function Login() {
         </div>
 
         {/* Student Illustration (Bottom Right) */}
-        <div className="hidden sm:flex absolute right-0 bottom-0 w-[70%] max-w-[600px] h-[50%] z-0 items-end justify-end pointer-events-none">
-           {/* Fade out to the left to blend image */}
-           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/50 to-transparent z-10 w-[40%]"></div>
-           <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent z-10 h-[20%] bottom-0"></div>
-           <img src={heroImg} alt="Student on campus" className="w-full h-full object-cover object-right-bottom mix-blend-multiply opacity-95" />
+        <div className="hidden sm:flex absolute right-0 bottom-0 w-[70%] max-w-[600px] h-[55%] z-0 items-end justify-end pointer-events-none">
+           {/* Fade out to the left and top to blend image */}
+           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/60 to-transparent z-10 w-[50%]"></div>
+           <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent z-10 h-[30%] bottom-0"></div>
+           <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-transparent z-10 h-[30%] top-0"></div>
+           <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000" alt="Student on campus" className="w-full h-full object-cover object-center mix-blend-multiply opacity-90 rounded-tl-[100px]" />
         </div>
 
         {/* Trust Statistics Card (Bottom Left) */}
