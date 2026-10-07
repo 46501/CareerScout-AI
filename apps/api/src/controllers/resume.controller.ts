@@ -4,6 +4,21 @@ import { Resume } from '../models/Resume';
 import { AuthRequest } from '../middleware/auth.middleware';
 import fs from 'fs/promises';
 import path from 'path';
+
+// Polyfills for pdf-parse/pdfjs-dist in Node 22+
+if (typeof global !== 'undefined') {
+  if (!global.DOMMatrix) {
+    global.DOMMatrix = class DOMMatrix {
+      constructor() { return this; }
+    } as any;
+  }
+  if (!global.Path2D) {
+    global.Path2D = class Path2D {
+      constructor() { return this; }
+    } as any;
+  }
+}
+
 const pdfParseLib = require('pdf-parse');
 const pdfParse = typeof pdfParseLib === 'function' ? pdfParseLib : (pdfParseLib.default || pdfParseLib.PDFParse || pdfParseLib);
 import { extractResumeData } from '../services/ai.service';

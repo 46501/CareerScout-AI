@@ -1,3 +1,13 @@
+// Polyfills for pdf-parse/pdfjs-dist in Node 22+
+if (typeof global !== 'undefined') {
+  if (!global.DOMMatrix) {
+    global.DOMMatrix = class DOMMatrix { constructor() { return this; } } as any;
+  }
+  if (!global.Path2D) {
+    global.Path2D = class Path2D { constructor() { return this; } } as any;
+  }
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

@@ -15,6 +15,14 @@ async function startWorker() {
     const mongoUri = process.env.MONGODB_URI;
     if (mongoUri) {
       await mongoose.connect(mongoUri);
+      try {
+        const mongooseApi = require('../../api/node_modules/mongoose');
+        if (mongooseApi && mongoose !== mongooseApi) {
+          await mongooseApi.connect(mongoUri);
+        }
+      } catch (e) {
+        console.error('Failed to connect API mongoose in worker:', e);
+      }
       console.log('MongoDB connected');
     }
 
