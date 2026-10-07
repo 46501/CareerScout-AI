@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 // @ts-ignore
-import { Opportunity } from '../../api/src/models/Opportunity';
+import { Opportunity } from '../../../api/src/models/Opportunity';
 // @ts-ignore
-import { CareerProfile } from '../../api/src/models/CareerProfile';
+import { CareerProfile } from '../../../api/src/models/CareerProfile';
 // @ts-ignore
-import { UserOpportunityMatch } from '../../api/src/models/UserOpportunityMatch';
+import { UserOpportunityMatch } from '../../../api/src/models/UserOpportunityMatch';
 
 export const runPersonalizedScout = async (userId: string) => {
   const profile = await CareerProfile.findOne({ userId });

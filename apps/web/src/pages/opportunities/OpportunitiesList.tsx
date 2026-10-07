@@ -85,6 +85,24 @@ export function OpportunitiesList() {
 
                       <p className="text-gray-600 line-clamp-2 text-sm">{opp.description}</p>
                       
+                      {opp.matchDetails && (
+                        <div className="bg-primary-50 rounded-lg p-3 mt-2 border border-primary-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-primary-700 font-semibold text-sm">AI Match Score: {opp.matchDetails.score}%</span>
+                            <div className="flex-1 h-1.5 bg-primary-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-primary-600 rounded-full" style={{ width: `${opp.matchDetails.score}%` }}></div>
+                            </div>
+                          </div>
+                          {opp.matchDetails.reasons?.length > 0 && (
+                            <ul className="text-xs text-primary-800 space-y-0.5 ml-4 list-disc">
+                              {opp.matchDetails.reasons.slice(0, 2).map((r: string, i: number) => (
+                                <li key={i}>{r}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                      
                       <div className="flex flex-wrap gap-2 pt-2">
                         {opp.skills.map((s: string) => (
                           <Badge key={s} variant="secondary">{s}</Badge>
