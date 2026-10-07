@@ -4,7 +4,8 @@ import { Resume } from '../models/Resume';
 import { AuthRequest } from '../middleware/auth.middleware';
 import fs from 'fs/promises';
 import path from 'path';
-const pdfParse = require('pdf-parse');
+const pdfParseLib = require('pdf-parse');
+const pdfParse = typeof pdfParseLib === 'function' ? pdfParseLib : (pdfParseLib.default || pdfParseLib.PDFParse || pdfParseLib);
 import { extractResumeData } from '../services/ai.service';
 
 export const uploadResume = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
