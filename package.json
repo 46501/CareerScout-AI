@@ -11,6 +11,8 @@
     "dev": "concurrently \"npm run dev -w @careerscout/api\" \"npm run dev -w web\" \"npm run dev -w @careerscout/worker\"",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration -w @careerscout/api",
+    "test:e2e": "npx playwright test -c apps/web/playwright.config.ts",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

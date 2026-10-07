@@ -15,7 +15,7 @@ export const getDashboardStats = async (req: Request, res: Response, next: NextF
     const applications = await Application.find({ user: userId });
     const applied = applications.length;
     const interviews = applications.filter(a => a.status === 'INTERVIEW').length;
-    const shortlisted = applications.filter(a => a.status === 'SHORTLISTED' || a.status === 'OFFER' || a.status === 'ACCEPTED').length;
+    const shortlisted = applications.filter(a => a.status === 'ONLINE_ASSESSMENT' || a.status === 'OFFER' || a.status === 'INTERVIEW').length;
 
     res.status(200).json({
       success: true,
@@ -46,7 +46,7 @@ export const getDashboardTrends = async (req: Request, res: Response, next: Next
     const currentMonth = new Date().getMonth();
     
     // Generate the last 6 months labels
-    const chartData = [];
+    const chartData: Array<{name: string, monthIndex: number, Jobs: number, Internships: number, Competitions: number, Hackathons: number}> = [];
     for (let i = 5; i >= 0; i--) {
       let m = currentMonth - i;
       if (m < 0) m += 12;
