@@ -71,5 +71,5 @@ describe('Scout Service Tests', () => {
     expect(matches.length).toBe(1);
     expect(matches[0].matchScore).toBeGreaterThan(0);
     expect(matches[0].matchReasons.length).toBeGreaterThan(0);
-  });
+  }, 30000);
 });

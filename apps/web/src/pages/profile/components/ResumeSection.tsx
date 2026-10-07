@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
-import { FileText, Upload, Trash2, CheckCircle, Search, AlertCircle, Eye, RefreshCw } from 'lucide-react';
+import { FileText, Upload, Trash2, Search, AlertCircle, Eye, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import api from '../../../lib/api';
 

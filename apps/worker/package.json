@@ -13,8 +13,11 @@
     "axios": "^1.20.0",
     "bullmq": "^5.18.0",
     "dotenv": "^16.4.5",
+    "kareem": "^2.6.3",
     "mongoose": "^8.7.0",
-    "redis": "^4.7.0"
+    "msgpackr": "^2.0.5",
+    "node-abort-controller": "^3.1.1",
+    "redis": "^6.3.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

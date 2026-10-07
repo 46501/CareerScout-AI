@@ -1,7 +1,7 @@
 import { CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
-import { Target, X, Plus } from 'lucide-react';
+import { Target, X } from 'lucide-react';
 import { Badge } from '../../../components/ui/Badge';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 
 const LOOKING_FOR_OPTIONS = ['Job', 'Internship', 'Hackathon', 'Competition', 'Fellowship'];
 
