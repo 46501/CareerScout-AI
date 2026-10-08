@@ -65,7 +65,7 @@ export const scoutWorker = new Worker('opportunity-discovery', async (job: Job) 
     let matchesFound = 0;
 
     for (const scrapedJob of hnJobs) {
-      const matchResult = calculateMatchScore(profile, scrapedJob);
+      const matchResult = await calculateMatchScore(profile, scrapedJob);
       
       // Save if match score is decent, or save anyway for demo purposes (score > 10)
       if (matchResult.score > 10) {

@@ -67,7 +67,62 @@ export const extractResumeData = async (resumeText: string) => {
   }
 };
 
-export const calculateMatchScore = (profile: any, opportunity: any) => {
+export const calculateMatchScore = async (profile: any, opportunity: any) => {
+  try {
+    if (!process.env.AI_API_KEY || process.env.AI_API_KEY.includes('your_gemini')) {
+      return deterministicMatch(profile, opportunity);
+    }
+    
+    const model = ai.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            score: { type: SchemaType.NUMBER, description: 'Match score between 0 and 100' },
+            reasons: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: 'Array of 2-3 short reasons for the score' }
+          },
+          required: ['score', 'reasons']
+        }
+      }
+    });
+
+    const prompt = `Analyze the fit between this user's profile and the job opportunity.
+    User Profile:
+    ${JSON.stringify({
+      skills: profile.skills,
+      experience: profile.experience,
+      goals: profile.careerGoals,
+      location: profile.locationPreferences
+    })}
+    
+    Job Opportunity:
+    ${JSON.stringify({
+      title: opportunity.title,
+      company: opportunity.organization,
+      description: opportunity.description,
+      skills: opportunity.skills,
+      type: opportunity.type,
+      location: opportunity.location
+    })}
+    
+    Calculate a match score from 0 to 100 based on skill overlap, role fit, and experience. Return the score and 2-3 brief reasons.`;
+
+    const result = await model.generateContent(prompt);
+    const json = JSON.parse(result.response.text());
+    
+    return {
+      score: Math.min(100, Math.max(0, json.score)),
+      reasons: json.reasons || []
+    };
+  } catch (error) {
+    console.error('AI matching failed, falling back to deterministic:', error);
+    return deterministicMatch(profile, opportunity);
+  }
+};
+
+const deterministicMatch = (profile: any, opportunity: any) => {
   // Simple deterministic hybrid matching
   let score = 0;
   
