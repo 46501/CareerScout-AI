@@ -30,9 +30,13 @@ import opportunityRoutes from './routes/opportunity.routes';
 import savedOpportunityRoutes from './routes/savedOpportunity.routes';
 import applicationRoutes from './routes/application.routes';
 import notificationRoutes from './routes/notification.routes';
+import sseRoutes from './routes/sse.routes';
 
 import scoutRoutes from './routes/scout.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+
+// Initialize PubSub immediately so subscriptions are active
+import './services/pubsub.service';
 
 app.use(helmet());
 app.use(cors({
@@ -55,6 +59,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/scout', scoutRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/stream', sseRoutes);
 
 import { errorHandler } from './middleware/error.middleware';
 

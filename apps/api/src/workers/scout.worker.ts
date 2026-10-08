@@ -81,12 +81,18 @@ export const scoutWorker = new Worker('opportunity-discovery', async (job: Job) 
 
           // Send notification only for High Matches (> 50%)
           if (matchResult.score >= 50) {
-            await Notification.create({
+            const notif = await Notification.create({
               userId: userId,
               title: 'New AI Job Match Found!',
               message: `We found a ${matchResult.score}% match for ${scrapedJob.title} at ${scrapedJob.organization}.`,
               type: 'SYSTEM',
               read: false
+            });
+
+            const { publishUserEvent } = require('../services/pubsub.service');
+            await publishUserEvent(userId.toString(), {
+              type: 'NOTIFICATION',
+              data: notif
             });
           }
         }

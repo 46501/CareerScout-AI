@@ -23,6 +23,7 @@ const pdfParseLib = require('pdf-parse');
 const pdfParse = typeof pdfParseLib === 'function' ? pdfParseLib : (pdfParseLib.default || pdfParseLib.PDFParse || pdfParseLib);
 const mammoth = require('mammoth');
 import { extractResumeData } from '../services/ai.service';
+import { publishUserEvent } from '../services/pubsub.service';
 
 export const uploadResume = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -75,9 +76,28 @@ export const uploadResume = async (req: AuthRequest, res: Response, next: NextFu
           expCount: extractedData.experience?.length || 0
         }
       });
+
+      // Broadcast real-time success to frontend
+      if (req.user?.id) {
+        await publishUserEvent(req.user.id, {
+          type: 'RESUME_PARSED',
+          status: 'SUCCESS',
+          data: extractedData
+        });
+      }
+
     } catch (processErr) {
       console.error('Resume processing error:', processErr);
       await Resume.findByIdAndUpdate(resume._id, { status: 'FAILED' });
+      
+      // Broadcast real-time error to frontend
+      if (req.user?.id) {
+        await publishUserEvent(req.user.id, {
+          type: 'RESUME_PARSED',
+          status: 'FAILED',
+          error: 'Could not parse resume data.'
+        });
+      }
     }
 
   } catch (error) {
