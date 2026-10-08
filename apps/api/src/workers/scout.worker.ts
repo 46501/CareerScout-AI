@@ -1,7 +1,7 @@
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 import { User } from '../models/User';
-import { Profile } from '../models/Profile';
+import { CareerProfile } from '../models/CareerProfile';
 import { Opportunity } from '../models/Opportunity';
 import { Notification } from '../models/Notification';
 import { calculateMatchScore } from '../services/ai.service';
@@ -53,7 +53,7 @@ export const scoutWorker = new Worker('opportunity-discovery', async (job: Job) 
   
   try {
     const user = await User.findById(userId);
-    const profile = await Profile.findOne({ userId });
+    const profile = await CareerProfile.findOne({ userId });
     
     if (!user || !profile) {
       throw new Error(`User or Profile not found for userId: ${userId}`);
