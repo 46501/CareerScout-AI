@@ -81,9 +81,11 @@ export const calculateMatchScore = async (profile: any, opportunity: any) => {
           type: SchemaType.OBJECT,
           properties: {
             score: { type: SchemaType.NUMBER, description: 'Match score between 0 and 100' },
-            reasons: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: 'Array of 2-3 short reasons for the score' }
+            reasons: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: 'Array of 2-3 short reasons for the score' },
+            missingSkills: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: 'Important technical skills required by the job that the user lacks' },
+            recommendation: { type: SchemaType.STRING, description: 'One short sentence of advice on how the user can improve their chances (e.g. what to highlight in cover letter, or what to learn)' }
           },
-          required: ['score', 'reasons']
+          required: ['score', 'reasons', 'missingSkills', 'recommendation']
         }
       }
     });
@@ -107,14 +109,17 @@ export const calculateMatchScore = async (profile: any, opportunity: any) => {
       location: opportunity.location
     })}
     
-    Calculate a match score from 0 to 100 based on skill overlap, role fit, and experience. Return the score and 2-3 brief reasons.`;
+    Calculate a match score from 0 to 100 based on skill overlap, role fit, and experience.
+    Identify any critical missing skills the user should learn, and give one short recommendation on how to stand out.`;
 
     const result = await model.generateContent(prompt);
     const json = JSON.parse(result.response.text());
     
     return {
       score: Math.min(100, Math.max(0, json.score)),
-      reasons: json.reasons || []
+      reasons: json.reasons || [],
+      missingSkills: json.missingSkills || [],
+      recommendation: json.recommendation || ''
     };
   } catch (error) {
     console.error('AI matching failed, falling back to deterministic:', error);

@@ -5,11 +5,13 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { BackButton } from '../../components/ui/BackButton';
+import { MatchAnalyzerModal } from '../../components/ui/MatchAnalyzerModal';
 import api from '../../lib/api';
 
 export function OpportunitiesList() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOppForAnalysis, setSelectedOppForAnalysis] = useState<any>(null);
 
   useEffect(() => {
     const fetchOpps = async () => {
@@ -93,17 +95,25 @@ export function OpportunitiesList() {
                       <p className="text-slate-400 line-clamp-2 text-sm leading-relaxed">{opp.description}</p>
                       
                       {opp.matchDetails && (
-                        <div className="bg-primary-900/20 rounded-lg p-3 mt-3 border border-primary-500/20 backdrop-blur-sm">
+                        <div className="bg-primary-900/20 rounded-lg p-3 mt-3 border border-primary-500/20 backdrop-blur-sm group/match relative overflow-hidden transition-all hover:bg-primary-900/30">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-primary-300 font-semibold text-sm">AI Match Score: {opp.matchDetails.score}%</span>
                             <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden shadow-inner">
                               <div className="h-full bg-gradient-to-r from-primary-600 to-accent-500 rounded-full" style={{ width: `${opp.matchDetails.score}%` }}></div>
                             </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 text-xs border-primary-500/30 text-primary-300 hover:bg-primary-500/20 opacity-0 group-hover/match:opacity-100 transition-opacity absolute right-3"
+                              onClick={(e) => { e.stopPropagation(); setSelectedOppForAnalysis(opp); }}
+                            >
+                              Analyze
+                            </Button>
                           </div>
                           {opp.matchDetails.reasons?.length > 0 && (
-                            <ul className="text-xs text-primary-200/70 space-y-1 ml-4 list-disc marker:text-primary-500/50">
+                            <ul className="text-xs text-primary-200/70 space-y-1 ml-4 list-disc marker:text-primary-500/50 pr-20">
                               {opp.matchDetails.reasons.slice(0, 2).map((r: string, i: number) => (
-                                <li key={i}>{r}</li>
+                                <li key={i} className="truncate">{r}</li>
                               ))}
                             </ul>
                           )}
@@ -134,6 +144,12 @@ export function OpportunitiesList() {
           )}
         </div>
       </div>
+      
+      <MatchAnalyzerModal 
+        isOpen={!!selectedOppForAnalysis} 
+        onClose={() => setSelectedOppForAnalysis(null)} 
+        opportunity={selectedOppForAnalysis} 
+      />
     </div>
   );
 }
