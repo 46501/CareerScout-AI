@@ -188,3 +188,41 @@ const deterministicMatch = (profile: any, opportunity: any) => {
     ]
   };
 };
+
+export const generateCoverLetter = async (profile: any, opportunity: any): Promise<string> => {
+  if (!process.env.AI_API_KEY || process.env.AI_API_KEY.includes('your_gemini')) {
+    return 'Dear Hiring Manager,\n\nI am very interested in this role. Please see my attached resume.\n\nSincerely,\n[Your Name]';
+  }
+  
+  try {
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `Write a highly tailored, professional cover letter for the following job opportunity, based on the user's profile.
+    
+    User Profile:
+    ${JSON.stringify({
+      skills: profile.skills,
+      experience: profile.experience,
+      education: profile.education
+    })}
+    
+    Job Opportunity:
+    ${JSON.stringify({
+      title: opportunity.title,
+      company: opportunity.organization,
+      description: opportunity.description
+    })}
+    
+    The cover letter should be 3-4 paragraphs:
+    1. Introduction (enthusiasm for the role and company).
+    2. Body (highlighting 1-2 key skills/experiences from the profile that match the job).
+    3. Conclusion (call to action).
+    Do not include placeholder addresses at the top. Just start with "Dear Hiring Manager," or the appropriate greeting. Return ONLY the cover letter text, no markdown blocks.`;
+
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+  } catch (error) {
+    console.error('AI Cover Letter generation failed:', error);
+    return 'Dear Hiring Manager,\n\nI am writing to express my strong interest in the open position at your company. My skills and background make me a great fit for this role.\n\nSincerely,\nCandidate';
+  }
+};

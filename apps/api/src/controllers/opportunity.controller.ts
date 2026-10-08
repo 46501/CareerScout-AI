@@ -2,6 +2,9 @@ import { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { Opportunity } from '../models/Opportunity';
 
+import { CareerProfile } from '../models/CareerProfile';
+import { generateCoverLetter as aiGenerateCoverLetter } from '../services/ai.service';
+
 export const getOpportunities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { page = 1, limit = 20, type, location, skills, filter } = req.query;
@@ -89,6 +92,30 @@ export const getOpportunityById = async (req: Request, res: Response, next: Next
     }
 
     res.status(200).json({ success: true, data: opportunity });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const generateCoverLetter = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = (req as any).user?.id;
+    const opportunityId = req.params.id;
+
+    const profile = await CareerProfile.findOne({ userId });
+    if (!profile) {
+      res.status(404).json({ success: false, error: { message: 'Profile not found' } });
+      return;
+    }
+
+    const opportunity = await Opportunity.findById(opportunityId);
+    if (!opportunity) {
+      res.status(404).json({ success: false, error: { message: 'Opportunity not found' } });
+      return;
+    }
+
+    const letter = await aiGenerateCoverLetter(profile, opportunity);
+    res.status(200).json({ success: true, data: { coverLetter: letter } });
   } catch (error) {
     next(error);
   }

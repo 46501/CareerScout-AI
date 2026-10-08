@@ -1,7 +1,9 @@
-import React from 'react';
-import { X, CheckCircle, AlertTriangle, Lightbulb, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, CheckCircle, AlertTriangle, Lightbulb, XCircle, FileText, Loader2, Copy } from 'lucide-react';
 import { Button } from './Button';
 import { Badge } from './Badge';
+
+import api from '../../lib/api';
 
 interface MatchAnalyzerModalProps {
   isOpen: boolean;
@@ -10,11 +12,26 @@ interface MatchAnalyzerModalProps {
 }
 
 export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, onClose, opportunity }) => {
+  const [coverLetter, setCoverLetter] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+
   if (!isOpen || !opportunity) return null;
 
   const match = opportunity.matchDetails;
   
   if (!match) return null;
+
+  const handleGenerateCoverLetter = async () => {
+    setGenerating(true);
+    try {
+      const res = await api.post(`/opportunities/${opportunity._id}/cover-letter`);
+      setCoverLetter(res.data.data.coverLetter);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -121,6 +138,42 @@ export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, 
               </div>
             </div>
           )}
+
+          {/* Cover Letter Section */}
+          <div className="pt-4 border-t border-slate-800/50">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                <FileText className="h-4 w-4 text-blue-400" /> Auto-Generated Cover Letter
+              </h4>
+              {!coverLetter && (
+                <Button 
+                  onClick={handleGenerateCoverLetter} 
+                  disabled={generating}
+                  className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg text-xs h-8"
+                >
+                  {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
+                  Generate Letter
+                </Button>
+              )}
+            </div>
+
+            {coverLetter && (
+              <div className="bg-slate-900/80 border border-slate-700/50 rounded-lg p-4 relative group">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800"
+                  onClick={() => navigator.clipboard.writeText(coverLetter)}
+                  title="Copy to clipboard"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+                <div className="whitespace-pre-wrap text-sm text-slate-300 font-serif leading-relaxed">
+                  {coverLetter}
+                </div>
+              </div>
+            )}
+          </div>
 
         </div>
 
