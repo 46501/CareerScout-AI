@@ -21,6 +21,7 @@ if (typeof global !== 'undefined') {
 
 const pdfParseLib = require('pdf-parse');
 const pdfParse = typeof pdfParseLib === 'function' ? pdfParseLib : (pdfParseLib.default || pdfParseLib.PDFParse || pdfParseLib);
+const mammoth = require('mammoth');
 import { extractResumeData } from '../services/ai.service';
 
 export const uploadResume = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -55,6 +56,9 @@ export const uploadResume = async (req: AuthRequest, res: Response, next: NextFu
       if (req.file.mimetype === 'application/pdf') {
         const data = await pdfParse(dataBuffer);
         text = data.text;
+      } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || req.file.originalname.endsWith('.docx')) {
+        const result = await mammoth.extractRawText({ buffer: dataBuffer });
+        text = result.value;
       } else {
         // Fallback for docx or other formats if needed, for MVP we'll just extract raw text if possible
         text = dataBuffer.toString('utf-8');
