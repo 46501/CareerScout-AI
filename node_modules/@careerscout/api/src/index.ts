@@ -77,6 +77,10 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`API running on http://localhost:${PORT}`);
     });
+    
+    // Initialize workers
+    require('./workers/scout.worker');
+    console.log('Background workers initialized');
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
