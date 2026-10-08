@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import api from '../../lib/api';
-import { Upload, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
+import { Upload, ChevronRight, ChevronLeft, CheckCircle, Sparkles } from 'lucide-react';
 
 const onboardingSchema = z.object({
   fullName: z.string().min(2, 'Name is required'),
@@ -65,108 +65,119 @@ export function OnboardingWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <div className="flex justify-between items-center mb-4">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute top-0 -left-4 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 animate-blob"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-blob" style={{ animationDelay: '2s' }}></div>
+
+      <Card className="w-full max-w-2xl glass-card text-white relative z-10 border-slate-800/50 shadow-2xl">
+        <CardHeader className="space-y-6">
+          <div className="flex justify-between items-center mb-2">
             <div className="flex space-x-2">
               {[1, 2, 3].map(i => (
-                <div key={i} className={`h-2 w-12 rounded-full ${step >= i ? 'bg-primary-600' : 'bg-gray-200'}`} />
+                <div key={i} className={`h-2 w-16 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'}`} />
               ))}
             </div>
-            <span className="text-sm font-medium text-gray-500">Step {step} of 3</span>
+            <span className="text-sm font-medium text-slate-400 bg-slate-900/50 px-3 py-1 rounded-full border border-slate-800">Step {step} of 3</span>
           </div>
-          <CardTitle className="text-2xl">
-            {step === 1 && "Basic Information"}
-            {step === 2 && "Skills & Preferences"}
-            {step === 3 && "Upload Resume"}
-          </CardTitle>
-          <CardDescription>
-            {step === 1 && "Let's start with the basics to build your career profile."}
-            {step === 2 && "Tell us what you're good at and what you're looking for."}
-            {step === 3 && "Let our AI analyze your resume to auto-fill the rest."}
-          </CardDescription>
+          <div>
+            <CardTitle className="text-3xl font-bold tracking-tight text-white mb-2 flex items-center gap-2">
+              {step === 1 && "Basic Information"}
+              {step === 2 && "Skills & Preferences"}
+              {step === 3 && <><Sparkles className="h-6 w-6 text-accent-500" /> Upload Resume</>}
+            </CardTitle>
+            <CardDescription className="text-slate-400 text-base">
+              {step === 1 && "Let's start with the basics to build your AI-powered career profile."}
+              {step === 2 && "Tell us what you're good at and what you're looking for."}
+              {step === 3 && "Let our AI analyze your resume to auto-fill the rest of your profile."}
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
             
-            {/* STEP 1 */}
-            {step === 1 && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <Input {...register('fullName')} placeholder="John Doe" />
-                  {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
+            <div className="transition-all duration-300 min-h-[280px]">
+              {/* STEP 1 */}
+              {step === 1 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-300">Full Name</label>
+                    <Input {...register('fullName')} placeholder="John Doe" className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-primary-500 focus:ring-primary-500/20 h-12" />
+                    {errors.fullName && <p className="text-red-400 text-sm">{errors.fullName.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-300">Professional Headline</label>
+                    <Input {...register('headline')} placeholder="e.g. Full Stack Developer | Computer Science Student" className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-primary-500 focus:ring-primary-500/20 h-12" />
+                    {errors.headline && <p className="text-red-400 text-sm">{errors.headline.message}</p>}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Professional Headline</label>
-                  <Input {...register('headline')} placeholder="e.g. Full Stack Developer | Computer Science Student" />
-                  {errors.headline && <p className="text-red-500 text-sm mt-1">{errors.headline.message}</p>}
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* STEP 2 */}
-            {step === 2 && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Key Skills (comma separated)</label>
-                  <Input {...register('skills')} placeholder="JavaScript, React, Python" />
+              {/* STEP 2 */}
+              {step === 2 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-300">Key Skills <span className="text-slate-500 font-normal">(comma separated)</span></label>
+                    <Input {...register('skills')} placeholder="JavaScript, React, Python, TensorFlow" className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-primary-500 focus:ring-primary-500/20 h-12" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-300">Preferred Locations <span className="text-slate-500 font-normal">(comma separated)</span></label>
+                    <Input {...register('preferredLocations')} placeholder="San Francisco, New York, London" className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-primary-500 focus:ring-primary-500/20 h-12" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-300">Remote Preference</label>
+                    <select 
+                      {...register('remotePreference')}
+                      className="flex h-12 w-full rounded-md border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 transition-colors"
+                    >
+                      <option value="ANY" className="bg-slate-900">Open to Any</option>
+                      <option value="REMOTE" className="bg-slate-900">Remote Only</option>
+                      <option value="HYBRID" className="bg-slate-900">Hybrid</option>
+                      <option value="ONSITE" className="bg-slate-900">On-site Only</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Locations (comma separated)</label>
-                  <Input {...register('preferredLocations')} placeholder="San Francisco, New York, London" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Remote Preference</label>
-                  <select 
-                    {...register('remotePreference')}
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  >
-                    <option value="ANY">Open to Any</option>
-                    <option value="REMOTE">Remote Only</option>
-                    <option value="HYBRID">Hybrid</option>
-                    <option value="ONSITE">On-site Only</option>
-                  </select>
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* STEP 3 */}
-            {step === 3 && (
-              <div className="space-y-6 text-center">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 hover:bg-gray-50 transition-colors cursor-pointer">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-sm text-gray-600 mb-2">Click to upload or drag and drop your resume</p>
-                  <p className="text-xs text-gray-500">PDF or DOCX up to 5MB</p>
-                  <Button variant="outline" className="mt-4" type="button">Browse Files</Button>
+              {/* STEP 3 */}
+              {step === 3 && (
+                <div className="space-y-6 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="border-2 border-dashed border-slate-700 rounded-2xl p-12 hover:bg-slate-800/30 hover:border-primary-500/50 transition-all duration-300 cursor-pointer group">
+                    <div className="bg-slate-900 p-4 rounded-full inline-block mb-4 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all">
+                      <Upload className="h-10 w-10 text-primary-400" />
+                    </div>
+                    <p className="text-base font-medium text-slate-200 mb-2">Click to upload or drag and drop your resume</p>
+                    <p className="text-sm text-slate-500">PDF or DOCX up to 5MB</p>
+                    <Button variant="outline" className="mt-6 border-slate-700 hover:bg-slate-800 text-white" type="button">Browse Files</Button>
+                  </div>
+                  <div className="bg-primary-900/20 border border-primary-500/30 rounded-xl p-4 flex items-start text-left backdrop-blur-sm">
+                    <CheckCircle className="h-5 w-5 text-primary-400 mt-0.5 mr-3 flex-shrink-0" />
+                    <p className="text-sm text-primary-100/80 leading-relaxed">
+                      Our intelligent parser will analyze your resume to automatically extract your education, work experience, and projects. You can review and edit everything on your dashboard later.
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-primary-50 rounded-lg p-4 flex items-start text-left">
-                  <CheckCircle className="h-5 w-5 text-primary-600 mt-0.5 mr-3 flex-shrink-0" />
-                  <p className="text-sm text-primary-800">
-                    Our AI will analyze your resume to automatically extract your education, work experience, and projects. You can review and edit everything on your dashboard later.
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            <div className="mt-8 flex justify-between">
+            <div className="mt-10 flex justify-between pt-6 border-t border-slate-800/50">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={prevStep}
                 disabled={step === 1}
+                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent h-12 px-6"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               
               {step < 3 ? (
-                <Button type="button" onClick={nextStep}>
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
+                <Button type="button" onClick={nextStep} className="bg-white text-slate-900 hover:bg-slate-200 h-12 px-8 font-semibold shadow-lg hover:shadow-xl transition-all">
+                  Next Step <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Complete Profile'}
+                <Button type="submit" disabled={isSubmitting} className="bg-primary-600 hover:bg-primary-500 text-white h-12 px-8 font-semibold shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-all">
+                  {isSubmitting ? 'Analyzing Resume...' : 'Complete Profile'}
                 </Button>
               )}
             </div>
