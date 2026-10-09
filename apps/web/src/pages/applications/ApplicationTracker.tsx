@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import { Card, CardContent } from '../../components/ui/Card';
 import { BackButton } from '../../components/ui/BackButton';
 import { Briefcase, Building2, Clock, CheckCircle2, XCircle, ChevronRight, Bookmark } from 'lucide-react';
