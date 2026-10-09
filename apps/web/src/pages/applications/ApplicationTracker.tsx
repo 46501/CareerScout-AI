@@ -91,9 +91,9 @@ export function ApplicationTracker() {
                 return (
                   <div key={col.id} className="w-80 flex flex-col h-[calc(100vh-200px)]">
                     {/* Column Header */}
-                    <div className={\`flex items-center justify-between p-3 rounded-t-xl border border-slate-800 border-b-0 \${col.bg} backdrop-blur-md\`}>
+                    <div className={`flex items-center justify-between p-3 rounded-t-xl border border-slate-800 border-b-0 ${col.bg} backdrop-blur-md`}>
                       <div className="flex items-center gap-2">
-                        <Icon className={\`h-4 w-4 \${col.color}\`} />
+                        <Icon className={`h-4 w-4 ${col.color}`} />
                         <span className="font-semibold text-slate-200">{col.title}</span>
                       </div>
                       <span className="text-xs font-bold text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded-full">
@@ -107,7 +107,7 @@ export function ApplicationTracker() {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={\`flex-1 p-3 rounded-b-xl border border-slate-800 transition-colors overflow-y-auto hide-scrollbar \${snapshot.isDraggingOver ? 'bg-slate-800/30 border-primary-500/30' : 'bg-slate-900/30'}\`}
+                          className={`flex-1 p-3 rounded-b-xl border border-slate-800 transition-colors overflow-y-auto hide-scrollbar ${snapshot.isDraggingOver ? 'bg-slate-800/30 border-primary-500/30' : 'bg-slate-900/30'}`}
                         >
                           {columnApps.map((app, index) => (
                             <Draggable key={app._id} draggableId={app._id} index={index}>
@@ -116,9 +116,9 @@ export function ApplicationTracker() {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className={\`mb-3 \${snapshot.isDragging ? 'z-50' : ''}\`}
+                                  className={`mb-3 ${snapshot.isDragging ? 'z-50' : ''}`}
                                 >
-                                  <Card className={\`glass-card border-slate-700/50 hover:border-primary-500/40 transition-all \${snapshot.isDragging ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)] rotate-2 scale-105' : ''}\`}>
+                                  <Card className={`glass-card border-slate-700/50 hover:border-primary-500/40 transition-all ${snapshot.isDragging ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)] rotate-2 scale-105' : ''}`}>
                                     <CardContent className="p-4">
                                       <h4 className="font-bold text-white text-sm truncate">{app.opportunity?.title || 'Unknown Role'}</h4>
                                       <div className="flex items-center text-slate-400 text-xs mt-1.5 gap-1.5">
