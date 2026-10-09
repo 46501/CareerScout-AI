@@ -26,7 +26,10 @@ export function Register() {
       await registerUser({ fullName, email, password });
       navigate('/onboarding');
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Registration failed');
+      console.error('Registration error:', err);
+      // If there is no response (e.g. CORS or network error), display the raw message
+      const errorMessage = err.response?.data?.error?.message || err.message || 'Registration failed';
+      setError(errorMessage);
     }
   };
 

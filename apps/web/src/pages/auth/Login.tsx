@@ -32,7 +32,10 @@ export function Login() {
       await login({ email, password });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      // If there is no response (e.g. CORS or network error), display the raw message
+      const errorMessage = err.response?.data?.error?.message || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
