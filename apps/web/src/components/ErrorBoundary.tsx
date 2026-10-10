@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-          <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-lg shadow-md max-w-md w-full text-center">
             <Bot className="h-16 w-16 text-primary-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong.</h1>
             <p className="text-gray-500 mb-6">

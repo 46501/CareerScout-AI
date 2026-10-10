@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Dashboard } from './components/Dashboard';
 import { Login } from './pages/auth/Login';
@@ -37,65 +38,67 @@ const GuestRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <GuestRoute>
-                <Login />
-              </GuestRoute>
-            } />
-            <Route path="/landing" element={<LandingPage />} />
-            <Route path="/login" element={
-              <GuestRoute>
-                <Login />
-              </GuestRoute>
-            } />
-            <Route path="/register" element={
-              <GuestRoute>
-                <Register />
-              </GuestRoute>
-            } />
-            <Route path="/onboarding" element={
-              <ProtectedRoute>
-                <OnboardingWizard />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/opportunities" element={
-              <ProtectedRoute>
-                <OpportunitiesList />
-              </ProtectedRoute>
-            } />
-            <Route path="/applications" element={
-              <ProtectedRoute>
-                <ApplicationTracker />
-              </ProtectedRoute>
-            } />
-            <Route path="/assistant" element={
-              <ProtectedRoute>
-                <Assistant />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <GuestRoute>
+                  <Login />
+                </GuestRoute>
+              } />
+              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/login" element={
+                <GuestRoute>
+                  <Login />
+                </GuestRoute>
+              } />
+              <Route path="/register" element={
+                <GuestRoute>
+                  <Register />
+                </GuestRoute>
+              } />
+              <Route path="/onboarding" element={
+                <ProtectedRoute>
+                  <OnboardingWizard />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/opportunities" element={
+                <ProtectedRoute>
+                  <OpportunitiesList />
+                </ProtectedRoute>
+              } />
+              <Route path="/applications" element={
+                <ProtectedRoute>
+                  <ApplicationTracker />
+                </ProtectedRoute>
+              } />
+              <Route path="/assistant" element={
+                <ProtectedRoute>
+                  <Assistant />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

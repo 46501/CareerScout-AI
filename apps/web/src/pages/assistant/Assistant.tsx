@@ -46,7 +46,7 @@ export function Assistant() {
               </div>
             ))}
           </CardContent>
-          <div className="p-4 border-t border-gray-200 bg-white">
+          <div className="p-4 border-t border-gray-200 bg-white dark:bg-slate-900">
             <div className="flex space-x-2">
               <Input 
                 value={input} 

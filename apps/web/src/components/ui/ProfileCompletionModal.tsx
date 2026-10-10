@@ -57,7 +57,7 @@ export const ProfileCompletionModal: React.FC<ProfileCompletionModalProps> = ({
       
       {/* Modal Content */}
       <div 
-        className={`relative bg-white w-full max-w-md rounded-[24px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden transform transition-all duration-300 ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}
+        className={`relative bg-white dark:bg-slate-900 w-full max-w-md rounded-[24px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden transform transition-all duration-300 ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}
         onClick={e => e.stopPropagation()}
       >
         <button 

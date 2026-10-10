@@ -75,7 +75,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
         ) : (
           <div className="space-y-4">
             {data.map((edu: any, i: number) => (
-              <div key={i} className="flex flex-col sm:flex-row gap-4 p-5 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+              <div key={i} className="flex flex-col sm:flex-row gap-4 p-5 border border-gray-100 bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
                 <div className="h-12 w-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
                   <GraduationCap className="h-6 w-6" />
                 </div>
@@ -115,7 +115,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
       {/* MODAL */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col">
             <div className="flex justify-between items-center p-5 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-900">{editIndex !== null ? 'Edit' : 'Add'} Education</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
@@ -129,7 +129,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                   type="text" 
                   value={formData.college || ''}
                   onChange={(e) => setFormData({...formData, college: e.target.value})}
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="e.g. Lovely Professional University"
                 />
               </div>
@@ -141,7 +141,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                     type="text" 
                     value={formData.degree || ''}
                     onChange={(e) => setFormData({...formData, degree: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g. B.Tech"
                   />
                 </div>
@@ -151,7 +151,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                     type="text" 
                     value={formData.branch || ''}
                     onChange={(e) => setFormData({...formData, branch: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g. Computer Science"
                   />
                 </div>
@@ -164,7 +164,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                     type="number" 
                     value={formData.startYear || ''}
                     onChange={(e) => setFormData({...formData, startYear: parseInt(e.target.value)})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div>
@@ -173,7 +173,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                     type="number" 
                     value={formData.graduationYear || ''}
                     onChange={(e) => setFormData({...formData, graduationYear: parseInt(e.target.value)})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
               </div>
@@ -184,7 +184,7 @@ export const EducationSection = ({ data = [], onChange }: any) => {
                   type="text" 
                   value={formData.cgpa || ''}
                   onChange={(e) => setFormData({...formData, cgpa: e.target.value})}
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="e.g. 8.5"
                 />
               </div>

@@ -154,7 +154,7 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             onClick={handleUploadClick}
             className="border-2 border-dashed border-primary-200 bg-primary-50 hover:bg-primary-100 rounded-xl p-12 text-center transition-colors cursor-pointer group"
           >
-            <div className="h-16 w-16 mx-auto bg-white rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-105 transition-transform">
+            <div className="h-16 w-16 mx-auto bg-white dark:bg-slate-900 rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-105 transition-transform">
                <Upload className="h-8 w-8 text-primary-500" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -171,7 +171,7 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             />
           </div>
         ) : uploadStatus !== 'completed' && uploadStatus !== 'idle' ? (
-          <div className="border border-gray-100 rounded-xl p-10 text-center space-y-6 shadow-sm bg-white">
+          <div className="border border-gray-100 rounded-xl p-10 text-center space-y-6 shadow-sm bg-white dark:bg-slate-900">
             <div className="flex justify-center">
               <div className="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center">
                 {uploadStatus === 'uploading' && <Upload className="h-10 w-10 text-primary-500 animate-bounce" />}
@@ -190,7 +190,7 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             </div>
           </div>
         ) : (
-          <div className="border border-gray-100 bg-white rounded-xl shadow-sm p-6">
+          <div className="border border-gray-100 bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
                 <div className="h-14 w-14 rounded-lg bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">

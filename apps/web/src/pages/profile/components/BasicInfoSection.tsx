@@ -34,7 +34,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                   type="text" 
                   value={data.fullName || ''}
                   onChange={(e) => handleChange('fullName', e.target.value)}
-                  className="w-full pl-10 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                  className="w-full pl-10 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                   placeholder="John Doe"
                 />
               </div>
@@ -63,7 +63,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                   type="tel" 
                   value={data.phone || ''}
                   onChange={(e) => handleChange('phone', e.target.value)}
-                  className="w-full pl-10 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                  className="w-full pl-10 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                   placeholder="9307043831"
                 />
               </div>
@@ -77,7 +77,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                   type="text" 
                   value={data.currentCity || ''}
                   onChange={(e) => handleChange('currentCity', e.target.value)}
-                  className="w-full pl-10 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                  className="w-full pl-10 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                   placeholder="Pune"
                 />
               </div>
@@ -93,7 +93,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                   <User className="h-10 w-10 text-gray-300" />
                 )}
               </div>
-              <button className="absolute bottom-0 right-0 p-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-primary-600 hover:bg-gray-50 transition-colors">
+              <button className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-full shadow-sm text-primary-600 hover:bg-gray-50 transition-colors">
                 <Camera className="h-4 w-4" />
               </button>
             </div>
@@ -123,7 +123,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                 type="url" 
                 value={data.linkedinUrl || ''}
                 onChange={(e) => handleChange('linkedinUrl', e.target.value)}
-                className="w-full pl-12 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                className="w-full pl-12 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                 placeholder="https://linkedin.com/in/yourusername"
               />
             </div>
@@ -136,7 +136,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                 type="url" 
                 value={data.githubUrl || ''}
                 onChange={(e) => handleChange('githubUrl', e.target.value)}
-                className="w-full pl-12 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                className="w-full pl-12 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                 placeholder="https://github.com/yourusername"
               />
             </div>
@@ -149,7 +149,7 @@ export const BasicInfoSection = ({ data = {}, onChange }: any) => {
                 type="url" 
                 value={data.portfolioUrl || ''}
                 onChange={(e) => handleChange('portfolioUrl', e.target.value)}
-                className="w-full pl-12 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                className="w-full pl-12 p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
                 placeholder="https://yourportfolio.com"
               />
             </div>

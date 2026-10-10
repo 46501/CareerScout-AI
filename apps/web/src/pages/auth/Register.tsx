@@ -34,7 +34,7 @@ export function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Blobs */}
       <div className="absolute top-0 -left-4 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 animate-blob"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-blob" style={{ animationDelay: '2s' }}></div>
@@ -42,24 +42,24 @@ export function Register() {
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="flex flex-col items-center">
           <div className="flex items-center space-x-2 mb-2">
-            <Sparkles className="h-8 w-8 text-primary-400" />
-            <span className="text-3xl font-bold text-white tracking-tight">CareerScout AI</span>
+            <Sparkles className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">CareerScout AI</span>
           </div>
-          <h2 className="mt-4 text-center text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="mt-4 text-center text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-400">
+          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-primary-400 hover:text-primary-300 transition-colors">
+            <Link to="/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-300 transition-colors">
               Sign in here
             </Link>
           </p>
         </div>
 
-        <Card className="glass-card border-slate-800/50 shadow-2xl">
+        <Card className="glass-card border-slate-200 dark:border-slate-800/50 shadow-2xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl text-white">Sign Up</CardTitle>
-            <CardDescription className="text-slate-400">Join CareerScout AI to discover your next big opportunity.</CardDescription>
+            <CardTitle className="text-2xl text-slate-900 dark:text-white">Sign Up</CardTitle>
+            <CardDescription className="text-slate-600 dark:text-slate-400">Join CareerScout AI to discover your next big opportunity.</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="mt-4 space-y-6" onSubmit={handleSubmit}>
@@ -75,7 +75,7 @@ export function Register() {
                     placeholder="Full Name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
+                    className="bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
                   />
                 </div>
                 <div>
@@ -89,7 +89,7 @@ export function Register() {
                     placeholder="Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
+                    className="bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
                   />
                 </div>
                 <div>
@@ -103,7 +103,7 @@ export function Register() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
+                    className="bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
                   />
                 </div>
                 <div>
@@ -117,7 +117,7 @@ export function Register() {
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
+                    className="bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-primary-500 h-12"
                   />
                 </div>
               </div>

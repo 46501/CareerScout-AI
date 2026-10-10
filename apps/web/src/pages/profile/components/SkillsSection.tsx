@@ -98,7 +98,7 @@ export const SkillsSection = ({ data = {}, onChange }: any) => {
                     {skill.name}
                     <button 
                       onClick={() => removeSkill(cat.id, i)} 
-                      className="ml-2 -mr-1 p-0.5 text-primary-400 hover:text-primary-800 hover:bg-primary-200 rounded-full transition-colors"
+                      className="ml-2 -mr-1 p-0.5 text-primary-600 dark:text-primary-400 hover:text-primary-800 hover:bg-primary-200 rounded-full transition-colors"
                       aria-label="Remove skill"
                     >
                       <X className="h-3 w-3" />
@@ -116,7 +116,7 @@ export const SkillsSection = ({ data = {}, onChange }: any) => {
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={(e) => handleAdd(cat.id, e)}
                       onBlur={() => handleBlur(cat.id)}
-                      className="px-3 py-1.5 text-sm bg-white border border-primary-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 w-40 transition-all shadow-sm"
+                      className="px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border border-primary-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 w-40 transition-all shadow-sm"
                     />
                   </div>
                 ) : (

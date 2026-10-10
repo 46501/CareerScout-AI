@@ -12,6 +12,7 @@ import { Badge } from './ui/Badge';
 import api from '../lib/api';
 import heroImg from '../assets/hero.png';
 import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
+import { ThemeToggle } from './ui/ThemeToggle';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
@@ -106,7 +107,7 @@ export const Dashboard = () => {
   const finalChartData = (trends && trends.length > 0) ? trends : defaultChartData;
 
   return (
-    <div className="min-h-screen bg-slate-950 flex font-sans text-slate-300 overflow-hidden relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-700 dark:text-slate-300 overflow-hidden relative">
       
       {/* Background Ambient Blobs */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob pointer-events-none"></div>
@@ -121,62 +122,62 @@ export const Dashboard = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 glass-card border-r border-slate-800/50 flex flex-col flex-shrink-0 h-screen transition-transform duration-300 ease-in-out lg:transform-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} rounded-none`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/50 pt-2 pb-2">
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 glass-card border-r border-slate-200 dark:border-slate-800/50 flex flex-col flex-shrink-0 h-screen transition-transform duration-300 ease-in-out lg:transform-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} rounded-none`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800/50 pt-2 pb-2">
           <div className="flex items-center">
             {/* Note: Recommend updating logo asset to a light version for dark mode if available */}
-            <span className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                <Bot className="h-6 w-6 text-primary-500" /> CareerScout
             </span>
           </div>
-          <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+          <button className="lg:hidden text-slate-600 dark:text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
             <X className="h-5 w-5" />
           </button>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto hide-scrollbar">
-          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl bg-primary-500/10 text-primary-400 mb-1 border border-primary-500/20 shadow-[inset_0_0_15px_rgba(99,102,241,0.1)]">
+          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-1 border border-primary-500/20 shadow-[inset_0_0_15px_rgba(99,102,241,0.1)]">
             <LayoutDashboard className="h-4 w-4 mr-3" /> Dashboard
           </Link>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Search className="h-4 w-4 mr-3 text-slate-500" /> Opportunities
+          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <Search className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Opportunities
           </Link>
-          <Link to="/applications" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <CheckCircle className="h-4 w-4 mr-3 text-slate-500" /> Applications
+          <Link to="/applications" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <CheckCircle className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Applications
           </Link>
-          <Link to="/assistant" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Bot className="h-4 w-4 mr-3 text-slate-500" /> AI Scout
+          <Link to="/assistant" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <Bot className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> AI Scout
           </Link>
-          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <FileText className="h-4 w-4 mr-3 text-slate-500" /> Resume
+          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <FileText className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Resume
           </Link>
-          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <User className="h-4 w-4 mr-3 text-slate-500" /> Profile
+          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <User className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Profile
           </Link>
           
           <div className="pt-4 pb-2">
-            <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Resources</p>
+            <p className="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resources</p>
           </div>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <BookOpen className="h-4 w-4 mr-3 text-slate-500" /> Learning Hub
+          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <BookOpen className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Learning Hub
           </Link>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Folder className="h-4 w-4 mr-3 text-slate-500" /> Resources
+          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <Folder className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Resources
           </Link>
-          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <PieChart className="h-4 w-4 mr-3 text-slate-500" /> Analytics
+          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
+            <PieChart className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Analytics
           </Link>
-          <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors mt-2">
-            <Settings className="h-4 w-4 mr-3 text-slate-500" /> Settings
+          <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors mt-2">
+            <Settings className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Settings
           </Link>
         </nav>
 
         {/* Sidebar Bottom Card */}
-        <div className="p-5 mx-4 mb-6 mt-auto bg-gradient-to-br from-primary-900/80 to-slate-900 rounded-2xl text-white relative overflow-hidden border border-primary-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+        <div className="p-5 mx-4 mb-6 mt-auto bg-gradient-to-br from-primary-900/80 to-slate-900 rounded-2xl text-slate-900 dark:text-white relative overflow-hidden border border-primary-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 rounded-full -mr-16 -mt-16 pointer-events-none blur-xl" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-500/20 rounded-full -ml-10 -mb-10 pointer-events-none blur-xl" />
           <div className="relative z-10">
-            <h4 className="font-bold text-[14px] leading-tight mb-2 text-white">Find Opportunities<br/>Built for Your Future</h4>
+            <h4 className="font-bold text-[14px] leading-tight mb-2 text-slate-900 dark:text-white">Find Opportunities<br/>Built for Your Future</h4>
             <p className="text-[11px] text-primary-200/80 mb-4 font-medium leading-relaxed">AI-powered recommendations<br/>for students and early careers.</p>
             <Button onClick={runScout} disabled={isScouting} className="w-full bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all rounded-xl text-xs font-semibold h-9">
               {isScouting ? 'Scanning Web...' : 'Run AI Scout →'}
@@ -188,20 +189,20 @@ export const Dashboard = () => {
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden z-10 relative">
         {/* Top Header */}
-        <header className="h-16 glass-card border-b border-slate-800/50 flex items-center justify-between px-4 sm:px-6 lg:px-8 flex-shrink-0 sticky top-0 z-20 rounded-none">
+        <header className="h-16 glass-card border-b border-slate-200 dark:border-slate-800/50 flex items-center justify-between px-4 sm:px-6 lg:px-8 flex-shrink-0 sticky top-0 z-20 rounded-none">
           <div className="flex items-center flex-1">
             <button 
-              className="lg:hidden mr-4 text-slate-400 hover:text-white"
+              className="lg:hidden mr-4 text-slate-600 dark:text-slate-400 hover:text-white"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex-1 max-w-2xl relative flex items-center hidden md:flex">
-              <Search className="h-4 w-4 text-slate-500 absolute left-3" />
+              <Search className="h-4 w-4 text-slate-500 dark:text-slate-400 absolute left-3" />
               <input 
                 type="text" 
                 placeholder="Search for internships, jobs, hackathons, competitions..." 
-                className="w-full pl-9 pr-16 py-2 bg-slate-900/50 border border-slate-700 rounded-full text-[13px] focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-shadow text-white placeholder-slate-500 font-medium"
+                className="w-full pl-9 pr-16 py-2 bg-white/80 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-full text-[13px] focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-shadow text-slate-900 dark:text-white placeholder-slate-500 font-medium"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     const target = e.target as HTMLInputElement;
@@ -212,37 +213,38 @@ export const Dashboard = () => {
                 }}
               />
               <div className="absolute right-3 flex items-center space-x-1">
-                <span className="text-[10px] font-semibold text-slate-500 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded shadow-sm">Enter</span>
+                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 rounded shadow-sm">Enter</span>
               </div>
             </div>
             
             {/* Mobile Header Title */}
             <div className="md:hidden flex items-center">
-              <span className="text-lg font-bold text-white flex items-center gap-2">
+              <span className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                  <Bot className="h-5 w-5 text-primary-500" /> CareerScout
               </span>
             </div>
           </div>
           
           <div className="flex items-center space-x-5 ml-4">
-            <button className="text-slate-400 hover:text-white transition-colors relative">
+            <ThemeToggle />
+            <button className="text-slate-600 dark:text-slate-400 hover:text-white transition-colors relative">
               <Bell className="h-5 w-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-accent-500 rounded-full border border-slate-900"></span>
             </button>
-            <div className="h-6 w-[1px] bg-slate-700"></div>
+            <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
             <div className="flex items-center cursor-pointer group">
-              <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold border border-slate-600 shadow-inner mr-3 object-cover overflow-hidden">
+              <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white font-bold border border-slate-300 dark:border-slate-600 shadow-inner mr-3 object-cover overflow-hidden">
                 {profile?.personal?.profilePhoto ? (
                   <img src={profile.personal.profilePhoto} alt="Profile" className="h-full w-full object-cover" />
                 ) : (
-                  <span className="text-sm font-bold text-primary-400">{fullName.charAt(0)}</span>
+                  <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{fullName.charAt(0)}</span>
                 )}
               </div>
               <div className="hidden md:block text-left mr-2">
-                <p className="text-[13px] font-bold text-white leading-tight">{fullName}</p>
-                <p className="text-[11px] font-medium text-slate-400">{profile?.education?.[0]?.institution || 'Student'}</p>
+                <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">{fullName}</p>
+                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">{profile?.education?.[0]?.institution || 'Student'}</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-slate-500 group-hover:text-white transition-colors" />
+              <ChevronDown className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-white transition-colors" />
             </div>
           </div>
         </header>
@@ -256,11 +258,11 @@ export const Dashboard = () => {
               
               {/* Mobile Search Bar */}
               <div className="md:hidden relative flex items-center w-full mb-2">
-                <Search className="h-4 w-4 text-slate-500 absolute left-3" />
+                <Search className="h-4 w-4 text-slate-500 dark:text-slate-400 absolute left-3" />
                 <input 
                   type="text" 
                   placeholder="Search opportunities..." 
-                  className="w-full pl-9 py-2 bg-slate-900/50 border border-slate-700 rounded-full text-[13px] focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-white placeholder-slate-500 shadow-sm"
+                  className="w-full pl-9 py-2 bg-white/80 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-full text-[13px] focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-900 dark:text-white placeholder-slate-500 shadow-sm"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       const target = e.target as HTMLInputElement;
@@ -273,7 +275,7 @@ export const Dashboard = () => {
               </div>
 
               {/* Hero Section */}
-              <div className="glass-card rounded-3xl border-slate-800/50 shadow-2xl overflow-hidden relative flex flex-col sm:flex-row sm:items-center p-6 sm:px-8 sm:min-h-[190px]">
+              <div className="glass-card rounded-3xl border-slate-200 dark:border-slate-800/50 shadow-2xl overflow-hidden relative flex flex-col sm:flex-row sm:items-center p-6 sm:px-8 sm:min-h-[190px]">
                 {/* Background gradient */}
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 to-transparent z-0"></div>
                 
@@ -284,17 +286,17 @@ export const Dashboard = () => {
                 </div>
                 
                 <div className="relative z-10 w-full sm:max-w-lg py-2 sm:py-6">
-                  <p className="text-[13px] font-semibold text-primary-300 mb-1 tracking-wide">Good Afternoon, 👋</p>
-                  <h2 className="text-[28px] sm:text-[32px] font-extrabold text-white mb-2 tracking-tight leading-none truncate">{firstName}</h2>
-                  <p className="text-[13px] text-slate-400 mb-5 font-medium max-w-sm leading-relaxed">"The right opportunity can be the start of something amazing."</p>
+                  <p className="text-[13px] font-semibold text-primary-700 dark:text-primary-300 mb-1 tracking-wide">Good Afternoon, 👋</p>
+                  <h2 className="text-[28px] sm:text-[32px] font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight leading-none truncate">{firstName}</h2>
+                  <p className="text-[13px] text-slate-600 dark:text-slate-400 mb-5 font-medium max-w-sm leading-relaxed">"The right opportunity can be the start of something amazing."</p>
                   
                   <div className="flex flex-wrap gap-2">
                     {profile?.skills && profile.skills.length > 0 ? (
                       profile.skills.slice(0, 3).map((skill: any) => (
-                        <span key={skill.name || skill} className="px-3 py-1.5 bg-slate-900/80 text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">{skill.name || skill}</span>
+                        <span key={skill.name || skill} className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">{skill.name || skill}</span>
                       ))
                     ) : (
-                      <span className="px-3 py-1.5 bg-slate-900/80 text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">Complete profile for tags</span>
+                      <span className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">Complete profile for tags</span>
                     )}
                   </div>
                 </div>
@@ -302,50 +304,50 @@ export const Dashboard = () => {
 
               {/* Statistics */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="glass-card rounded-2xl border-slate-800/50 p-4 shadow-lg flex items-center hover:border-primary-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-                  <div className="w-12 h-12 bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-400 mr-4 border border-primary-500/20 shadow-inner group-hover:scale-110 transition-transform">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-4 shadow-lg flex items-center hover:border-primary-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+                  <div className="w-12 h-12 bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4 border border-primary-500/20 shadow-inner group-hover:scale-110 transition-transform">
                     <Briefcase className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold text-slate-400 mb-0.5">Saved</h3>
+                    <h3 className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">Saved</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-white">{stats?.saved || 0}</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">{stats?.saved || 0}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="glass-card rounded-2xl border-slate-800/50 p-4 shadow-lg flex items-center hover:border-green-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-4 shadow-lg flex items-center hover:border-green-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
                   <div className="w-12 h-12 bg-green-900/20 rounded-xl flex items-center justify-center text-green-400 mr-4 border border-green-500/20 shadow-inner group-hover:scale-110 transition-transform">
                     <FileText className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold text-slate-400 mb-0.5">Applied</h3>
+                    <h3 className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">Applied</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-white">{stats?.applied || 0}</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">{stats?.applied || 0}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="glass-card rounded-2xl border-slate-800/50 p-4 shadow-lg flex items-center hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-4 shadow-lg flex items-center hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
                   <div className="w-12 h-12 bg-purple-900/20 rounded-xl flex items-center justify-center text-purple-400 mr-4 border border-purple-500/20 shadow-inner group-hover:scale-110 transition-transform">
                     <Users className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold text-slate-400 mb-0.5">Interviews</h3>
+                    <h3 className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">Interviews</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-white">{stats?.interviews || 0}</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">{stats?.interviews || 0}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="glass-card rounded-2xl border-slate-800/50 p-4 shadow-lg flex items-center hover:border-accent-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-                  <div className="w-12 h-12 bg-accent-900/20 rounded-xl flex items-center justify-center text-accent-400 mr-4 border border-accent-500/20 shadow-inner group-hover:scale-110 transition-transform">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-4 shadow-lg flex items-center hover:border-accent-500/50 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+                  <div className="w-12 h-12 bg-accent-900/20 rounded-xl flex items-center justify-center text-accent-600 dark:text-accent-400 mr-4 border border-accent-500/20 shadow-inner group-hover:scale-110 transition-transform">
                     <Trophy className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold text-slate-400 mb-0.5">Shortlisted</h3>
+                    <h3 className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">Shortlisted</h3>
                     <div className="flex items-baseline space-x-2">
-                      <p className="text-xl font-bold text-white">{stats?.shortlisted || 0}</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">{stats?.shortlisted || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -355,11 +357,11 @@ export const Dashboard = () => {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-primary-900/30 border border-primary-500/30 flex items-center justify-center mr-3 flex-shrink-0 shadow-inner">
-                    <Sparkles className="h-4 w-4 text-primary-400" />
+                    <Sparkles className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h2 className="text-[18px] font-bold text-white tracking-tight">Recommended for You</h2>
-                    <p className="text-[12px] text-slate-400 font-medium line-clamp-1 sm:line-clamp-none">Opportunities picked based on your profile, skills and interests</p>
+                    <h2 className="text-[18px] font-bold text-slate-900 dark:text-white tracking-tight">Recommended for You</h2>
+                    <p className="text-[12px] text-slate-600 dark:text-slate-400 font-medium line-clamp-1 sm:line-clamp-none">Opportunities picked based on your profile, skills and interests</p>
                   </div>
                 </div>
                 <div className="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 md:pb-0 w-full md:w-auto">
@@ -367,7 +369,7 @@ export const Dashboard = () => {
                     <button 
                       key={tab} 
                       onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border ${activeTab === tab ? 'bg-primary-600/20 text-white border-primary-500/50 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'}`}
+                      className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border ${activeTab === tab ? 'bg-primary-600/20 text-white border-primary-500/50 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-white/80 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-800 hover:text-white'}`}
                     >
                       {tab}
                     </button>
@@ -378,8 +380,8 @@ export const Dashboard = () => {
               {/* Opportunity Cards */}
               <div className="space-y-4">
                 {(!matches || matches.length === 0) ? (
-                  <div className="p-8 text-center glass-card rounded-2xl border-slate-800/50">
-                    <p className="text-slate-400 font-medium">No personalized opportunities yet. Complete your profile or run AI Scout.</p>
+                  <div className="p-8 text-center glass-card rounded-2xl border-slate-200 dark:border-slate-800/50">
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">No personalized opportunities yet. Complete your profile or run AI Scout.</p>
                   </div>
                 ) : (
                   matches.map((match: any) => (
@@ -394,7 +396,7 @@ export const Dashboard = () => {
                       deadline={match.deadline ? `Apply by ${new Date(match.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}` : 'Deadline not specified'} 
                       applicants={match.applicantsCount ? `${match.applicantsCount} applicants` : 'Applicants: N/A'} 
                       match={match.matchDetails?.score || 0} 
-                      logoColor="bg-slate-800 border-slate-700"
+                      logoColor="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700"
                     />
                   ))
                 )}
@@ -403,10 +405,10 @@ export const Dashboard = () => {
               {/* Analytics Section */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-2 pb-8">
                 {/* Opportunity Trends */}
-                <div className="glass-card rounded-2xl border-slate-800/50 p-6 shadow-2xl">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[15px] font-bold text-white">Opportunity Trends</h3>
-                    <div className="flex items-center text-[11px] font-semibold text-slate-400 bg-slate-900/50 border border-slate-700 rounded-md px-2.5 py-1 cursor-pointer hover:bg-slate-800 hover:text-white transition-colors">
+                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">Opportunity Trends</h3>
+                    <div className="flex items-center text-[11px] font-semibold text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-md px-2.5 py-1 cursor-pointer hover:bg-slate-800 hover:text-white transition-colors">
                       Last 6 months <ChevronDown className="h-3 w-3 ml-1" />
                     </div>
                   </div>
@@ -427,17 +429,17 @@ export const Dashboard = () => {
                       </ResponsiveContainer>
                     ) : (
                       <div className="flex h-full items-center justify-center">
-                        <p className="text-slate-500 text-sm font-medium">Not enough data yet.</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Not enough data yet.</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* In-Demand Skills */}
-                <div className="glass-card rounded-2xl border-slate-800/50 p-6 shadow-2xl flex flex-col h-full">
+                <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-6 shadow-2xl flex flex-col h-full">
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className="text-[15px] font-bold text-white">In-Demand Skills</h3>
-                    <Link to="/opportunities" className="text-[12px] font-bold text-primary-400 hover:text-primary-300 flex items-center">
+                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">In-Demand Skills</h3>
+                    <Link to="/opportunities" className="text-[12px] font-bold text-primary-600 dark:text-primary-400 hover:text-primary-300 flex items-center">
                       View all <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
                     </Link>
                   </div>
@@ -448,7 +450,7 @@ export const Dashboard = () => {
                       ))
                     ) : (
                       <div className="flex h-full items-center justify-center">
-                        <p className="text-slate-500 text-sm font-medium">No skill-demand data available yet.</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No skill-demand data available yet.</p>
                       </div>
                     )}
                   </div>
@@ -460,10 +462,10 @@ export const Dashboard = () => {
             <div className="w-full xl:w-[320px] flex flex-col gap-6 flex-shrink-0">
               
               {/* Profile Completion */}
-              <div className="glass-card rounded-2xl border-slate-800/50 p-6 shadow-2xl">
+              <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-[15px] font-bold text-white">Profile Completion</h3>
-                  <Link to="/profile" className="text-[12px] font-bold text-primary-400 hover:text-primary-300 flex items-center">
+                  <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">Profile Completion</h3>
+                  <Link to="/profile" className="text-[12px] font-bold text-primary-600 dark:text-primary-400 hover:text-primary-300 flex items-center">
                     Edit Profile <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
                   </Link>
                 </div>
@@ -475,7 +477,7 @@ export const Dashboard = () => {
                       <circle cx="50" cy="50" r="42" fill="none" stroke="#1e293b" strokeWidth="12" />
                       <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" strokeWidth="12" strokeDasharray="264" strokeDashoffset={264 - (264 * (completionData?.percentage || 0)) / 100} className="transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" strokeLinecap="round" />
                     </svg>
-                    <div className="absolute text-[28px] font-extrabold text-white">{completionData?.percentage || 0}%</div>
+                    <div className="absolute text-[28px] font-extrabold text-slate-900 dark:text-white">{completionData?.percentage || 0}%</div>
                   </div>
                 </div>
 
@@ -499,11 +501,11 @@ export const Dashboard = () => {
                 ) : (
                   <div className="bg-accent-500/10 border border-accent-500/20 rounded-xl p-3.5 flex items-start mb-0">
                     <div className="mt-0.5 mr-2 flex-shrink-0">
-                      <span className="flex h-5 w-5 rounded-full bg-accent-500/20 items-center justify-center text-accent-400">
+                      <span className="flex h-5 w-5 rounded-full bg-accent-500/20 items-center justify-center text-accent-600 dark:text-accent-400">
                         <Star className="h-3 w-3 fill-accent-400" />
                       </span>
                     </div>
-                    <p className="text-[12px] text-accent-300 font-medium leading-relaxed pr-2">
+                    <p className="text-[12px] text-accent-700 dark:text-accent-300 font-medium leading-relaxed pr-2">
                       Complete your profile to get more relevant opportunities.
                     </p>
                   </div>
@@ -511,21 +513,21 @@ export const Dashboard = () => {
               </div>
 
               {/* AI Scout Card */}
-              <div className="glass-card rounded-2xl border-slate-800/50 p-6 shadow-2xl relative overflow-hidden group">
+              <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-6 shadow-2xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary-500/20 rounded-full blur-xl group-hover:bg-primary-500/30 transition-colors"></div>
                 <div className="flex items-center justify-between mb-4 relative z-10">
-                  <h3 className="text-[15px] font-bold text-white">AI Scout</h3>
-                  <Link to="/assistant" className="text-[12px] font-bold text-primary-400 hover:text-primary-300">
+                  <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">AI Scout</h3>
+                  <Link to="/assistant" className="text-[12px] font-bold text-primary-600 dark:text-primary-400 hover:text-primary-300">
                     How it works?
                   </Link>
                 </div>
                 
                 <div className="flex items-center mb-5 relative z-10">
-                  <div className="w-[52px] h-[52px] rounded-2xl bg-slate-900/80 flex items-center justify-center mr-4 border border-primary-500/30 shadow-inner flex-shrink-0">
-                    <Bot className="h-[26px] w-[26px] text-primary-400" />
+                  <div className="w-[52px] h-[52px] rounded-2xl bg-white/90 dark:bg-slate-900/80 flex items-center justify-center mr-4 border border-primary-500/30 shadow-inner flex-shrink-0">
+                    <Bot className="h-[26px] w-[26px] text-primary-600 dark:text-primary-400" />
                   </div>
-                  <p className="text-[12px] text-slate-400 font-medium leading-relaxed">
-                    Status: <span className={`font-bold ${isScouting ? 'text-accent-400 animate-pulse' : 'text-primary-400'}`}>{scoutStatus?.status || 'Ready'}</span><br/>
+                  <p className="text-[12px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                    Status: <span className={`font-bold ${isScouting ? 'text-accent-600 dark:text-accent-400 animate-pulse' : 'text-primary-600 dark:text-primary-400'}`}>{scoutStatus?.status || 'Ready'}</span><br/>
                     Let AI find the best opportunities based on your profile, skills and goals.
                   </p>
                 </div>
@@ -535,26 +537,26 @@ export const Dashboard = () => {
                 </Button>
 
                 <div className="grid grid-cols-2 gap-y-3 gap-x-2 relative z-10">
-                  <div className="flex items-center text-[11px] font-semibold text-slate-300 bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-800">
+                  <div className="flex items-center text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
                     <Sparkles className="h-3.5 w-3.5 text-green-400 mr-2" /> Personalized Results
                   </div>
-                  <div className="flex items-center text-[11px] font-semibold text-slate-300 bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-800">
-                    <Heart className="h-3.5 w-3.5 text-accent-400 mr-2" /> Smart Matching
+                  <div className="flex items-center text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                    <Heart className="h-3.5 w-3.5 text-accent-600 dark:text-accent-400 mr-2" /> Smart Matching
                   </div>
-                  <div className="flex items-center text-[11px] font-semibold text-slate-300 bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-800">
+                  <div className="flex items-center text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
                     <Clock className="h-3.5 w-3.5 text-blue-400 mr-2" /> Daily Updates
                   </div>
-                  <div className="flex items-center text-[11px] font-semibold text-slate-300 bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-800">
+                  <div className="flex items-center text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
                     <Navigation className="h-3.5 w-3.5 text-indigo-400 mr-2" /> Multiple Sources
                   </div>
                 </div>
               </div>
 
               {/* Recent Opportunities */}
-              <div className="glass-card rounded-2xl border-slate-800/50 p-6 shadow-2xl">
+              <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-[15px] font-bold text-white">Recent Opportunities</h3>
-                  <Link to="/opportunities" className="text-[12px] font-bold text-primary-400 flex items-center hover:text-primary-300">
+                  <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">Recent Opportunities</h3>
+                  <Link to="/opportunities" className="text-[12px] font-bold text-primary-600 dark:text-primary-400 flex items-center hover:text-primary-300">
                     View all <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
                   </Link>
                 </div>
@@ -562,7 +564,7 @@ export const Dashboard = () => {
                 <div className="space-y-5">
                   {recentOpportunities && recentOpportunities.length > 0 ? (
                     recentOpportunities.map((opp: any, i: number) => {
-                      const colors = ['bg-green-500/20 text-green-400 border-green-500/30', 'bg-accent-500/20 text-accent-400 border-accent-500/30', 'bg-blue-500/20 text-blue-400 border-blue-500/30', 'bg-purple-500/20 text-purple-400 border-purple-500/30'];
+                      const colors = ['bg-green-500/20 text-green-400 border-green-500/30', 'bg-accent-500/20 text-accent-600 dark:text-accent-400 border-accent-500/30', 'bg-blue-500/20 text-blue-400 border-blue-500/30', 'bg-purple-500/20 text-purple-400 border-purple-500/30'];
                       return (
                         <RecentOpp 
                           key={opp._id}
@@ -578,7 +580,7 @@ export const Dashboard = () => {
                     })
                   ) : (
                     <div className="text-center py-4">
-                      <p className="text-slate-500 text-sm font-medium">No recent opportunities found.</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No recent opportunities found.</p>
                     </div>
                   )}
                 </div>
@@ -600,7 +602,7 @@ export const Dashboard = () => {
       {alertMessage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setAlertMessage(null)}></div>
-          <div className="relative glass-card border border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative glass-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6">
               <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full mb-4 shadow-inner ${alertMessage.type === 'success' ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
                 {alertMessage.type === 'success' ? (
@@ -610,12 +612,12 @@ export const Dashboard = () => {
                 )}
               </div>
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white mb-2">{alertMessage.title}</h3>
-                <p className="text-sm text-slate-400">{alertMessage.message}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{alertMessage.title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{alertMessage.message}</p>
               </div>
             </div>
-            <div className="bg-slate-900/50 px-6 py-4 flex justify-center border-t border-slate-800">
-              <Button onClick={() => setAlertMessage(null)} className="w-full font-bold bg-slate-800 hover:bg-slate-700 text-white border-0">
+            <div className="bg-white/80 dark:bg-slate-900/50 px-6 py-4 flex justify-center border-t border-slate-200 dark:border-slate-800">
+              <Button onClick={() => setAlertMessage(null)} className="w-full font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white border-0">
                 Close
               </Button>
             </div>
@@ -629,22 +631,22 @@ export const Dashboard = () => {
 // --- Subcomponents ---
 
 const OpportunityCard = ({ logo, title, company, location, type, skills, deadline, applicants, match, logoColor }: any) => (
-  <div className="glass-card rounded-2xl border-slate-800/50 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row gap-4 sm:gap-5 hover:border-primary-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:-translate-y-1 transition-all duration-300 group w-full overflow-hidden">
+  <div className="glass-card rounded-2xl border-slate-200 dark:border-slate-800/50 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row gap-4 sm:gap-5 hover:border-primary-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:-translate-y-1 transition-all duration-300 group w-full overflow-hidden">
     <div className="flex items-center sm:items-start gap-4">
-      <div className={`w-12 h-12 ${logoColor} rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 shadow-inner border`}>
+      <div className={`w-12 h-12 ${logoColor} rounded-xl flex items-center justify-center text-slate-900 dark:text-white font-bold text-xl flex-shrink-0 shadow-inner border`}>
         {logo}
       </div>
       <div className="sm:hidden flex-1 min-w-0">
-        <h3 className="text-[16px] font-bold text-white leading-tight mb-0.5 truncate group-hover:text-primary-400 transition-colors">{title}</h3>
-        <p className="text-[13px] text-slate-400 font-medium truncate">{company} • {location}</p>
+        <h3 className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight mb-0.5 truncate group-hover:text-primary-400 transition-colors">{title}</h3>
+        <p className="text-[13px] text-slate-600 dark:text-slate-400 font-medium truncate">{company} • {location}</p>
       </div>
     </div>
 
     <div className="flex-1 min-w-0 w-full">
       <div className="hidden sm:flex justify-between items-start mb-1.5">
         <div className="min-w-0 flex-1 pr-4">
-          <h3 className="text-[16px] font-bold text-white leading-tight mb-1 truncate group-hover:text-primary-400 transition-colors">{title}</h3>
-          <p className="text-[13px] text-slate-400 font-medium truncate">{company} • {location}</p>
+          <h3 className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight mb-1 truncate group-hover:text-primary-400 transition-colors">{title}</h3>
+          <p className="text-[13px] text-slate-600 dark:text-slate-400 font-medium truncate">{company} • {location}</p>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0">
           <Badge className="bg-green-500/10 text-green-400 border border-green-500/20 font-bold px-2.5 py-0.5 rounded-full text-[11px] shadow-sm flex items-center">
@@ -662,24 +664,24 @@ const OpportunityCard = ({ logo, title, company, location, type, skills, deadlin
       
       <div className="flex flex-wrap gap-2 my-3">
         {skills.map((s: string) => (
-          <span key={s} className="px-2.5 py-1 bg-slate-900/50 text-slate-300 rounded-lg text-[11px] font-semibold border border-slate-700 truncate max-w-full">
+          <span key={s} className="px-2.5 py-1 bg-white/80 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 rounded-lg text-[11px] font-semibold border border-slate-300 dark:border-slate-700 truncate max-w-full">
             {s}
           </span>
         ))}
       </div>
       
-      <div className="flex flex-col xs:flex-row flex-wrap text-[12px] font-medium text-slate-500 gap-y-2 gap-x-5 mt-1">
+      <div className="flex flex-col xs:flex-row flex-wrap text-[12px] font-medium text-slate-500 dark:text-slate-400 gap-y-2 gap-x-5 mt-1">
         <div className="flex items-center truncate"><Briefcase className="h-4 w-4 mr-1.5 flex-shrink-0 text-slate-600" /> {type}</div>
         <div className="flex items-center truncate"><Clock className="h-4 w-4 mr-1.5 flex-shrink-0 text-slate-600" /> {deadline}</div>
         <div className="flex items-center truncate"><Users className="h-4 w-4 mr-1.5 flex-shrink-0 text-slate-600" /> {applicants}</div>
       </div>
     </div>
     
-    <div className="flex sm:flex-col justify-between items-end sm:border-l border-slate-800 sm:pl-5 min-w-0 sm:min-w-[130px] mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 w-full sm:w-auto">
+    <div className="flex sm:flex-col justify-between items-end sm:border-l border-slate-200 dark:border-slate-800 sm:pl-5 min-w-0 sm:min-w-[130px] mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 w-full sm:w-auto">
       <button className="text-slate-600 hover:text-accent-400 transition-colors hidden sm:block p-1">
         <Bookmark className="h-5 w-5" />
       </button>
-      <Button className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-200 rounded-xl shadow-[0_0_10px_rgba(255,255,255,0.1)] h-[38px] text-[13px] font-bold px-5 transition-all border-0">
+      <Button className="w-full sm:w-auto bg-white dark:bg-slate-900 text-slate-900 hover:bg-slate-200 rounded-xl shadow-[0_0_10px_rgba(255,255,255,0.1)] h-[38px] text-[13px] font-bold px-5 transition-all border-0">
         View Details →
       </Button>
     </div>
@@ -688,15 +690,15 @@ const OpportunityCard = ({ logo, title, company, location, type, skills, deadlin
 
 const SkillBar = ({ name, percent, color }: any) => (
   <div className="flex items-center">
-    <span className="w-7 h-7 bg-slate-800/80 rounded-lg flex items-center justify-center mr-3 border border-slate-700 flex-shrink-0 shadow-inner text-primary-400">
+    <span className="w-7 h-7 bg-slate-100/80 dark:bg-slate-800/80 rounded-lg flex items-center justify-center mr-3 border border-slate-300 dark:border-slate-700 flex-shrink-0 shadow-inner text-primary-600 dark:text-primary-400">
       <Star className="h-4 w-4" />
     </span>
     <div className="flex-1">
       <div className="flex justify-between items-end mb-1.5">
         <span className="text-[13px] font-bold text-slate-200">{name}</span>
-        <span className="text-[11px] font-bold text-slate-400">{percent}%</span>
+        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">{percent}%</span>
       </div>
-      <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden shadow-inner">
+      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden shadow-inner">
         <div className={`${color} h-1.5 rounded-full relative shadow-[0_0_10px_currentColor]`} style={{ width: `${percent}%` }}>
           <div className="absolute inset-0 bg-white/20"></div>
         </div>
@@ -712,10 +714,10 @@ const ProfileStep = ({ name, completed }: any) => (
         <CheckCircle className="h-3 w-3 text-green-400" />
       </div>
     ) : (
-      <div className="w-[18px] h-[18px] rounded-full border border-slate-600 flex items-center justify-center mr-3 flex-shrink-0">
+      <div className="w-[18px] h-[18px] rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center mr-3 flex-shrink-0">
       </div>
     )}
-    <span className={`text-[13px] font-semibold ${completed ? 'text-slate-200' : 'text-slate-500'}`}>{name}</span>
+    <span className={`text-[13px] font-semibold ${completed ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>{name}</span>
   </div>
 );
 
@@ -725,11 +727,11 @@ const RecentOpp = ({ logo, bg, title, company, type, tags, time }: any) => (
       {logo}
     </div>
     <div className="flex-1 min-w-0">
-      <h4 className="text-[13px] font-bold text-white leading-tight truncate mb-1 group-hover:text-primary-400 transition-colors">{title}</h4>
-      <p className="text-[11px] text-slate-400 mb-1.5 font-medium">{company} • {type}</p>
+      <h4 className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight truncate mb-1 group-hover:text-primary-400 transition-colors">{title}</h4>
+      <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-1.5 font-medium">{company} • {type}</p>
       <div className="flex items-center gap-1.5">
         {tags.map((t: string) => (
-          <span key={t} className="text-[10px] px-2 py-0.5 bg-slate-800 border border-slate-700 text-slate-300 font-semibold rounded-md shadow-sm">{t}</span>
+          <span key={t} className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-md shadow-sm">{t}</span>
         ))}
       </div>
     </div>
@@ -737,7 +739,7 @@ const RecentOpp = ({ logo, bg, title, company, type, tags, time }: any) => (
       <button className="text-slate-600 hover:text-accent-400 transition-colors">
         <Bookmark className="h-4 w-4" />
       </button>
-      <span className="text-[10px] text-slate-500 font-semibold">{time}</span>
+      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{time}</span>
     </div>
   </div>
 );

@@ -3,8 +3,7 @@ import { Bot, Bell, User as UserIcon, Settings, LogOut, FileText } from 'lucide-
 import { Link } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
-
-
+import { ThemeToggle } from './ui/ThemeToggle';
 import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 
 interface HeaderProps {
@@ -37,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
 
   return (
     <>
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-semibold text-gray-900">Overview</h1>
       <div className="flex items-center space-x-4">
         <Button 
@@ -49,6 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
         >
           <Bot className="h-4 w-4 mr-2" /> {isScouting ? 'Scanning...' : 'Run AI Scout'}
         </Button>
+        <ThemeToggle />
         <button className="text-gray-400 hover:text-gray-500">
           <Bell className="h-6 w-6" />
         </button>
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-50">
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-md shadow-lg py-1 border border-gray-200 z-50">
               <Link 
                 to="/profile" 
                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

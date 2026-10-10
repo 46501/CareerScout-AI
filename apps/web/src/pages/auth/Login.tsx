@@ -44,7 +44,7 @@ export function Login() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#F4F7F9] font-sans">
       {/* LEFT SIDE - BRANDING & HERO (55%) */}
-      <div className="w-full lg:w-[55%] relative flex flex-col justify-between overflow-hidden bg-white border-b lg:border-b-0 lg:border-r border-gray-100 min-h-[400px] lg:min-h-screen">
+      <div className="w-full lg:w-[55%] relative flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-900 border-b lg:border-b-0 lg:border-r border-gray-100 min-h-[400px] lg:min-h-screen">
         
         {/* Soft Background Gradients */}
         <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-blue-50/80 rounded-full blur-3xl pointer-events-none"></div>
@@ -184,7 +184,7 @@ export function Login() {
         </div>
 
         {/* Login Card */}
-        <div className="w-full max-w-[460px] bg-white p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 relative z-10">
+        <div className="w-full max-w-[460px] bg-white dark:bg-slate-900 p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 relative z-10">
           
           {/* Mobile Logo Fallback */}
           <div className="lg:hidden flex items-center mb-10 justify-center">
@@ -207,7 +207,7 @@ export function Login() {
               onClick={() => setActiveTab('Student')}
               className={`flex-1 py-2.5 text-[14px] font-bold rounded-[10px] transition-all duration-200 ${
                 activeTab === 'Student' 
-                  ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -218,7 +218,7 @@ export function Login() {
               onClick={() => setActiveTab('Recruiter')}
               className={`flex-1 py-2.5 text-[14px] font-bold rounded-[10px] transition-all duration-200 ${
                 activeTab === 'Recruiter' 
-                  ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -242,7 +242,7 @@ export function Login() {
                 <input
                   type="email"
                   required
-                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -259,7 +259,7 @@ export function Login() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full pl-11 pr-12 py-3.5 bg-white border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
+                  className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

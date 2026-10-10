@@ -56,7 +56,7 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
       <CardContent className="pt-6 space-y-8">
         <div>
           <label className="block text-sm font-semibold text-gray-900 mb-2">Preferred Locations</label>
-          <div className="flex flex-wrap items-center gap-2 p-2 min-h-[44px] bg-white border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500 transition-shadow cursor-text">
+          <div className="flex flex-wrap items-center gap-2 p-2 min-h-[44px] bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500 transition-shadow cursor-text">
             {(data.preferredLocations || []).map((loc: string, i: number) => (
               <Badge key={i} variant="secondary" className="px-2.5 py-1 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center transition-colors">
                 {loc}
@@ -101,7 +101,7 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
                   className={`flex-1 sm:flex-none min-w-[120px] px-4 py-3 rounded-xl border text-center transition-all ${
                     isSelected 
                       ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm font-medium' 
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                      : 'bg-white dark:bg-slate-900 border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {opt}
@@ -117,7 +117,7 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
             <button
               onClick={() => onChange({ ...data, willingToRelocate: false })}
               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                !data.willingToRelocate ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                !data.willingToRelocate ? 'bg-white dark:bg-slate-900 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               No
@@ -125,7 +125,7 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
             <button
               onClick={() => onChange({ ...data, willingToRelocate: true })}
               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                data.willingToRelocate ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                data.willingToRelocate ? 'bg-white dark:bg-slate-900 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               Yes

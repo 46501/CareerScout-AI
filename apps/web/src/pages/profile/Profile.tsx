@@ -103,23 +103,23 @@ export const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-4 sm:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-8 relative overflow-hidden">
       {/* Background Blobs */}
       <div className="absolute top-0 -left-4 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-blob"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '2s' }}></div>
 
       <div className="max-w-7xl mx-auto space-y-6 pb-20 relative z-10">
         <div>
-          <BackButton fallback="/dashboard" label="Back to Dashboard" className="text-slate-400 hover:text-white" />
+          <BackButton fallback="/dashboard" label="Back to Dashboard" className="text-slate-600 dark:text-slate-400 hover:text-white" />
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800/50 pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800/50 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight mt-2">Edit Profile</h1>
-            <p className="text-slate-400 mt-1 text-sm">Keep your profile up to date to get better opportunities and personalized recommendations.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">Edit Profile</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">Keep your profile up to date to get better opportunities and personalized recommendations.</p>
           </div>
           <div className="flex space-x-3 w-full sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-none border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white" onClick={fetchProfile}>Cancel</Button>
+            <Button variant="outline" className="flex-1 sm:flex-none border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white" onClick={fetchProfile}>Cancel</Button>
             <Button className="flex-1 sm:flex-none bg-primary-600 hover:bg-primary-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all" onClick={handleSave}>Save Changes</Button>
           </div>
         </div>
@@ -127,7 +127,7 @@ export const Profile = () => {
         <div className="flex flex-col lg:flex-row gap-8 items-start pt-2">
           
           {/* LEFT PROFILE NAVIGATION */}
-          <div className="w-full lg:w-[320px] flex-shrink-0 glass-card rounded-xl border-slate-800/50 p-3 overflow-x-auto lg:overflow-visible shadow-2xl">
+          <div className="w-full lg:w-[320px] flex-shrink-0 glass-card rounded-xl border-slate-200 dark:border-slate-800/50 p-3 overflow-x-auto lg:overflow-visible shadow-2xl">
             <div className="flex lg:flex-col gap-1 min-w-max lg:min-w-0">
               {SECTIONS.map((s) => {
                 const Icon = s.icon;
@@ -139,13 +139,13 @@ export const Profile = () => {
                     key={s.id}
                     onClick={() => setActiveSection(s.id)}
                     className={`flex items-start text-left p-4 rounded-xl transition-all duration-300 w-full ${
-                      isActive ? 'bg-primary-600/20 border border-primary-500/30 text-white shadow-inner' : 'hover:bg-slate-800/50 border border-transparent text-slate-400'
+                      isActive ? 'bg-primary-600/20 border border-primary-500/30 text-white shadow-inner' : 'hover:bg-slate-800/50 border border-transparent text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    <Icon className={`mt-0.5 mr-3 h-5 w-5 flex-shrink-0 ${isActive ? 'text-primary-400' : 'text-slate-500'}`} />
+                    <Icon className={`mt-0.5 mr-3 h-5 w-5 flex-shrink-0 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-400'}`} />
                     <div className="flex-1 whitespace-nowrap lg:whitespace-normal">
-                      <div className={`font-semibold text-sm ${isActive ? 'text-white' : 'text-slate-300'}`}>{s.label}</div>
-                      <div className={`text-xs mt-0.5 ${isActive ? 'text-primary-300' : 'text-slate-500'}`}>{s.desc}</div>
+                      <div className={`font-semibold text-sm ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>{s.label}</div>
+                      <div className={`text-xs mt-0.5 ${isActive ? 'text-primary-700 dark:text-primary-300' : 'text-slate-500 dark:text-slate-400'}`}>{s.desc}</div>
                     </div>
                     {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-400 mt-1 ml-2 flex-shrink-0" />}
                   </button>
@@ -158,14 +158,14 @@ export const Profile = () => {
           <div className="flex-1 w-full lg:w-auto space-y-6">
             
             {/* Completion Banner */}
-            <div className="glass-card rounded-xl border border-slate-800/50 p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
+            <div className="glass-card rounded-xl border border-slate-200 dark:border-slate-800/50 p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
               <div className="flex items-center gap-4 w-full md:w-auto z-10">
                 <div className="h-12 w-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 shadow-inner">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg tracking-tight">Profile Completion</h3>
-                  <p className="text-sm text-slate-400">Complete all sections to get better recommendations</p>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">Profile Completion</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Complete all sections to get better recommendations</p>
                 </div>
               </div>
               
@@ -176,12 +176,12 @@ export const Profile = () => {
                   <div className="text-xs text-green-400/80">Keep going! You're almost there.</div>
                 </div>
               </div>
-              <div className="w-full h-1.5 bg-slate-800 absolute bottom-0 left-0">
+              <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 absolute bottom-0 left-0">
                  <div className="bg-gradient-to-r from-blue-600 to-primary-500 h-1.5 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${completion.percentage}%` }}></div>
               </div>
             </div>
 
-            <div className="glass-card rounded-xl border border-slate-800/50 overflow-hidden shadow-2xl relative min-h-[400px] text-white">
+            <div className="glass-card rounded-xl border border-slate-200 dark:border-slate-800/50 overflow-hidden shadow-2xl relative min-h-[400px] text-slate-900 dark:text-white">
               <div className="p-6 [&_label]:text-slate-300 [&_p]:text-slate-400 [&_h2]:text-white [&_h3]:text-white [&_.bg-white]:bg-transparent [&_.border-gray-200]:border-slate-700">
                 {activeSection === 'basic' && <BasicInfoSection data={profileData.personal} onChange={handleSectionChange('personal')} isEditing={true} />}
                 {activeSection === 'education' && <EducationSection data={profileData.education} onChange={handleSectionChange('education')} isEditing={true} />}

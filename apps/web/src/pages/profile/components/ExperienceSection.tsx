@@ -103,7 +103,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
         {data.length > 0 && (
           <div className="space-y-4">
             {data.map((exp: any, i: number) => (
-              <div key={i} className="flex flex-col sm:flex-row gap-4 p-5 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+              <div key={i} className="flex flex-col sm:flex-row gap-4 p-5 border border-gray-100 bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
                 <div className="h-12 w-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
                   <Briefcase className="h-6 w-6" />
                 </div>
@@ -166,7 +166,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
       {/* MODAL */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
             <div className="flex justify-between items-center p-5 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-900">{editIndex !== null ? 'Edit' : 'Add'} Experience</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
@@ -181,7 +181,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                     type="text" 
                     value={formData.title || ''}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g. Software Engineer Intern"
                   />
                 </div>
@@ -191,7 +191,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                     type="text" 
                     value={formData.company || ''}
                     onChange={(e) => setFormData({...formData, company: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g. Google"
                   />
                 </div>
@@ -203,7 +203,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                   <select 
                     value={formData.employmentType || 'Full-time'}
                     onChange={(e) => setFormData({...formData, employmentType: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   >
                     <option value="Internship">Internship</option>
                     <option value="Full-time">Full-time</option>
@@ -217,7 +217,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                     type="text" 
                     value={formData.location || ''}
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g. Remote, or San Francisco, CA"
                   />
                 </div>
@@ -230,7 +230,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                     type="month" 
                     value={formData.startDate ? new Date(formData.startDate).toISOString().slice(0, 7) : ''}
                     onChange={(e) => setFormData({...formData, startDate: new Date(e.target.value).toISOString()})}
-                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div>
@@ -241,7 +241,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                       disabled={formData.currentlyWorking}
                       value={formData.endDate ? new Date(formData.endDate).toISOString().slice(0, 7) : ''}
                       onChange={(e) => setFormData({...formData, endDate: new Date(e.target.value).toISOString()})}
-                      className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-400"
+                      className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-400"
                     />
                     <label className="flex items-center text-sm text-gray-700 cursor-pointer">
                       <input 
@@ -261,7 +261,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                 <textarea 
                   value={formData.description || ''}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 h-28 resize-none"
+                  className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 h-28 resize-none"
                   placeholder="Describe your responsibilities and achievements..."
                 />
               </div>
@@ -272,7 +272,7 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                   type="text" 
                   value={(formData.technologiesUsed || []).join(', ')}
                   onChange={(e) => handleTechString(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="React, Node.js, AWS"
                 />
               </div>

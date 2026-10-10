@@ -50,7 +50,7 @@ export const Settings = () => {
               onClick={() => setDailyScout(!dailyScout)}
               className={`${dailyScout ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full transition-colors`}
             >
-              <span className={`${dailyScout ? 'translate-x-5' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 mt-1`} />
+              <span className={`${dailyScout ? 'translate-x-5' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 transition duration-200 mt-1`} />
             </button>
           </div>
 
