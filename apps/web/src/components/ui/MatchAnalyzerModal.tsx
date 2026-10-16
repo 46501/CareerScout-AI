@@ -4,6 +4,7 @@ import { Button } from './Button';
 import { Badge } from './Badge';
 
 import api from '../../lib/api';
+import { useNotification } from '../../context/NotificationContext';
 
 interface MatchAnalyzerModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface MatchAnalyzerModalProps {
 }
 
 export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, onClose, opportunity }) => {
+  const { notify } = useNotification();
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
 
@@ -26,8 +28,16 @@ export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, 
     try {
       const res = await api.post(`/opportunities/${opportunity._id}/cover-letter`);
       setCoverLetter(res.data.data.coverLetter);
-    } catch (err) {
+      notify.success({
+        title: 'Cover Letter Ready',
+        message: 'AI generated a tailored cover letter for this role.'
+      });
+    } catch (err: any) {
       console.error(err);
+      notify.error({
+        title: 'Generation Failed',
+        message: 'Could not generate cover letter. Please try again.'
+      });
     } finally {
       setGenerating(false);
     }
@@ -163,7 +173,10 @@ export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, 
                   variant="ghost"
                   size="icon"
                   className="absolute top-2 right-2 text-slate-600 dark:text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 dark:bg-slate-800"
-                  onClick={() => navigator.clipboard.writeText(coverLetter)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(coverLetter);
+                    notify.success('Cover letter copied to clipboard');
+                  }}
                   title="Copy to clipboard"
                 >
                   <Copy className="h-4 w-4" />

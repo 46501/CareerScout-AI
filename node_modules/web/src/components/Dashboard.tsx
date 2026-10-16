@@ -17,13 +17,14 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
+import { useNotification } from '../context/NotificationContext';
 
 export const Dashboard = () => {
+  const { notify } = useNotification();
   const [activeTab, setActiveTab] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScouting, setIsScouting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState<{type: 'success'|'error', title: string, message: string} | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
@@ -84,7 +85,7 @@ export const Dashboard = () => {
       setIsScouting(true);
       const res = await api.post('/scout/run');
       if (res.data?.message) {
-        setAlertMessage({ type: 'success', title: 'Scout Started', message: res.data.message });
+        notify.success({ title: 'Scout Started', message: res.data.message });
       }
       refetchScoutStatus();
     } catch (err: any) {
@@ -92,7 +93,7 @@ export const Dashboard = () => {
       if (errMsg && errMsg.toLowerCase().includes('profile must be 100% complete')) {
         setIsModalOpen(true);
       } else {
-        setAlertMessage({ type: 'error', title: 'Failed to run scout', message: errMsg || 'An unexpected error occurred.' });
+        notify.error({ title: 'Failed to run scout', message: errMsg || 'An unexpected error occurred.' });
       }
       setIsScouting(false);
     }
@@ -597,33 +598,6 @@ export const Dashboard = () => {
         completionPercentage={completionData?.percentage || 0}
         missingFields={completionData?.missingFields || []}
       />
-
-      {/* Alert Modal */}
-      {alertMessage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setAlertMessage(null)}></div>
-          <div className="relative glass-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6">
-              <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full mb-4 shadow-inner ${alertMessage.type === 'success' ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
-                {alertMessage.type === 'success' ? (
-                  <CheckCircle className="h-6 w-6 text-green-400" />
-                ) : (
-                  <X className="h-6 w-6 text-red-400" />
-                )}
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{alertMessage.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{alertMessage.message}</p>
-              </div>
-            </div>
-            <div className="bg-white/80 dark:bg-slate-900/50 px-6 py-4 flex justify-center border-t border-slate-200 dark:border-slate-800">
-              <Button onClick={() => setAlertMessage(null)} className="w-full font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white border-0">
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

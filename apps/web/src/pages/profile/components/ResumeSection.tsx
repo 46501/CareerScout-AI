@@ -3,8 +3,10 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from '../../../co
 import { FileText, Upload, Trash2, Search, AlertCircle, Eye, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import api from '../../../lib/api';
+import { useNotification } from '../../../context/NotificationContext';
 
 export const ResumeSection = ({ fetchProfile }: any) => {
+  const { notify, confirm } = useNotification();
   const [resumeData, setResumeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'analyzing' | 'completed'>('idle');
@@ -66,7 +68,10 @@ export const ResumeSection = ({ fetchProfile }: any) => {
     } catch (error) {
       console.error('Upload failed', error);
       setUploadStatus('idle');
-      alert('Upload failed. Please try again.');
+      notify.error({
+        title: 'Upload Failed',
+        message: 'Failed to upload your resume. Please check the file and try again.'
+      });
     }
   };
 
@@ -81,10 +86,17 @@ export const ResumeSection = ({ fetchProfile }: any) => {
           if (updatedResume.status === 'EXTRACTED' || updatedResume.status === 'CONFIRMED') {
             clearInterval(interval);
             setUploadStatus('completed');
+            notify.success({
+              title: 'Resume Analyzed',
+              message: 'AI has extracted your details. Please review and confirm.'
+            });
           } else if (updatedResume.status === 'FAILED') {
             clearInterval(interval);
             setUploadStatus('idle');
-            alert('AI Resume extraction failed. Please try again.');
+            notify.error({
+              title: 'Extraction Failed',
+              message: 'AI Resume extraction could not complete. Please try uploading again.'
+            });
           } else if (updatedResume.status === 'PROCESSING') {
              setUploadStatus('analyzing');
           }
@@ -99,22 +111,37 @@ export const ResumeSection = ({ fetchProfile }: any) => {
     try {
       await api.post('/resume/confirm', { parsedData: resumeData.parsedData });
       setResumeData({ ...resumeData, status: 'CONFIRMED' });
-      alert('Resume analysis confirmed and merged into profile');
+      notify.success({
+        title: 'Resume Merged',
+        message: 'Resume analysis confirmed and merged into your profile.'
+      });
       fetchProfile();
     } catch (err) {
-      alert('Failed to confirm resume data');
+      notify.error({
+        title: 'Confirmation Failed',
+        message: 'Failed to confirm resume data. Please try again.'
+      });
     }
   };
 
   const handleDelete = async () => {
-    if(confirm('Are you sure you want to delete your resume?')) {
+    const confirmed = await confirm({
+      title: 'Delete Resume',
+      message: 'Are you sure you want to delete your resume? This will remove your uploaded document and extracted details.',
+      confirmText: 'Delete Resume',
+      cancelText: 'Keep Resume',
+      variant: 'danger'
+    });
+    if (confirmed) {
       try {
         setResumeData(null);
         setUploadStatus('idle');
         setProgress(0);
         fetchProfile();
+        notify.success('Resume deleted successfully');
       } catch (err) {
         console.error(err);
+        notify.error('Failed to delete resume');
       }
     }
   };

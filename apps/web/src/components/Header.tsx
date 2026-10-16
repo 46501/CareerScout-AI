@@ -3,6 +3,7 @@ import { Bot, Bell, User as UserIcon, Settings, LogOut, FileText } from 'lucide-
 import { Link } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 
@@ -15,8 +16,24 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completionPercentage, missingFields = [] }) => {
   const { user, logout } = useAuth();
+  const { confirm, notify } = useNotification();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleLogout = async () => {
+    setDropdownOpen(false);
+    const confirmed = await confirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out of CareerScout AI?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+    if (confirmed) {
+      logout();
+      notify.info('Signed out successfully');
+    }
+  };
 
   const handleRunScout = () => {
     if (completionPercentage < 100) {
@@ -94,10 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
               </Link>
               <div className="border-t border-gray-100 my-1"></div>
               <button 
-                onClick={() => {
-                  setDropdownOpen(false);
-                  logout();
-                }}
+                onClick={handleLogout}
                 className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               >
                 <LogOut className="h-4 w-4 mr-2" /> Logout

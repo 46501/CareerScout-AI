@@ -8,6 +8,7 @@ import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import api from '../../lib/api';
 import { Upload, ChevronRight, ChevronLeft, CheckCircle, Sparkles } from 'lucide-react';
+import { useNotification } from '../../context/NotificationContext';
 
 const onboardingSchema = z.object({
   fullName: z.string().min(2, 'Name is required'),
@@ -20,6 +21,7 @@ const onboardingSchema = z.object({
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
 export function OnboardingWizard() {
+  const { notify } = useNotification();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -55,10 +57,18 @@ export function OnboardingWizard() {
       };
 
       await api.put('/profile', payload);
+      notify.success({
+        title: 'Profile Created',
+        message: 'Your onboarding profile has been saved successfully!'
+      });
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save profile', error);
-      alert('Failed to save profile. Please try again.');
+      const errMsg = error.response?.data?.error?.message || 'Failed to save profile. Please try again.';
+      notify.error({
+        title: 'Save Failed',
+        message: errMsg
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Sparkles } from 'lucide-react';
 
 export function Register() {
+  const { notify } = useNotification();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,17 +21,26 @@ export function Register() {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      notify.warning('Passwords do not match');
       return;
     }
     try {
       setError('');
       await registerUser({ fullName, email, password });
+      notify.success({
+        title: 'Account Created',
+        message: 'Welcome to CareerScout AI! Let\'s set up your career profile.'
+      });
       navigate('/onboarding');
     } catch (err: any) {
       console.error('Registration error:', err);
       // If there is no response (e.g. CORS or network error), display the raw message
       const errorMessage = err.response?.data?.error?.message || err.message || 'Registration failed';
       setError(errorMessage);
+      notify.error({
+        title: 'Registration Failed',
+        message: errorMessage
+      });
     }
   };
 

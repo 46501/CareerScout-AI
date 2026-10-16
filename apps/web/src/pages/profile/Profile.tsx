@@ -4,6 +4,8 @@ import { BackButton } from '../../components/ui/BackButton';
 import api from '../../lib/api';
 import { User, GraduationCap, Settings, Briefcase, Target, MapPin, FileText, CheckCircle2 } from 'lucide-react';
 
+import { useNotification } from '../../context/NotificationContext';
+
 import { BasicInfoSection } from './components/BasicInfoSection';
 import { EducationSection } from './components/EducationSection';
 import { SkillsSection } from './components/SkillsSection';
@@ -33,6 +35,7 @@ const SECTIONS = [
 ];
 
 export const Profile = () => {
+  const { notify } = useNotification();
   const [completion, setCompletion] = useState({ percentage: 0, isComplete: false, missingFields: [] as string[] });
   const [profileData, setProfileData] = useState<any>(DEFAULT_PROFILE_DATA);
   const [activeSection, setActiveSection] = useState('basic');
@@ -88,10 +91,17 @@ export const Profile = () => {
         });
       }
 
-      alert('Profile updated successfully.');
-    } catch (error) {
+      notify.success({
+        title: 'Profile Updated',
+        message: 'Your profile has been saved successfully.'
+      });
+    } catch (error: any) {
       console.error('Save profile error:', error);
-      alert('Unable to save profile. Please try again.');
+      const errMsg = error.response?.data?.error?.message || 'Unable to save profile. Please try again.';
+      notify.error({
+        title: 'Save Failed',
+        message: errMsg
+      });
     }
   };
 

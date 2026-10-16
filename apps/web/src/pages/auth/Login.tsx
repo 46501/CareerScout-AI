@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../../components/ui/Button';
 import { 
   Search, 
@@ -21,6 +22,7 @@ export function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { notify } = useNotification();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,12 +31,20 @@ export function Login() {
       setError('');
       setIsLoading(true);
       await login({ email, password });
+      notify.success({
+        title: 'Welcome Back!',
+        message: 'Signed in successfully.'
+      });
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
       // If there is no response (e.g. CORS or network error), display the raw message
       const errorMessage = err.response?.data?.error?.message || err.message || 'Login failed. Please check your credentials.';
       setError(errorMessage);
+      notify.error({
+        title: 'Sign In Failed',
+        message: errorMessage
+      });
     } finally {
       setIsLoading(false);
     }

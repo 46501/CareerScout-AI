@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
 import { Briefcase, Plus, Trash2, Edit2, X } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
+import { useNotification } from '../../../context/NotificationContext';
 
 export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false, onNoExperienceChange }: any) => {
+  const { confirm, notify } = useNotification();
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<any>({});
@@ -29,8 +31,10 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
       const newData = [...data];
       newData[editIndex] = formData;
       onChange(newData);
+      notify.success('Experience entry updated');
     } else {
       onChange([...data, formData]);
+      notify.success('Experience entry added');
     }
     // Also clear the hasNoExperience flag if they add something
     if (hasNoExperience) {
@@ -39,11 +43,19 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
     closeModal();
   };
 
-  const removeExperience = (index: number) => {
-    if(confirm('Are you sure you want to delete this experience entry?')) {
+  const removeExperience = async (index: number) => {
+    const confirmed = await confirm({
+      title: 'Delete Experience Entry',
+      message: 'Are you sure you want to delete this experience entry? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+    if (confirmed) {
       const newData = [...data];
       newData.splice(index, 1);
       onChange(newData);
+      notify.success('Experience entry removed');
     }
   };
 

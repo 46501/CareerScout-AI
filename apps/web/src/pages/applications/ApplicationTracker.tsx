@@ -5,6 +5,7 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { BackButton } from '../../components/ui/BackButton';
 import { Briefcase, Building2, Clock, CheckCircle2, XCircle, ChevronRight, Bookmark } from 'lucide-react';
 import api from '../../lib/api';
+import { useNotification } from '../../context/NotificationContext';
 
 const COLUMNS = [
   { id: 'SAVED', title: 'Saved', icon: Bookmark, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-white/80 dark:bg-slate-900/50' },
@@ -16,6 +17,7 @@ const COLUMNS = [
 ];
 
 export function ApplicationTracker() {
+  const { notify } = useNotification();
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,8 +50,17 @@ export function ApplicationTracker() {
 
     try {
       await api.put(`/applications/${draggableId}`, { status: newStatus });
+      const columnTitle = COLUMNS.find(c => c.id === newStatus)?.title || newStatus;
+      notify.success({
+        title: 'Application Moved',
+        message: `Status updated to ${columnTitle}.`
+      });
     } catch (error) {
       console.error('Failed to update status', error);
+      notify.error({
+        title: 'Update Failed',
+        message: 'Could not update status. Restoring previous state.'
+      });
       // Revert if failed (simple reload for now)
       const res = await api.get('/applications');
       if (res.data.success) setApplications(res.data.data);

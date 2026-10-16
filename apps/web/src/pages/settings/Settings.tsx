@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button';
 import { BackButton } from '../../components/ui/BackButton';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import api from '../../lib/api';
 
 export const Settings = () => {
+  const { notify } = useNotification();
   const { user } = useAuth();
   const [dailyScout, setDailyScout] = useState(true);
   const [scoutStatus, setScoutStatus] = useState(user?.scoutStatus || 'INCOMPLETE');
@@ -28,7 +30,10 @@ export const Settings = () => {
     // In a real app we'd call an endpoint to update scoutStatus to PAUSED/ACTIVE
     const newStatus = scoutStatus === 'PAUSED' ? 'ACTIVE' : 'PAUSED';
     setScoutStatus(newStatus);
-    alert(`CareerScout AI is now ${newStatus}`);
+    notify.info({
+      title: 'Scout Status Changed',
+      message: `CareerScout AI automation is now ${newStatus.toLowerCase()}.`
+    });
   };
 
   return (

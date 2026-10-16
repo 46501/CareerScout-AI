@@ -7,8 +7,10 @@ import { Badge } from '../../components/ui/Badge';
 import { BackButton } from '../../components/ui/BackButton';
 import { MatchAnalyzerModal } from '../../components/ui/MatchAnalyzerModal';
 import api from '../../lib/api';
+import { useNotification } from '../../context/NotificationContext';
 
 export function OpportunitiesList() {
+  const { notify } = useNotification();
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOppForAnalysis, setSelectedOppForAnalysis] = useState<any>(null);
@@ -87,7 +89,18 @@ export function OpportunitiesList() {
                             {opp.salary && <span className="flex items-center truncate text-green-400/90"><DollarSign className="h-3.5 w-3.5 mr-1 shrink-0"/> {opp.salary}</span>}
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="text-slate-500 dark:text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-slate-500 dark:text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            notify.success({
+                              title: 'Saved to Favorites',
+                              message: `${opp.title} at ${opp.organization} saved.`
+                            });
+                          }}
+                        >
                           <Star className="h-5 w-5" />
                         </Button>
                       </div>
@@ -135,7 +148,19 @@ export function OpportunitiesList() {
                           {new Date(opp.postedAt).toLocaleDateString()}
                         </div>
                       </div>
-                      <Button className="w-auto md:w-full bg-white dark:bg-slate-900 text-slate-900 hover:bg-slate-200 font-semibold shadow-lg transition-all" onClick={(e) => { e.stopPropagation(); window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); }}>Apply Now</Button>
+                      <Button 
+                        className="w-auto md:w-full bg-white dark:bg-slate-900 text-slate-900 hover:bg-slate-200 font-semibold shadow-lg transition-all" 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          notify.info({
+                            title: 'Opening Application',
+                            message: `Opening portal for ${opp.title}...`
+                          });
+                          window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); 
+                        }}
+                      >
+                        Apply Now
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

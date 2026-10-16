@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
 import { GraduationCap, Plus, Trash2, Edit2, X } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
+import { useNotification } from '../../../context/NotificationContext';
 
 export const EducationSection = ({ data = [], onChange }: any) => {
+  const { confirm, notify } = useNotification();
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<any>({});
@@ -29,17 +31,27 @@ export const EducationSection = ({ data = [], onChange }: any) => {
       const newData = [...data];
       newData[editIndex] = formData;
       onChange(newData);
+      notify.success('Education entry updated');
     } else {
       onChange([...data, formData]);
+      notify.success('Education entry added');
     }
     closeModal();
   };
 
-  const removeEducation = (index: number) => {
-    if(confirm('Are you sure you want to delete this education entry?')) {
+  const removeEducation = async (index: number) => {
+    const confirmed = await confirm({
+      title: 'Delete Education Entry',
+      message: 'Are you sure you want to delete this education entry? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+    if (confirmed) {
       const newData = [...data];
       newData.splice(index, 1);
       onChange(newData);
+      notify.success('Education entry removed');
     }
   };
 
