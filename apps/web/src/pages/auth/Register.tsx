@@ -45,20 +45,22 @@ export function Register() {
             <Sparkles className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">CareerScout AI</span>
           </div>
-          <h2 className="mt-4 text-center text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-300 transition-colors">
-              Sign in here
-            </Link>
-          </p>
         </div>
 
         <Card className="glass-card border-slate-200 dark:border-slate-800/50 shadow-2xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl text-slate-900 dark:text-white">Sign Up</CardTitle>
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-3 mb-1">
+              <CardTitle className="text-2xl text-slate-900 dark:text-white">Sign Up</CardTitle>
+              <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400 shrink-0">
+                Already have an account?{' '}
+                <Link to="/login" className="text-blue-600 dark:text-primary-400 font-bold hover:text-blue-700 dark:hover:text-primary-300 transition-colors">
+                  Sign in →
+                </Link>
+              </div>
+            </div>
             <CardDescription className="text-slate-600 dark:text-slate-400">Join CareerScout AI to discover your next big opportunity.</CardDescription>
           </CardHeader>
           <CardContent>

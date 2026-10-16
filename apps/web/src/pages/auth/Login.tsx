@@ -20,7 +20,6 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('Student');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -178,71 +177,52 @@ export function Login() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/40 rounded-bl-[100px] pointer-events-none blur-2xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100/40 rounded-tr-[100px] pointer-events-none blur-2xl"></div>
 
-        {/* Top Right Signup */}
-        <div className="absolute top-8 right-10 text-[14px] font-medium text-gray-500 hidden sm:block z-20">
-          New here? <Link to="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">Sign up →</Link>
-        </div>
-
         {/* Login Card */}
-        <div className="w-full max-w-[460px] bg-white dark:bg-slate-900 p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 relative z-10">
+        <div className="w-full max-w-[460px] bg-white dark:bg-slate-900 p-9 sm:p-11 rounded-[32px] shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-gray-100/80 dark:border-slate-800 relative z-10">
           
           {/* Mobile Logo Fallback */}
           <div className="lg:hidden flex items-center mb-10 justify-center">
             <img src="/branding/careerscout-logo.png" alt="CareerScout AI" className="h-8 w-auto object-contain" />
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-3xl sm:text-[32px] font-extrabold text-gray-900 mb-2.5 tracking-tight flex items-center">
-              Welcome Back <span className="ml-2 text-[28px] animate-wave origin-bottom-right inline-block">👋</span>
-            </h2>
-            <p className="text-[14px] text-gray-500 font-medium leading-relaxed pr-4">
-              Sign in to continue your career journey with CareerScout AI.
+          <div className="mb-7">
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-3 mb-1.5">
+              <h2 className="text-2xl sm:text-[28px] font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center">
+                Welcome Back <span className="ml-2 text-[24px] sm:text-[26px] animate-wave origin-bottom-right inline-block">👋</span>
+              </h2>
+              <div className="text-[13px] font-medium text-gray-500 dark:text-slate-400 shrink-0">
+                New here?{' '}
+                <Link to="/register" className="text-blue-600 dark:text-blue-400 font-bold hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                  Sign up →
+                </Link>
+              </div>
+            </div>
+            <p className="text-[14px] text-gray-500 dark:text-slate-400 font-medium leading-relaxed mb-3">
+              Your next opportunity starts here.
             </p>
-          </div>
-
-          {/* Student / Recruiter Tabs */}
-          <div className="flex p-1.5 bg-gray-50/80 rounded-[14px] mb-8 border border-gray-100">
-            <button 
-              type="button"
-              onClick={() => setActiveTab('Student')}
-              className={`flex-1 py-2.5 text-[14px] font-bold rounded-[10px] transition-all duration-200 ${
-                activeTab === 'Student' 
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Student
-            </button>
-            <button 
-              type="button"
-              onClick={() => setActiveTab('Recruiter')}
-              className={`flex-1 py-2.5 text-[14px] font-bold rounded-[10px] transition-all duration-200 ${
-                activeTab === 'Recruiter' 
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100/50' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Recruiter
-            </button>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/60 text-[12px] font-semibold text-blue-600 dark:text-blue-400 shadow-sm">
+              <span className="text-blue-500 dark:text-blue-400 text-[11px] leading-none">✦</span>
+              <span>AI-Powered Career Discovery</span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-3.5 text-[13px] font-semibold text-red-600 bg-red-50 border border-red-100 rounded-xl text-center">
+              <div className="p-3.5 text-[13px] font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-xl text-center">
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-[13px] font-bold text-gray-900 ml-1">Email Address</label>
+              <label className="text-[13px] font-bold text-gray-900 dark:text-slate-200 ml-1">Email Address</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500 text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500 text-gray-400 dark:text-slate-500">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
                   type="email"
                   required
-                  className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-[14px] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-slate-500 font-medium hover:border-gray-300 dark:hover:border-slate-600"
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -251,22 +231,22 @@ export function Login() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[13px] font-bold text-gray-900 ml-1">Password</label>
+              <label className="text-[13px] font-bold text-gray-900 dark:text-slate-200 ml-1">Password</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500 text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500 text-gray-400 dark:text-slate-500">
                   <Lock className="h-4 w-4" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-[14px] text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder-gray-400 font-medium hover:border-gray-300"
+                  className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-[14px] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-slate-500 font-medium hover:border-gray-300 dark:hover:border-slate-600"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button 
                   type="button" 
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -279,13 +259,13 @@ export function Login() {
                 <input 
                   id="remember-me" 
                   type="checkbox" 
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-[4px] cursor-pointer" 
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-700 dark:bg-slate-800 rounded-[4px] cursor-pointer" 
                 />
-                <label htmlFor="remember-me" className="ml-2.5 block text-[13px] font-semibold text-gray-600 cursor-pointer select-none">
+                <label htmlFor="remember-me" className="ml-2.5 block text-[13px] font-semibold text-gray-600 dark:text-slate-400 cursor-pointer select-none">
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-[13px] font-bold text-blue-600 hover:text-blue-700 hover:underline transition-all">
+              <a href="#" className="text-[13px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-all">
                 Forgot password?
               </a>
             </div>
@@ -307,13 +287,13 @@ export function Login() {
           <div className="mt-6 mb-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-100"></div>
+                <div className="w-full border-t border-gray-100 dark:border-slate-800"></div>
               </div>
             </div>
           </div>
           
-          <div className="text-center text-[14px] font-medium text-gray-500">
-            Don't have an account? <Link to="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors ml-1">Sign up</Link>
+          <div className="text-center text-[14px] font-medium text-gray-500 dark:text-slate-400">
+            Don't have an account? <Link to="/register" className="text-blue-600 dark:text-blue-400 font-bold hover:text-blue-700 dark:hover:text-blue-300 transition-colors ml-1">Sign up</Link>
           </div>
         </div>
       </div>
