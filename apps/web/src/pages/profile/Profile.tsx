@@ -5,6 +5,8 @@ import api from '../../lib/api';
 import { User, GraduationCap, Settings, Briefcase, Target, MapPin, FileText, CheckCircle2 } from 'lucide-react';
 
 import { useNotification } from '../../context/NotificationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { BasicInfoSection } from './components/BasicInfoSection';
 import { EducationSection } from './components/EducationSection';
@@ -36,6 +38,8 @@ const SECTIONS = [
 
 export const Profile = () => {
   const { notify } = useNotification();
+  const { updateUser, refreshUser } = useAuth();
+  const queryClient = useQueryClient();
   const [completion, setCompletion] = useState({ percentage: 0, isComplete: false, missingFields: [] as string[] });
   const [profileData, setProfileData] = useState<any>(DEFAULT_PROFILE_DATA);
   const [activeSection, setActiveSection] = useState('basic');
@@ -56,6 +60,14 @@ export const Profile = () => {
           careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...profile?.careerGoals },
           locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...profile?.locationPreferences }
         });
+
+        if (profile?.personal?.fullName) {
+          updateUser({
+            fullName: profile.personal.fullName,
+            name: profile.personal.fullName,
+            profilePhoto: profile.personal.profilePhoto
+          });
+        }
       }
     } catch (err: any) {
       if (err.response?.status !== 404) {
@@ -89,6 +101,18 @@ export const Profile = () => {
           careerGoals: { ...DEFAULT_PROFILE_DATA.careerGoals, ...updated?.careerGoals },
           locationPreferences: { ...DEFAULT_PROFILE_DATA.locationPreferences, ...updated?.locationPreferences }
         });
+
+        if (updated?.personal?.fullName) {
+          updateUser({
+            fullName: updated.personal.fullName,
+            name: updated.personal.fullName,
+            profilePhoto: updated.personal.profilePhoto
+          });
+        }
+
+        await queryClient.invalidateQueries({ queryKey: ['profile'] });
+        await queryClient.invalidateQueries({ queryKey: ['profileCompletion'] });
+        refreshUser().catch(() => {});
       }
 
       notify.success({

@@ -1,10 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api, { setAccessToken } from '../lib/api';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role: string;
+  fullName?: string;
+  name?: string;
+  profilePhoto?: string;
   scoutStatus?: string;
   scoutSettings?: any;
 }
@@ -15,6 +18,8 @@ interface AuthContextType {
   login: (data: any) => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +27,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const refreshUser = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      if (response.data?.data?.user) {
+        setUser(response.data.data.user);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
+  const updateUser = (data: Partial<User>) => {
+    setUser(prev => (prev ? { ...prev, ...data } : null));
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -59,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, refreshUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

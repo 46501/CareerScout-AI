@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
+import { CareerProfile } from '../models/CareerProfile';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -21,11 +22,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email, passwordHash });
 
-    await import('../models/CareerProfile').then(m => {
-      return m.CareerProfile.create({
-        userId: user._id,
-        personal: { fullName }
-      });
+    await CareerProfile.create({
+      userId: user._id,
+      personal: { fullName }
     });
 
     const accessToken = generateAccessToken(user._id as any, user.role);
@@ -47,6 +46,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
           id: user._id,
           email: user.email,
           role: user.role,
+          fullName: fullName,
+          name: fullName,
+          profilePhoto: '',
           scoutStatus: user.scoutStatus,
           scoutSettings: user.scoutSettings
         }
@@ -76,6 +78,8 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     const accessToken = generateAccessToken(user._id as any, user.role);
     const refreshToken = generateRefreshToken(user._id as any, user.role);
 
+    const profile = await CareerProfile.findOne({ userId: user._id }).lean();
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -91,6 +95,9 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
           id: user._id,
           email: user.email,
           role: user.role,
+          fullName: profile?.personal?.fullName || '',
+          name: profile?.personal?.fullName || '',
+          profilePhoto: profile?.personal?.profilePhoto || '',
           scoutStatus: user.scoutStatus,
           scoutSettings: user.scoutSettings
         }
@@ -114,6 +121,7 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
       res.status(404).json({ success: false, error: { message: 'User not found' } });
       return;
     }
+    const profile = await CareerProfile.findOne({ userId }).lean();
     res.status(200).json({
       success: true,
       data: {
@@ -121,6 +129,9 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
           id: user._id,
           email: user.email,
           role: user.role,
+          fullName: profile?.personal?.fullName || '',
+          name: profile?.personal?.fullName || '',
+          profilePhoto: profile?.personal?.profilePhoto || '',
           scoutStatus: user.scoutStatus,
           scoutSettings: user.scoutSettings
         }

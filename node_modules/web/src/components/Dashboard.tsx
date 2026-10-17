@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Search, FileText, Bot, User, 
   BookOpen, Folder, PieChart, Settings, Bell, ChevronDown, 
   Briefcase, Bookmark, Users, 
   ArrowRight, Sparkles, Trophy, CheckCircle, 
-  Star, Heart, Navigation, Clock, Menu, X
+  Star, Heart, Navigation, Clock, Menu, X, LogOut
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
@@ -18,23 +18,57 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { useNotification } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 export const Dashboard = () => {
-  const { notify } = useNotification();
+  const { notify, confirm } = useNotification();
+  const { user: authUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScouting, setIsScouting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { data: profile } = useQuery({
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setIsUserMenuOpen(false);
+    const confirmed = await confirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out of CareerScout AI?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+    if (confirmed) {
+      await logout();
+      notify.info('Signed out successfully');
+      navigate('/login');
+    }
+  };
+
+  const { data: profileResponse } = useQuery({
     queryKey: ['profile'],
     queryFn: () => api.get('/profile').then(res => res.data.data)
   });
+  const profile = profileResponse?.profile || profileResponse;
 
   const { data: completionData } = useQuery({
     queryKey: ['profileCompletion'],
     queryFn: () => api.get('/profile/completion').then(res => res.data.data)
   });
+
+  const completion = completionData || profileResponse?.profileCompletion;
 
   const { data: stats } = useQuery({
     queryKey: ['dashboardStats'],
@@ -76,7 +110,7 @@ export const Dashboard = () => {
   }, [scoutStatus]);
 
   const runScout = async () => {
-    if (completionData && completionData.percentage < 100) {
+    if (completion && completion.percentage < 100) {
       setIsModalOpen(true);
       return;
     }
@@ -99,8 +133,55 @@ export const Dashboard = () => {
     }
   };
 
-  const firstName = profile?.personal?.fullName?.split(' ')[0] || 'there';
-  const fullName = profile?.personal?.fullName || 'User';
+  const rawFullName = profile?.personal?.fullName || authUser?.fullName || authUser?.name || '';
+  const fullName = rawFullName.trim();
+  const firstName = fullName ? fullName.split(/\s+/)[0] : '';
+  const roleDisplay = authUser?.role === 'ADMIN' ? 'Admin' : 'Student';
+
+  const getInitials = (name?: string, email?: string) => {
+    if (name && name.trim()) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+      }
+      return parts[0].charAt(0).toUpperCase();
+    }
+    if (email && email.trim()) {
+      return email.trim().charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
+
+  const initials = getInitials(fullName, authUser?.email);
+  const profilePhoto = profile?.personal?.profilePhoto || authUser?.profilePhoto;
+
+  const getGreetingTime = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+  const timeGreeting = getGreetingTime();
+  const greetingText = firstName ? `${timeGreeting}, ${firstName} 👋` : `${timeGreeting} 👋`;
+
+  const allSkills: string[] = useMemo(() => {
+    if (!profile?.skills) return [];
+    if (Array.isArray(profile.skills)) {
+      return profile.skills.map((s: any) => typeof s === 'string' ? s : s.name).filter(Boolean);
+    }
+    const list: string[] = [];
+    const categories = ['programmingLanguages', 'webDevelopment', 'aiMachineLearning', 'databases', 'devopsCloud'] as const;
+    for (const cat of categories) {
+      const items = (profile.skills as any)[cat];
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          const name = typeof item === 'string' ? item : item?.name;
+          if (name && !list.includes(name)) list.push(name);
+        }
+      }
+    }
+    return list;
+  }, [profile]);
 
   const defaultChartData = [
     { name: 'Apr', Jobs: 0, Internships: 0, Competitions: 0, Hackathons: 0 },
@@ -233,19 +314,64 @@ export const Dashboard = () => {
               <span className="absolute top-0 right-0 w-2 h-2 bg-accent-500 rounded-full border border-slate-900"></span>
             </button>
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
-            <div className="flex items-center cursor-pointer group">
-              <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white font-bold border border-slate-300 dark:border-slate-600 shadow-inner mr-3 object-cover overflow-hidden">
-                {profile?.personal?.profilePhoto ? (
-                  <img src={profile.personal.profilePhoto} alt="Profile" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{fullName.charAt(0)}</span>
-                )}
-              </div>
-              <div className="hidden md:block text-left mr-2">
-                <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">{fullName}</p>
-                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">{profile?.education?.[0]?.institution || 'Student'}</p>
-              </div>
-              <ChevronDown className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-white transition-colors" />
+            {/* Top Right User Profile Menu */}
+            <div className="relative" ref={userMenuRef}>
+              <button 
+                onClick={() => setIsUserMenuOpen(prev => !prev)}
+                className="flex items-center cursor-pointer group focus:outline-none rounded-xl p-1.5 -mr-1.5 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors"
+                aria-expanded={isUserMenuOpen}
+                aria-haspopup="true"
+                id="user-menu-button"
+              >
+                <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white font-bold border border-slate-300 dark:border-slate-600 shadow-inner mr-3 object-cover overflow-hidden">
+                  {profilePhoto ? (
+                    <img src={profilePhoto} alt={fullName || 'User'} className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold text-primary-600 dark:text-primary-400">{initials}</span>
+                  )}
+                </div>
+                <div className="hidden md:block text-left mr-2">
+                  <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">{fullName || 'My Account'}</p>
+                  <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">{roleDisplay}</p>
+                </div>
+                <ChevronDown className={`h-4 w-4 text-slate-500 dark:text-slate-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180 text-primary-500' : 'group-hover:text-white'}`} />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 glass-card rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800/60">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{fullName || 'My Account'}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{authUser?.email || ''}</p>
+                    <div className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20">
+                      {roleDisplay}
+                    </div>
+                  </div>
+                  <div className="py-1">
+                    <Link 
+                      to="/profile" 
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                    >
+                      <User className="h-4 w-4 mr-2.5 text-slate-400" /> View & Edit Profile
+                    </Link>
+                    <Link 
+                      to="/settings" 
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                    >
+                      <Settings className="h-4 w-4 mr-2.5 text-slate-400" /> Settings
+                    </Link>
+                  </div>
+                  <div className="border-t border-slate-200 dark:border-slate-800/60 pt-1">
+                    <button 
+                      onClick={handleLogout}
+                      className="flex w-full items-center px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4 mr-2.5" /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -287,17 +413,17 @@ export const Dashboard = () => {
                 </div>
                 
                 <div className="relative z-10 w-full sm:max-w-lg py-2 sm:py-6">
-                  <p className="text-[13px] font-semibold text-primary-700 dark:text-primary-300 mb-1 tracking-wide">Good Afternoon, 👋</p>
-                  <h2 className="text-[28px] sm:text-[32px] font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight leading-none truncate">{firstName}</h2>
+                  <p className="text-[13px] font-semibold text-primary-700 dark:text-primary-300 mb-1 tracking-wide">Welcome Back</p>
+                  <h2 className="text-[28px] sm:text-[32px] font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight leading-none truncate">{greetingText}</h2>
                   <p className="text-[13px] text-slate-600 dark:text-slate-400 mb-5 font-medium max-w-sm leading-relaxed">"The right opportunity can be the start of something amazing."</p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {profile?.skills && profile.skills.length > 0 ? (
-                      profile.skills.slice(0, 3).map((skill: any) => (
-                        <span key={skill.name || skill} className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">{skill.name || skill}</span>
+                    {allSkills.length > 0 ? (
+                      allSkills.slice(0, 4).map((skillName) => (
+                        <span key={skillName} className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">{skillName}</span>
                       ))
                     ) : (
-                      <span className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner">Complete profile for tags</span>
+                      <Link to="/profile" className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/80 text-primary-700 dark:text-primary-300 rounded-full text-[11px] font-bold border border-primary-500/30 shadow-inner hover:border-primary-500 transition-colors">Complete profile for tags</Link>
                     )}
                   </div>
                 </div>

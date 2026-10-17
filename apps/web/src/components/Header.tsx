@@ -44,12 +44,16 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
   };
 
   const getInitials = () => {
+    if (user?.fullName && user.fullName.trim()) {
+      const parts = user.fullName.trim().split(/\s+/);
+      if (parts.length >= 2) return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+      return parts[0].charAt(0).toUpperCase();
+    }
     if (user?.email) return user.email.charAt(0).toUpperCase();
     return 'U';
   };
 
-  // Default to initials, in a real app this would map to a user.profilePhoto URL
-  const hasPhoto = false; 
+  const hasPhoto = !!user?.profilePhoto; 
 
   return (
     <>
