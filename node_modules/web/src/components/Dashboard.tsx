@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Search, FileText, Bot, User, 
-  BookOpen, Folder, PieChart, Settings, Bell, ChevronDown, 
+  Search, FileText, Bot, User, 
+  Settings, Bell, ChevronDown, 
   Briefcase, Bookmark, Users, 
   ArrowRight, Sparkles, Trophy, CheckCircle, 
-  Star, Heart, Navigation, Clock, Menu, X, LogOut
+  Star, Heart, Navigation, Clock, Menu, LogOut
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
@@ -13,6 +13,7 @@ import api from '../lib/api';
 import heroImg from '../assets/hero.png';
 import { ProfileCompletionModal } from './ui/ProfileCompletionModal';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { Sidebar } from './Sidebar';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
@@ -195,78 +196,13 @@ export const Dashboard = () => {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-blob pointer-events-none" style={{ animationDelay: '2s' }}></div>
 
-      {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-950/80 z-40 lg:hidden backdrop-blur-md" 
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 glass-card border-r border-slate-200 dark:border-slate-800/50 flex flex-col flex-shrink-0 h-screen transition-transform duration-300 ease-in-out lg:transform-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} rounded-none`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800/50 pt-2 pb-2">
-          <div className="flex items-center">
-            {/* Note: Recommend updating logo asset to a light version for dark mode if available */}
-            <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-               <Bot className="h-6 w-6 text-primary-500" /> CareerScout
-            </span>
-          </div>
-          <button className="lg:hidden text-slate-600 dark:text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto hide-scrollbar">
-          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-1 border border-primary-500/20 shadow-[inset_0_0_15px_rgba(99,102,241,0.1)]">
-            <LayoutDashboard className="h-4 w-4 mr-3" /> Dashboard
-          </Link>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Search className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Opportunities
-          </Link>
-          <Link to="/applications" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <CheckCircle className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Applications
-          </Link>
-          <Link to="/assistant" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Bot className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> AI Scout
-          </Link>
-          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <FileText className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Resume
-          </Link>
-          <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <User className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Profile
-          </Link>
-          
-          <div className="pt-4 pb-2">
-            <p className="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resources</p>
-          </div>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <BookOpen className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Learning Hub
-          </Link>
-          <Link to="/opportunities" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <Folder className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Resources
-          </Link>
-          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors">
-            <PieChart className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Analytics
-          </Link>
-          <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-800/50 hover:text-white mb-1 transition-colors mt-2">
-            <Settings className="h-4 w-4 mr-3 text-slate-500 dark:text-slate-400" /> Settings
-          </Link>
-        </nav>
-
-        {/* Sidebar Bottom Card */}
-        <div className="p-5 mx-4 mb-6 mt-auto bg-gradient-to-br from-primary-900/80 to-slate-900 rounded-2xl text-slate-900 dark:text-white relative overflow-hidden border border-primary-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 rounded-full -mr-16 -mt-16 pointer-events-none blur-xl" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-500/20 rounded-full -ml-10 -mb-10 pointer-events-none blur-xl" />
-          <div className="relative z-10">
-            <h4 className="font-bold text-[14px] leading-tight mb-2 text-slate-900 dark:text-white">Find Opportunities<br/>Built for Your Future</h4>
-            <p className="text-[11px] text-primary-200/80 mb-4 font-medium leading-relaxed">AI-powered recommendations<br/>for students and early careers.</p>
-            <Button onClick={runScout} disabled={isScouting} className="w-full bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all rounded-xl text-xs font-semibold h-9">
-              {isScouting ? 'Scanning Web...' : 'Run AI Scout →'}
-            </Button>
-          </div>
-        </div>
-      </aside>
+      {/* Unified Sidebar Navigation */}
+      <Sidebar 
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+        onRunScout={runScout}
+        isScouting={isScouting}
+      />
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden z-10 relative">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bot, Bell, User as UserIcon, Settings, LogOut, FileText, CheckCheck, Sparkles, ExternalLink } from 'lucide-react';
+import { Bot, Bell, User as UserIcon, Settings, LogOut, CheckCheck, Sparkles, ExternalLink } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
@@ -230,14 +230,7 @@ export const Header: React.FC<HeaderProps> = ({ onRunScout, isScouting, completi
                 className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
                 onClick={() => setDropdownOpen(false)}
               >
-                <UserIcon className="h-4 w-4 mr-2" /> Profile
-              </Link>
-              <Link 
-                to="/profile" 
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
-                onClick={() => setDropdownOpen(false)}
-              >
-                <FileText className="h-4 w-4 mr-2" /> Edit Profile
+                <UserIcon className="h-4 w-4 mr-2" /> My Profile
               </Link>
               <Link 
                 to="/settings" 

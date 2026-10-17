@@ -86,6 +86,11 @@ function App() {
                     <Assistant />
                   </ProtectedRoute>
                 } />
+                <Route path="/scout" element={
+                  <ProtectedRoute>
+                    <Assistant />
+                  </ProtectedRoute>
+                } />
                 <Route path="/profile" element={
                   <ProtectedRoute>
                     <Profile />
