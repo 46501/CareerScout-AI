@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
 import { RemotiveProvider } from './providers/RemotiveProvider';
+import { ArbeitnowProvider } from './providers/ArbeitnowProvider';
+import { DevpostProvider } from './providers/DevpostProvider';
 
 // Load .env from monorepo root
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
@@ -26,17 +28,28 @@ async function startWorker() {
       console.log('MongoDB connected');
     }
 
-    const provider = new RemotiveProvider();
+    const remotiveProvider = new RemotiveProvider();
+    const arbeitnowProvider = new ArbeitnowProvider();
+    const devpostProvider = new DevpostProvider();
     
-    // Seed on startup with real jobs
-    await provider.run();
+    const runAllProviders = async () => {
+      console.log('Running all opportunity providers (Remotive, Arbeitnow, Devpost)...');
+      await Promise.allSettled([
+        remotiveProvider.run(),
+        arbeitnowProvider.run(),
+        devpostProvider.run()
+      ]);
+    };
+
+    // Seed on startup with real jobs, internships, and hackathons
+    await runAllProviders();
 
     const worker = new Worker('opportunity-discovery', async job => {
       console.log(`Processing job ${job.id} of type ${job.name}`);
       
       if (job.name === 'dailyOpportunityDiscovery') {
         console.log('Running daily opportunity discovery...');
-        await provider.run();
+        await runAllProviders();
         console.log('Discovery complete.');
       } else if (job.name === 'personalizedOpportunityDiscovery') {
         console.log(`Running personalized scout for user ${job.data.userId}`);

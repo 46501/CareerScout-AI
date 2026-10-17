@@ -28,11 +28,13 @@ async function fetchHackerNewsJobs() {
         const organization = titleParts.length > 1 ? titleParts[0].trim() : 'HackerNews Startup';
         const role = titleParts.length > 1 ? titleParts[1].trim() : item.title;
 
+        const isInternship = /intern/i.test(role) || /intern/i.test(item.text || '');
+
         jobs.push({
           title: role,
           organization: organization,
           location: item.text?.toLowerCase().includes('remote') ? 'Remote' : 'Various',
-          type: 'JOB',
+          type: isInternship ? 'INTERNSHIP' : 'JOB',
           remoteType: item.text?.toLowerCase().includes('remote') ? 'REMOTE' : 'HYBRID',
           description: normalizeJobDescription(item.text || item.title),
           skills: ['Engineering', 'Software Development'], // Default skills, since HN doesn't provide structured tags

@@ -20,13 +20,18 @@ export class RemotiveProvider {
       let count = 0;
 
       for (const job of jobs) {
-        // Map Remotive job to CareerScout Opportunity schema
+        const internRegex = /\bintern(ship)?s?\b/i;
+        const isInternship = internRegex.test(job.title || '') || 
+          (job.tags && job.tags.some((t: string) => internRegex.test(t))) || 
+          internRegex.test(job.job_type || '');
+
         const opp = {
           title: job.title,
           organization: job.company_name,
           organizationLogo: job.company_logo || undefined,
           description: normalizeJobDescription(job.description), // Normalized clean text without HTML artifacts
-          type: job.job_type === 'contract' ? 'FREELANCE' : 'JOB',
+          type: isInternship ? 'INTERNSHIP' : 'JOB',
+          category: job.category || (job.job_type === 'contract' ? 'Contract' : 'Full Time'),
           skills: job.tags || [],
           location: job.candidate_required_location || 'Worldwide',
           remoteType: 'REMOTE',
