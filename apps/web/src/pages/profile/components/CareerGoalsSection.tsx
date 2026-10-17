@@ -10,11 +10,12 @@ const TagInput = ({ label, placeholder, tags = [], onAdd, onRemove }: any) => {
   const [inputValue, setInputValue] = useState('');
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      const val = inputValue.trim();
-      if (val) {
-        onAdd(val);
+      const raw = inputValue.trim();
+      if (raw) {
+        const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+        parts.forEach(p => onAdd(p));
         setInputValue('');
       }
     } else if (e.key === 'Backspace' && inputValue === '') {
@@ -46,9 +47,10 @@ const TagInput = ({ label, placeholder, tags = [], onAdd, onRemove }: any) => {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => {
-            const val = inputValue.trim();
-            if (val) {
-              onAdd(val);
+            const raw = inputValue.trim();
+            if (raw) {
+              const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+              parts.forEach(p => onAdd(p));
               setInputValue('');
             }
           }}

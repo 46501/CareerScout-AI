@@ -202,6 +202,7 @@ export const Dashboard = () => {
         onCloseMobile={() => setIsMobileMenuOpen(false)}
         onRunScout={runScout}
         isScouting={isScouting}
+        isProfileComplete={completion?.percentage === 100}
       />
 
       {/* Main Container */}
@@ -595,8 +596,16 @@ export const Dashboard = () => {
                   </p>
                 </div>
 
-                <Button onClick={runScout} disabled={isScouting} className="w-full bg-primary-600 hover:bg-primary-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] rounded-xl py-2 h-10 font-semibold text-[13px] mb-5 transition-all border-0 relative z-10">
-                  {isScouting ? 'Scouting...' : 'Run AI Scout →'}
+                <Button 
+                  onClick={runScout} 
+                  disabled={isScouting || (completion?.percentage !== undefined && completion.percentage < 100)} 
+                  className="w-full bg-primary-600 hover:bg-primary-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] rounded-xl py-2 h-10 font-semibold text-[13px] mb-5 transition-all border-0 relative z-10 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isScouting 
+                    ? 'Scouting...' 
+                    : (completion?.percentage !== undefined && completion.percentage < 100 
+                        ? `Complete Profile (${completion.percentage}%) to Scout` 
+                        : 'Run AI Scout →')}
                 </Button>
 
                 <div className="grid grid-cols-2 gap-y-3 gap-x-2 relative z-10">

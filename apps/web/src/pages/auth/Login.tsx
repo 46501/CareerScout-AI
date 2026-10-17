@@ -231,6 +231,8 @@ export function Login() {
                 </div>
                 <input
                   type="email"
+                  name="email"
+                  id="email"
                   required
                   className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-[14px] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-slate-500 font-medium hover:border-gray-300 dark:hover:border-slate-600"
                   placeholder="Enter your email address"
@@ -248,6 +250,8 @@ export function Login() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  id="password"
                   required
                   className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-[14px] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-slate-500 font-medium hover:border-gray-300 dark:hover:border-slate-600"
                   placeholder="Enter your password"

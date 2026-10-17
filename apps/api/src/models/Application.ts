@@ -26,6 +26,7 @@ const ApplicationSchema = new Schema<IApplication>(
 );
 
 ApplicationSchema.index({ user: 1, opportunity: 1 }, { unique: true });
+ApplicationSchema.index({ user: 1, updatedAt: -1 });
 ApplicationSchema.index({ status: 1 });
 
 export const Application = mongoose.model<IApplication>('Application', ApplicationSchema);

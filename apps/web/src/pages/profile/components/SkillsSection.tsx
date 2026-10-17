@@ -23,21 +23,25 @@ export const SkillsSection = ({ data = {}, onChange }: any) => {
   }, [activeCategory]);
 
   const handleAdd = (categoryId: string, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      const val = inputValue.trim();
-      if (!val) {
+      const raw = inputValue.trim();
+      if (!raw) {
         setActiveCategory(null);
         return;
       }
       
-      const categoryData = data[categoryId] || [];
-      if (!categoryData.find((s: any) => s.name.toLowerCase() === val.toLowerCase())) {
-        onChange({
-          ...data,
-          [categoryId]: [...categoryData, { name: val }]
-        });
+      const newSkills = raw.split(',').map(s => s.trim()).filter(Boolean);
+      const categoryData = [...(data[categoryId] || [])];
+      for (const skill of newSkills) {
+        if (!categoryData.find((s: any) => s.name.toLowerCase() === skill.toLowerCase())) {
+          categoryData.push({ name: skill });
+        }
       }
+      onChange({
+        ...data,
+        [categoryId]: categoryData
+      });
       setInputValue('');
     } else if (e.key === 'Escape') {
       setActiveCategory(null);
@@ -48,15 +52,19 @@ export const SkillsSection = ({ data = {}, onChange }: any) => {
   };
 
   const handleBlur = (categoryId: string) => {
-    const val = inputValue.trim();
-    if (val) {
-      const categoryData = data[categoryId] || [];
-      if (!categoryData.find((s: any) => s.name.toLowerCase() === val.toLowerCase())) {
-        onChange({
-          ...data,
-          [categoryId]: [...categoryData, { name: val }]
-        });
+    const raw = inputValue.trim();
+    if (raw) {
+      const newSkills = raw.split(',').map(s => s.trim()).filter(Boolean);
+      const categoryData = [...(data[categoryId] || [])];
+      for (const skill of newSkills) {
+        if (!categoryData.find((s: any) => s.name.toLowerCase() === skill.toLowerCase())) {
+          categoryData.push({ name: skill });
+        }
       }
+      onChange({
+        ...data,
+        [categoryId]: categoryData
+      });
     }
     setActiveCategory(null);
     setInputValue('');

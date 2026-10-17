@@ -11,6 +11,13 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
     statusCode = 400;
     message = Object.values(err.errors).map((val: any) => val.message).join(', ');
     code = 'VALIDATION_ERROR';
+  } else if (err.name === 'MulterError') {
+    statusCode = 400;
+    message = err.code === 'LIMIT_FILE_SIZE' ? 'File size exceeds maximum allowed limit of 5MB' : err.message;
+    code = err.code || 'UPLOAD_ERROR';
+  } else if (err.message && (err.message.includes('Only PDF') || err.message.includes('allowed'))) {
+    statusCode = 400;
+    code = 'INVALID_FILE_TYPE';
   } else if (err.code === 11000) {
     statusCode = 409;
     message = 'Duplicate field value entered';

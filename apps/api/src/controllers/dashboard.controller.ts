@@ -68,10 +68,11 @@ export const getDashboardTrends = async (req: Request, res: Response, next: Next
       const monthData = chartData.find(d => d.monthIndex === mIndex);
       
       if (monthData) {
-        if (opp.type === 'Job') monthData.Jobs++;
-        else if (opp.type === 'Internship') monthData.Internships++;
-        else if (opp.type === 'Competition') monthData.Competitions++;
-        else if (opp.type === 'Hackathon') monthData.Hackathons++;
+        const oppType = (opp.type || '').toUpperCase();
+        if (oppType === 'JOB' || oppType === 'FREELANCE') monthData.Jobs++;
+        else if (oppType === 'INTERNSHIP') monthData.Internships++;
+        else if (oppType === 'COMPETITION') monthData.Competitions++;
+        else if (oppType === 'HACKATHON') monthData.Hackathons++;
       }
     });
 

@@ -13,13 +13,15 @@ interface SidebarProps {
   onCloseMobile?: () => void;
   onRunScout?: () => void;
   isScouting?: boolean;
+  isProfileComplete?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile,
   onRunScout,
-  isScouting = false
+  isScouting = false,
+  isProfileComplete
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -157,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               disabled={isScouting} 
               className="w-full bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-sm transition-all rounded-xl text-xs font-semibold h-8 mt-1"
             >
-              {isScouting ? 'Scanning Web...' : 'Run AI Scout →'}
+              {isScouting ? 'Scanning Web...' : (isProfileComplete === false ? 'Complete Profile to Scout' : 'Run AI Scout →')}
             </Button>
           </div>
         </div>

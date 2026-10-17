@@ -62,3 +62,22 @@ export const updateApplication = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
+
+export const deleteApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const app = await Application.findOneAndDelete({
+      _id: req.params.id,
+      user: (req as any).user?.id
+    });
+
+    if (!app) {
+      res.status(404).json({ success: false, error: { message: 'Application not found' } });
+      return;
+    }
+
+    res.status(200).json({ success: true, message: 'Application deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+

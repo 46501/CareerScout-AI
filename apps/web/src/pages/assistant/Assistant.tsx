@@ -186,11 +186,17 @@ export function Assistant() {
           <div className="flex items-center gap-3">
             <Button
               onClick={handleRunScout}
-              disabled={isScouting}
-              className="bg-primary-600 hover:bg-primary-500 text-white shadow-md font-semibold px-5 h-10 rounded-xl flex items-center gap-2"
+              disabled={isScouting || (profileCompletion?.percentage !== undefined && profileCompletion.percentage < 100)}
+              className="bg-primary-600 hover:bg-primary-500 text-white shadow-md font-semibold px-5 h-10 rounded-xl flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <RefreshCw className={`h-4 w-4 ${isScouting ? 'animate-spin' : ''}`} />
-              <span>{isScouting ? 'Scouting Web...' : 'Scout Opportunities Now'}</span>
+              <span>
+                {isScouting 
+                  ? 'Scouting Web...' 
+                  : (profileCompletion?.percentage !== undefined && profileCompletion.percentage < 100 
+                      ? `Complete Profile (${profileCompletion.percentage}%) to Scout` 
+                      : 'Scout Opportunities Now')}
+              </span>
             </Button>
           </div>
         </div>
@@ -313,8 +319,14 @@ export function Assistant() {
                 <p className="text-slate-600 dark:text-slate-400 text-xs max-w-md mx-auto mb-5 leading-relaxed">
                   Run the AI Scout to score active jobs, internships, and hackathons against your saved skills and career goals.
                 </p>
-                <Button onClick={handleRunScout} className="bg-primary-600 hover:bg-primary-500 text-white text-xs h-9 rounded-xl">
-                  Run AI Scout Now
+                <Button 
+                  onClick={handleRunScout} 
+                  disabled={isScouting || (profileCompletion?.percentage !== undefined && profileCompletion.percentage < 100)}
+                  className="bg-primary-600 hover:bg-primary-500 text-white text-xs h-9 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {profileCompletion?.percentage !== undefined && profileCompletion.percentage < 100 
+                    ? `Complete Profile (${profileCompletion.percentage}%) to Scout` 
+                    : 'Run AI Scout Now'}
                 </Button>
               </Card>
             ) : (

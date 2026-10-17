@@ -18,14 +18,18 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
   };
 
   const handleAddLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      const val = locInput.trim();
-      if (!val) return;
-      const arr = data.preferredLocations || [];
-      if (!arr.includes(val)) {
-        onChange({ ...data, preferredLocations: [...arr, val] });
+      const raw = locInput.trim();
+      if (!raw) return;
+      const newLocs = raw.split(',').map(s => s.trim()).filter(Boolean);
+      const arr = [...(data.preferredLocations || [])];
+      for (const loc of newLocs) {
+        if (!arr.includes(loc)) {
+          arr.push(loc);
+        }
       }
+      onChange({ ...data, preferredLocations: arr });
       setLocInput('');
     } else if (e.key === 'Backspace' && locInput === '') {
       const arr = data.preferredLocations || [];
@@ -75,12 +79,16 @@ export const LocationPrefsSection = ({ data = {}, onChange }: any) => {
               onChange={(e) => setLocInput(e.target.value)}
               onKeyDown={handleAddLocation}
               onBlur={() => {
-                const val = locInput.trim();
-                if (val) {
-                  const arr = data.preferredLocations || [];
-                  if (!arr.includes(val)) {
-                    onChange({ ...data, preferredLocations: [...arr, val] });
+                const raw = locInput.trim();
+                if (raw) {
+                  const newLocs = raw.split(',').map(s => s.trim()).filter(Boolean);
+                  const arr = [...(data.preferredLocations || [])];
+                  for (const loc of newLocs) {
+                    if (!arr.includes(loc)) {
+                      arr.push(loc);
+                    }
                   }
+                  onChange({ ...data, preferredLocations: arr });
                   setLocInput('');
                 }
               }}
