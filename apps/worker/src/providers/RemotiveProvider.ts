@@ -1,6 +1,7 @@
 import axios from 'axios';
 import mongoose from 'mongoose';
 import { Opportunity } from '../../../api/src/models/Opportunity';
+import { normalizeJobDescription } from '../utils/descriptionNormalizer';
 
 export class RemotiveProvider {
   name = 'RemotiveProvider';
@@ -24,7 +25,7 @@ export class RemotiveProvider {
           title: job.title,
           organization: job.company_name,
           organizationLogo: job.company_logo || undefined,
-          description: job.description, // Note: Remotive sends HTML description. This is fine for display if sanitized, or text content.
+          description: normalizeJobDescription(job.description), // Normalized clean text without HTML artifacts
           type: job.job_type === 'contract' ? 'FREELANCE' : 'JOB',
           skills: job.tags || [],
           location: job.candidate_required_location || 'Worldwide',

@@ -1,6 +1,7 @@
 import { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { Opportunity } from '../models/Opportunity';
+import { normalizeJobDescription } from '../utils/descriptionNormalizer';
 
 import { CareerProfile } from '../models/CareerProfile';
 import { generateCoverLetter as aiGenerateCoverLetter } from '../services/ai.service';
@@ -28,11 +29,13 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
 
       const total = await UserOpportunityMatch.countDocuments({ userId });
       
-      // Map to opportunity format but attach match metadata
+      // Map to opportunity format but attach match metadata and normalize description
       const opportunities = matches.map(match => {
         const opp = match.opportunityId as any;
+        const obj = opp?.toObject ? opp.toObject() : opp;
         return {
-          ...opp.toObject(),
+          ...obj,
+          description: normalizeJobDescription(obj?.description),
           matchDetails: {
             score: match.matchScore,
             matchedSkills: match.matchedSkills,
@@ -68,9 +71,17 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
 
     const total = await Opportunity.countDocuments(query);
 
+    const normalizedOpportunities = opportunities.map(opp => {
+      const obj = opp.toObject ? opp.toObject() : opp;
+      return {
+        ...obj,
+        description: normalizeJobDescription(obj.description)
+      };
+    });
+
     res.status(200).json({ 
       success: true, 
-      data: opportunities,
+      data: normalizedOpportunities,
       pagination: {
         total,
         page: Number(page),
@@ -91,7 +102,15 @@ export const getOpportunityById = async (req: Request, res: Response, next: Next
       return;
     }
 
-    res.status(200).json({ success: true, data: opportunity });
+    const obj = opportunity.toObject ? opportunity.toObject() : opportunity;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...obj,
+        description: normalizeJobDescription(obj.description)
+      }
+    });
   } catch (error) {
     next(error);
   }

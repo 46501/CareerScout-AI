@@ -6,6 +6,7 @@ import { Opportunity } from '../models/Opportunity';
 import { Notification } from '../models/Notification';
 import { calculateMatchScore } from '../services/ai.service';
 import { OpportunitySource } from '../models/OpportunitySource';
+import { normalizeJobDescription } from '../utils/descriptionNormalizer';
 
 const redisConnection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', { maxRetriesPerRequest: null });
 
@@ -33,7 +34,7 @@ async function fetchHackerNewsJobs() {
           location: item.text?.toLowerCase().includes('remote') ? 'Remote' : 'Various',
           type: 'JOB',
           remoteType: item.text?.toLowerCase().includes('remote') ? 'REMOTE' : 'HYBRID',
-          description: item.text ? item.text.replace(/<[^>]*>?/gm, '') : item.title,
+          description: normalizeJobDescription(item.text || item.title),
           skills: ['Engineering', 'Software Development'], // Default skills, since HN doesn't provide structured tags
           applicationUrl: item.url || `https://news.ycombinator.com/item?id=${id}`,
           postedAt: new Date(item.time * 1000)

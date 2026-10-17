@@ -6,6 +6,8 @@ import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { BackButton } from '../../components/ui/BackButton';
 import { MatchAnalyzerModal } from '../../components/ui/MatchAnalyzerModal';
+import { OpportunityDetailModal } from '../../components/ui/OpportunityDetailModal';
+import { normalizeJobDescription } from '../../lib/descriptionNormalizer';
 import api from '../../lib/api';
 import { useNotification } from '../../context/NotificationContext';
 
@@ -14,6 +16,7 @@ export function OpportunitiesList() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOppForAnalysis, setSelectedOppForAnalysis] = useState<any>(null);
+  const [selectedOppForDetail, setSelectedOppForDetail] = useState<any>(null);
 
   useEffect(() => {
     const fetchOpps = async () => {
@@ -68,7 +71,11 @@ export function OpportunitiesList() {
             </Card>
           ) : (
             opportunities.map(opp => (
-              <Card key={opp._id} className="glass-card hover:border-primary-500/50 transition-all duration-300 cursor-pointer group border-slate-200 dark:border-slate-800/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:-translate-y-1">
+              <Card 
+                key={opp._id} 
+                className="glass-card hover:border-primary-500/50 transition-all duration-300 cursor-pointer group border-slate-200 dark:border-slate-800/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:-translate-y-1"
+                onClick={() => setSelectedOppForDetail(opp)}
+              >
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="w-16 h-16 rounded-xl bg-white/80 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
@@ -105,7 +112,7 @@ export function OpportunitiesList() {
                         </Button>
                       </div>
 
-                      <p className="text-slate-600 dark:text-slate-400 line-clamp-2 text-sm leading-relaxed">{opp.description}</p>
+                      <p className="text-slate-600 dark:text-slate-400 line-clamp-2 text-sm leading-relaxed">{normalizeJobDescription(opp.description)}</p>
                       
                       {opp.matchDetails && (
                         <div className="bg-primary-900/20 rounded-lg p-3 mt-3 border border-primary-500/20 backdrop-blur-sm group/match relative overflow-hidden transition-all hover:bg-primary-900/30">
@@ -174,6 +181,15 @@ export function OpportunitiesList() {
         isOpen={!!selectedOppForAnalysis} 
         onClose={() => setSelectedOppForAnalysis(null)} 
         opportunity={selectedOppForAnalysis} 
+      />
+
+      <OpportunityDetailModal
+        isOpen={!!selectedOppForDetail}
+        onClose={() => setSelectedOppForDetail(null)}
+        opportunity={selectedOppForDetail}
+        onAnalyze={(opp) => {
+          setSelectedOppForAnalysis(opp);
+        }}
       />
     </div>
   );
