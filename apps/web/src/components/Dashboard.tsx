@@ -475,7 +475,7 @@ export const Dashboard = () => {
                   {/* Circular Progress Indicator */}
                   <div className="relative w-[130px] h-[130px] flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="#1e293b" strokeWidth="12" />
+                      <circle cx="50" cy="50" r="42" fill="none" className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="12" />
                       <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" strokeWidth="12" strokeDasharray="264" strokeDashoffset={264 - (264 * (completionData?.percentage || 0)) / 100} className="transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" strokeLinecap="round" />
                     </svg>
                     <div className="absolute text-[28px] font-extrabold text-slate-900 dark:text-white">{completionData?.percentage || 0}%</div>
@@ -489,13 +489,13 @@ export const Dashboard = () => {
                 </div>
 
                 {completionData?.percentage === 100 ? (
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3.5 flex items-start mb-0">
+                  <div className="bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 dark:border-emerald-500/30 rounded-xl p-3.5 flex items-start mb-0">
                     <div className="mt-0.5 mr-2 flex-shrink-0">
-                      <span className="flex h-5 w-5 rounded-full bg-green-500/20 items-center justify-center text-green-400">
+                      <span className="flex h-5 w-5 rounded-full bg-emerald-500/20 items-center justify-center text-emerald-600 dark:text-emerald-400">
                         <CheckCircle className="h-3 w-3" />
                       </span>
                     </div>
-                    <p className="text-[12px] text-green-300 font-medium leading-relaxed pr-2">
+                    <p className="text-[12px] text-emerald-800 dark:text-emerald-300 font-medium leading-relaxed pr-2">
                       Your profile is complete. You're ready for personalized opportunities.
                     </p>
                   </div>
@@ -669,7 +669,7 @@ const SkillBar = ({ name, percent, color }: any) => (
     </span>
     <div className="flex-1">
       <div className="flex justify-between items-end mb-1.5">
-        <span className="text-[13px] font-bold text-slate-200">{name}</span>
+        <span className="text-[13px] font-bold text-slate-900 dark:text-slate-100">{name}</span>
         <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">{percent}%</span>
       </div>
       <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden shadow-inner">
@@ -684,14 +684,14 @@ const SkillBar = ({ name, percent, color }: any) => (
 const ProfileStep = ({ name, completed }: any) => (
   <div className="flex items-center text-sm py-0.5">
     {completed ? (
-      <div className="w-[18px] h-[18px] rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mr-3 flex-shrink-0">
-        <CheckCircle className="h-3 w-3 text-green-400" />
+      <div className="w-[18px] h-[18px] rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 dark:border-emerald-500/40 flex items-center justify-center mr-3 flex-shrink-0">
+        <CheckCircle className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
       </div>
     ) : (
       <div className="w-[18px] h-[18px] rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center mr-3 flex-shrink-0">
       </div>
     )}
-    <span className={`text-[13px] font-semibold ${completed ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>{name}</span>
+    <span className={`text-[13px] ${completed ? 'font-semibold text-slate-900 dark:text-slate-100' : 'font-medium text-slate-600 dark:text-slate-400'}`}>{name}</span>
   </div>
 );
 

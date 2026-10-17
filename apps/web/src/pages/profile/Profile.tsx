@@ -179,11 +179,11 @@ export const Profile = () => {
                 </div>
               </div>
               
-              <div className="w-full md:w-auto bg-green-500/10 rounded-xl py-2.5 px-4 border border-green-500/20 flex items-center gap-3 z-10 backdrop-blur-sm">
-                <CheckCircle2 className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <div className="w-full md:w-auto bg-emerald-500/10 dark:bg-emerald-500/15 rounded-xl py-2.5 px-4 border border-emerald-500/20 dark:border-emerald-500/30 flex items-center gap-3 z-10 backdrop-blur-sm">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-green-300">{7 - completion.missingFields.length} of 7 sections completed</div>
-                  <div className="text-xs text-green-400/80">Keep going! You're almost there.</div>
+                  <div className="text-sm font-bold text-emerald-800 dark:text-emerald-300">{7 - completion.missingFields.length} of 7 sections completed</div>
+                  <div className="text-xs text-emerald-700/80 dark:text-emerald-400/80 font-medium">Keep going! You're almost there.</div>
                 </div>
               </div>
               <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 absolute bottom-0 left-0">
