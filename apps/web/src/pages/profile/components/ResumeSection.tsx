@@ -119,7 +119,7 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             setUploadStatus('idle');
             notify.error({
               title: 'Extraction Failed',
-              message: 'AI Resume extraction could not complete. Please try uploading again.'
+              message: updatedResume.error || 'AI Resume extraction could not complete. Please try uploading again.'
             });
           } else if (updatedResume.status === 'PROCESSING') {
              setUploadStatus('analyzing');
@@ -158,14 +158,15 @@ export const ResumeSection = ({ fetchProfile }: any) => {
     });
     if (confirmed) {
       try {
+        await api.delete('/resume');
         setResumeData(null);
         setUploadStatus('idle');
         setProgress(0);
         fetchProfile();
         notify.success('Resume deleted successfully');
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        notify.error('Failed to delete resume');
+        notify.error(err.response?.data?.error?.message || 'Failed to delete resume');
       }
     }
   };
@@ -273,17 +274,34 @@ export const ResumeSection = ({ fetchProfile }: any) => {
               </div>
             </div>
 
-            {resumeData?.status === 'PENDING_REVIEW' && (
-              <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            {(resumeData?.status === 'EXTRACTED' || resumeData?.status === 'PENDING_REVIEW') && (
+              <div className="mt-6 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-lg p-4">
                 <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 text-yellow-600 mr-2.5 mt-0.5 shrink-0" />
+                  <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mr-2.5 mt-0.5 shrink-0" />
                   <div className="flex-1">
-                    <h4 className="text-sm font-bold text-yellow-900">AI Analysis Ready</h4>
-                    <p className="text-sm text-yellow-800 mt-1 mb-3">
-                      We detected {resumeData.aiDetected?.skillsCount || 0} skills, {resumeData.aiDetected?.expCount || 0} experience entries, and {resumeData.aiDetected?.eduCount || 0} education entry.
+                    <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">AI Analysis Ready</h4>
+                    <p className="text-sm text-amber-800 dark:text-amber-300 mt-1 mb-3">
+                      We detected {resumeData.aiDetected?.skillsCount || 0} skills, {resumeData.aiDetected?.expCount || 0} experience entries, and {resumeData.aiDetected?.eduCount || 0} education entries.
                     </p>
-                    <Button size="sm" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-300" onClick={handleConfirm}>
+                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white border-none shadow-sm font-medium" onClick={handleConfirm}>
                       Review & Confirm Analysis
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {resumeData?.status === 'FAILED' && (
+              <div className="mt-6 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-lg p-4">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 mr-2.5 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-rose-900 dark:text-rose-200">Extraction Incomplete</h4>
+                    <p className="text-sm text-rose-800 dark:text-rose-300 mt-1 mb-3">
+                      {resumeData.error || 'AI Resume extraction could not complete. Please try uploading again.'}
+                    </p>
+                    <Button size="sm" variant="outline" className="border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40" onClick={handleUploadClick}>
+                      <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Upload Again
                     </Button>
                   </div>
                 </div>

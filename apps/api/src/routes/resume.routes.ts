@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
-import { uploadResume, getResume, confirmResumeExtraction } from '../controllers/resume.controller';
+import { uploadResume, getResume, confirmResumeExtraction, deleteResume } from '../controllers/resume.controller';
 import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -32,5 +32,6 @@ router.use(authenticate);
 router.post('/upload', upload.single('resume'), uploadResume);
 router.get('/', getResume);
 router.post('/confirm', confirmResumeExtraction);
+router.delete('/', deleteResume);
 
 export default router;
