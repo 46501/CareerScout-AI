@@ -1,10 +1,94 @@
 import { NextFunction } from 'express';
 import { Request, Response } from 'express';
+import { Queue } from 'bullmq';
+import IORedis from 'ioredis';
 import { Opportunity } from '../models/Opportunity';
-import { normalizeJobDescription } from '../utils/descriptionNormalizer';
-
+import { OpportunitySource } from '../models/OpportunitySource';
+import { UserOpportunityMatch } from '../models/UserOpportunityMatch';
 import { CareerProfile } from '../models/CareerProfile';
+import { normalizeJobDescription } from '../utils/descriptionNormalizer';
 import { generateCoverLetter as aiGenerateCoverLetter } from '../services/ai.service';
+
+const redisConnection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', { maxRetriesPerRequest: null });
+const discoveryQueue = new Queue('opportunity-discovery', { connection: redisConnection });
+
+export const getOpportunityStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const sources = await OpportunitySource.find().sort({ name: 1 });
+    
+    // Find most recent success timestamp
+    let lastSyncAt: Date | null = null;
+    for (const s of sources) {
+      if (s.lastSuccessAt && (!lastSyncAt || s.lastSuccessAt > lastSyncAt)) {
+        lastSyncAt = s.lastSuccessAt;
+      }
+    }
+
+    // Category breakdown of active opportunities
+    const [totalActive, jobsCount, internshipsCount, hackathonsCount, competitionsCount, fellowshipsCount, expiredCount] = await Promise.all([
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' } }),
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' }, type: { $in: ['JOB', 'FREELANCE'] } }),
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' }, type: 'INTERNSHIP' }),
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' }, type: 'HACKATHON' }),
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' }, type: 'COMPETITION' }),
+      Opportunity.countDocuments({ isActive: true, status: { $ne: 'EXPIRED' }, type: 'FELLOWSHIP' }),
+      Opportunity.countDocuments({ status: 'EXPIRED' })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        lastSyncAt,
+        totalActive,
+        expiredCount,
+        countsByCategory: {
+          all: totalActive,
+          jobs: jobsCount,
+          internships: internshipsCount,
+          hackathons: hackathonsCount,
+          competitions: competitionsCount,
+          fellowships: fellowshipsCount
+        },
+        sources: sources.map(s => ({
+          name: s.name,
+          identifier: s.identifier,
+          type: s.type,
+          status: s.status,
+          lastRunAt: s.lastRunAt,
+          lastSuccessAt: s.lastSuccessAt,
+          lastError: s.lastError,
+          opportunitiesFound: s.opportunitiesFound,
+          totalOpportunitiesActive: s.totalOpportunitiesActive,
+          lastRunDurationMs: s.lastRunDurationMs
+        }))
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const syncOpportunities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = (req as any).user?.id || (req as any).user?.userId;
+    console.log(`[API] Manual opportunity sync requested by user ${userId}`);
+
+    // Queue discovery job in BullMQ
+    const job = await discoveryQueue.add('dailyOpportunityDiscovery', {
+      manual: true,
+      requestedBy: userId,
+      requestedAt: new Date()
+    });
+
+    res.status(202).json({
+      success: true,
+      message: 'Opportunity sync job enqueued successfully. Providers will refresh in background.',
+      jobId: job.id
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getOpportunities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -17,14 +101,16 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
       location,
       remoteType,
       skills,
+      minScore,
+      includeExpired = 'false',
       sort = 'newest',
       filter
     } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit);
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.id || (req as any).user?.userId;
 
-    // Helper to normalize opportunity types (supporting plurals and case variations)
+    // Helper to normalize opportunity types
     const normalizeType = (t?: any): string | null => {
       if (!t || typeof t !== 'string') return null;
       const clean = t.trim().toUpperCase();
@@ -43,11 +129,19 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
     const targetType = normalizeType(type);
 
     // Build base query
-    const query: any = { isActive: true };
+    const query: any = {};
+
+    // Freshness & Expiration Filter
+    if (includeExpired === 'true') {
+      // User explicitly requested expired opportunities too
+    } else {
+      // By default: never show expired listings
+      query.isActive = true;
+      query.status = { $ne: 'EXPIRED' };
+    }
 
     if (targetType) {
       if (targetType === 'JOB') {
-        // Support both JOB and legacy FREELANCE contract listings under Jobs
         query.type = { $in: ['JOB', 'FREELANCE'] };
       } else {
         query.type = targetType;
@@ -85,46 +179,36 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
       }
     }
 
-    // Sorting option
-    let sortObj: any = { postedAt: -1 };
-    if (sort === 'oldest') {
-      sortObj = { postedAt: 1 };
-    } else if (sort === 'title_asc') {
-      sortObj = { title: 1 };
-    } else if (sort === 'title_desc') {
-      sortObj = { title: -1 };
-    } else if (sort === 'deadline') {
-      sortObj = { deadline: 1 };
-    }
+    // Handle minScore or filter='recommended' or score sorting
+    const hasMinScore = minScore !== undefined && !isNaN(Number(minScore)) && Number(minScore) > 0;
+    const isRecommendedFilter = filter === 'recommended';
+    const isScoreSort = sort === 'score_desc' || sort === 'score_asc';
 
-    if (filter === 'recommended') {
-      // Must be authenticated to get recommended
-      if (!userId) {
-        res.status(401).json({ success: false, error: { message: 'Authentication required for recommended filter' } });
-        return;
-      }
-
-      const { UserOpportunityMatch } = await import('../models/UserOpportunityMatch');
-
-      // Find all opportunity IDs that match the composable filters (type, search, location, etc.)
-      const matchingOpps = await Opportunity.find(query).select('_id');
-      const matchingOppIds = matchingOpps.map(o => o._id);
+    if (userId && (hasMinScore || isRecommendedFilter || isScoreSort)) {
+      // Find candidate IDs satisfying base query
+      const candidateOpps = await Opportunity.find(query).select('_id');
+      const candidateIds = candidateOpps.map(o => o._id);
 
       const matchQuery: any = {
         userId,
-        opportunityId: { $in: matchingOppIds }
+        opportunityId: { $in: candidateIds }
       };
 
+      if (hasMinScore) {
+        matchQuery.matchScore = { $gte: Number(minScore) };
+      }
+
+      const sortCriteria: any = sort === 'score_asc' ? { matchScore: 1 } : { matchScore: -1 };
+
+      const total = await UserOpportunityMatch.countDocuments(matchQuery);
       const matches = await UserOpportunityMatch.find(matchQuery)
-        .sort(sort === 'score_asc' ? { matchScore: 1 } : { matchScore: -1 })
+        .sort(sortCriteria)
         .skip(skip)
         .limit(Number(limit))
         .populate('opportunityId');
 
-      const total = await UserOpportunityMatch.countDocuments(matchQuery);
-
       const opportunities = matches
-        .filter(match => match.opportunityId)
+        .filter(m => m.opportunityId)
         .map(match => {
           const opp = match.opportunityId as any;
           const obj = opp?.toObject ? opp.toObject() : opp;
@@ -136,6 +220,7 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
               matchedSkills: match.matchedSkills,
               missingSkills: match.missingSkills,
               reasons: match.matchReasons,
+              eligibilityWarnings: match.eligibilityWarnings,
               isViewed: match.isViewed,
               isSaved: match.isSaved
             }
@@ -145,9 +230,26 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
       res.status(200).json({
         success: true,
         data: opportunities,
-        pagination: { total, page: Number(page), pages: Math.ceil(total / Number(limit)), limit: Number(limit) }
+        pagination: {
+          total,
+          page: Number(page),
+          pages: Math.ceil(total / Number(limit)),
+          limit: Number(limit)
+        }
       });
       return;
+    }
+
+    // Standard sorting option
+    let sortObj: any = { postedAt: -1 };
+    if (sort === 'oldest') {
+      sortObj = { postedAt: 1 };
+    } else if (sort === 'title_asc') {
+      sortObj = { title: 1 };
+    } else if (sort === 'title_desc') {
+      sortObj = { title: -1 };
+    } else if (sort === 'deadline') {
+      sortObj = { deadline: 1 };
     }
 
     // General query with full pagination
@@ -162,7 +264,6 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
     let matchMap = new Map<string, any>();
     if (userId && opportunities.length > 0) {
       try {
-        const { UserOpportunityMatch } = await import('../models/UserOpportunityMatch');
         const oppIds = opportunities.map(o => o._id);
         const userMatches = await UserOpportunityMatch.find({ userId, opportunityId: { $in: oppIds } });
         for (const m of userMatches) {
@@ -171,6 +272,7 @@ export const getOpportunities = async (req: Request, res: Response, next: NextFu
             matchedSkills: m.matchedSkills,
             missingSkills: m.missingSkills,
             reasons: m.matchReasons,
+            eligibilityWarnings: m.eligibilityWarnings,
             isViewed: m.isViewed,
             isSaved: m.isSaved
           });
@@ -214,13 +316,31 @@ export const getOpportunityById = async (req: Request, res: Response, next: Next
       return;
     }
 
-    const obj = opportunity.toObject ? opportunity.toObject() : opportunity;
+    const obj = (opportunity.toObject ? opportunity.toObject() : opportunity) as any;
+    const userId = (req as any).user?.id || (req as any).user?.userId;
+
+    let matchDetails = obj.matchDetails;
+    if (userId) {
+      const userMatch = await UserOpportunityMatch.findOne({ userId, opportunityId: opportunity._id });
+      if (userMatch) {
+        matchDetails = {
+          score: userMatch.matchScore,
+          matchedSkills: userMatch.matchedSkills,
+          missingSkills: userMatch.missingSkills,
+          reasons: userMatch.matchReasons,
+          eligibilityWarnings: userMatch.eligibilityWarnings,
+          isViewed: userMatch.isViewed,
+          isSaved: userMatch.isSaved
+        };
+      }
+    }
 
     res.status(200).json({
       success: true,
       data: {
         ...obj,
-        description: normalizeJobDescription(obj.description)
+        description: normalizeJobDescription(obj.description),
+        ...(matchDetails ? { matchDetails } : {})
       }
     });
   } catch (error) {
@@ -230,7 +350,7 @@ export const getOpportunityById = async (req: Request, res: Response, next: Next
 
 export const generateCoverLetter = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.id || (req as any).user?.userId;
     const opportunityId = req.params.id;
 
     const profile = await CareerProfile.findOne({ userId });

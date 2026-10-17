@@ -2,5 +2,7 @@ export {
   decodeHtmlEntities,
   isHtmlContent,
   normalizeJobDescription,
-  getJobDescriptionExcerpt
+  getJobDescriptionExcerpt,
+  normalizeCanonicalUrl
 } from '../../../../packages/shared/src/descriptionNormalizer';
+

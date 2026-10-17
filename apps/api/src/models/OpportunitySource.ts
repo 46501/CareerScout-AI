@@ -9,6 +9,8 @@ export interface IOpportunitySource extends Document {
   lastSuccessAt?: Date;
   lastError?: string;
   opportunitiesFound: number;
+  totalOpportunitiesActive?: number;
+  lastRunDurationMs?: number;
 }
 
 const OpportunitySourceSchema = new Schema<IOpportunitySource>(
@@ -21,6 +23,8 @@ const OpportunitySourceSchema = new Schema<IOpportunitySource>(
     lastSuccessAt: { type: Date },
     lastError: { type: String },
     opportunitiesFound: { type: Number, default: 0 },
+    totalOpportunitiesActive: { type: Number, default: 0 },
+    lastRunDurationMs: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

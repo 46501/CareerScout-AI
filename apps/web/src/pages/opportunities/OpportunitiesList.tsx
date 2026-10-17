@@ -1,9 +1,10 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Search, Briefcase, MapPin, DollarSign, Clock, Star, 
   X, ChevronDown, GraduationCap, Trophy, Award, SlidersHorizontal, 
-  RotateCcw, ExternalLink, Sparkles 
+  RotateCcw, ExternalLink, Sparkles, RefreshCw,
+  ShieldCheck, Calendar
 } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -17,23 +18,33 @@ import api from '../../lib/api';
 import { useNotification } from '../../context/NotificationContext';
 
 const CATEGORIES = [
-  { id: 'All', label: 'All Opportunities', icon: Briefcase },
-  { id: 'Internships', label: 'Internships', icon: GraduationCap },
-  { id: 'Jobs', label: 'Jobs', icon: Briefcase },
-  { id: 'Hackathons', label: 'Hackathons', icon: Trophy },
-  { id: 'Competitions', label: 'Competitions', icon: Award },
-  { id: 'Fellowships', label: 'Fellowships', icon: Sparkles }
+  { id: 'All', label: 'All Opportunities', icon: Briefcase, countKey: 'all' },
+  { id: 'Internships', label: 'Internships', icon: GraduationCap, countKey: 'internships' },
+  { id: 'Jobs', label: 'Jobs', icon: Briefcase, countKey: 'jobs' },
+  { id: 'Hackathons', label: 'Hackathons', icon: Trophy, countKey: 'hackathons' },
+  { id: 'Competitions', label: 'Competitions', icon: Award, countKey: 'competitions' },
+  { id: 'Fellowships', label: 'Fellowships', icon: Sparkles, countKey: 'fellowships' }
 ];
 
 const REMOTE_OPTIONS = [
-  { value: 'ALL', label: 'All Locations' },
+  { value: 'ALL', label: 'All Work Modes' },
   { value: 'REMOTE', label: 'Remote Only' },
   { value: 'HYBRID', label: 'Hybrid' },
   { value: 'ONSITE', label: 'Onsite' }
 ];
 
+const MIN_SCORE_OPTIONS = [
+  { value: '0', label: 'Any Match Score' },
+  { value: '50', label: '50%+ Fit' },
+  { value: '60', label: '60%+ Fit' },
+  { value: '70', label: '70%+ Strong Match' },
+  { value: '80', label: '80%+ Top Match' }
+];
+
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest First' },
+  { value: 'score_desc', label: 'Highest Match Score' },
+  { value: 'deadline', label: 'Approaching Deadline' },
   { value: 'oldest', label: 'Oldest First' },
   { value: 'title_asc', label: 'Title (A-Z)' },
   { value: 'title_desc', label: 'Title (Z-A)' }
@@ -49,12 +60,16 @@ export function OpportunitiesList() {
   const initialRemote = searchParams.get('remote') || 'ALL';
   const initialLocation = searchParams.get('location') || '';
   const initialSort = searchParams.get('sort') || 'newest';
+  const initialMinScore = searchParams.get('minScore') || '0';
+  const initialIncludeExpired = searchParams.get('includeExpired') === 'true';
 
   const [selectedCategory, setSelectedCategory] = useState<string>(initialType);
   const [searchInput, setSearchInput] = useState<string>(initialSearch);
   const [appliedSearch, setAppliedSearch] = useState<string>(initialSearch);
   const [remoteFilter, setRemoteFilter] = useState<string>(initialRemote);
   const [locationFilter, setLocationFilter] = useState<string>(initialLocation);
+  const [minScoreFilter, setMinScoreFilter] = useState<string>(initialMinScore);
+  const [includeExpired, setIncludeExpired] = useState<boolean>(initialIncludeExpired);
   const [sortBy, setSortBy] = useState<string>(initialSort);
 
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
@@ -63,6 +78,10 @@ export function OpportunitiesList() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  // System Status & Ingestion Sync state
+  const [statusData, setStatusData] = useState<any>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const [selectedOppForAnalysis, setSelectedOppForAnalysis] = useState<any>(null);
   const [selectedOppForDetail, setSelectedOppForDetail] = useState<any>(null);
@@ -82,77 +101,66 @@ export function OpportunitiesList() {
     if (appliedSearch) params.search = appliedSearch;
     if (remoteFilter && remoteFilter !== 'ALL') params.remote = remoteFilter;
     if (locationFilter) params.location = locationFilter;
+    if (minScoreFilter && minScoreFilter !== '0') params.minScore = minScoreFilter;
+    if (includeExpired) params.includeExpired = 'true';
     if (sortBy && sortBy !== 'newest') params.sort = sortBy;
 
     setSearchParams(params, { replace: true });
-  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, sortBy, setSearchParams]);
+  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, minScoreFilter, includeExpired, sortBy, setSearchParams]);
 
-  // Fetch opportunities from API when filters change
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchOpps = async () => {
-      setLoading(true);
-      setPage(1);
-      try {
-        const queryParams: any = {
-          page: 1,
-          limit: 15,
-          sort: sortBy
-        };
-
-        if (selectedCategory && selectedCategory !== 'All') {
-          queryParams.type = selectedCategory;
-        }
-        if (appliedSearch) {
-          queryParams.search = appliedSearch;
-        }
-        if (remoteFilter && remoteFilter !== 'ALL') {
-          queryParams.remoteType = remoteFilter;
-        }
-        if (locationFilter.trim()) {
-          queryParams.location = locationFilter.trim();
-        }
-
-        const res = await api.get('/opportunities', { params: queryParams });
-        if (!isCancelled) {
-          if (res.data?.success && Array.isArray(res.data.data)) {
-            setOpportunities(res.data.data);
-            setTotalCount(res.data.pagination?.total || res.data.data.length);
-          } else {
-            setOpportunities([]);
-            setTotalCount(0);
-          }
-        }
-      } catch (e) {
-        if (!isCancelled) {
-          console.error('Failed to fetch opportunities:', e);
-          setOpportunities([]);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
+  // Fetch opportunity system status
+  const fetchStatus = useCallback(async () => {
+    try {
+      const res = await api.get('/opportunities/status');
+      if (res.data?.success) {
+        setStatusData(res.data.data);
       }
-    };
+    } catch (e) {
+      console.warn('Could not fetch opportunity status:', e);
+    }
+  }, []);
 
-    fetchOpps();
+  useEffect(() => {
+    fetchStatus();
+  }, [fetchStatus]);
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, sortBy]);
-
-  // Load more pagination handler
-  const handleLoadMore = async () => {
-    if (loadingMore || opportunities.length >= totalCount) return;
-
-    setLoadingMore(true);
-    const nextPage = page + 1;
+  // Manual Ingestion Sync Handler
+  const handleManualSync = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    notify.info({
+      title: 'Syncing Opportunities',
+      message: 'Triggered live ingestion from Remotive, Arbeitnow, Devpost, and Devfolio...'
+    });
 
     try {
+      await api.post('/opportunities/sync');
+      setTimeout(async () => {
+        await fetchStatus();
+        await fetchOpportunities();
+        setIsSyncing(false);
+        notify.success({
+          title: 'Sync Complete',
+          message: 'Opportunities refreshed with latest live data.'
+        });
+      }, 2500);
+    } catch (e: any) {
+      setIsSyncing(false);
+      console.error('Manual sync failed:', e);
+      notify.error({
+        title: 'Sync Error',
+        message: 'Could not complete opportunity sync. Please check network connection.'
+      });
+    }
+  };
+
+  // Fetch opportunities from API when filters change
+  const fetchOpportunities = useCallback(async () => {
+    setLoading(true);
+    setPage(1);
+    try {
       const queryParams: any = {
-        page: nextPage,
+        page: 1,
         limit: 15,
         sort: sortBy
       };
@@ -169,6 +177,53 @@ export function OpportunitiesList() {
       if (locationFilter.trim()) {
         queryParams.location = locationFilter.trim();
       }
+      if (minScoreFilter && minScoreFilter !== '0') {
+        queryParams.minScore = minScoreFilter;
+      }
+      if (includeExpired) {
+        queryParams.includeExpired = 'true';
+      }
+
+      const res = await api.get('/opportunities', { params: queryParams });
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        setOpportunities(res.data.data);
+        setTotalCount(res.data.pagination?.total || res.data.data.length);
+      } else {
+        setOpportunities([]);
+        setTotalCount(0);
+      }
+    } catch (e) {
+      console.error('Failed to fetch opportunities:', e);
+      setOpportunities([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, minScoreFilter, includeExpired, sortBy]);
+
+  useEffect(() => {
+    fetchOpportunities();
+  }, [fetchOpportunities]);
+
+  // Load more pagination handler
+  const handleLoadMore = async () => {
+    if (loadingMore || opportunities.length >= totalCount) return;
+
+    setLoadingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const queryParams: any = {
+        page: nextPage,
+        limit: 15,
+        sort: sortBy
+      };
+
+      if (selectedCategory && selectedCategory !== 'All') queryParams.type = selectedCategory;
+      if (appliedSearch) queryParams.search = appliedSearch;
+      if (remoteFilter && remoteFilter !== 'ALL') queryParams.remoteType = remoteFilter;
+      if (locationFilter.trim()) queryParams.location = locationFilter.trim();
+      if (minScoreFilter && minScoreFilter !== '0') queryParams.minScore = minScoreFilter;
+      if (includeExpired) queryParams.includeExpired = 'true';
 
       const res = await api.get('/opportunities', { params: queryParams });
       if (res.data?.success && Array.isArray(res.data.data)) {
@@ -190,6 +245,8 @@ export function OpportunitiesList() {
     setAppliedSearch('');
     setRemoteFilter('ALL');
     setLocationFilter('');
+    setMinScoreFilter('0');
+    setIncludeExpired(false);
     setSortBy('newest');
     setIsFilterPanelOpen(false);
   };
@@ -201,9 +258,11 @@ export function OpportunitiesList() {
     if (appliedSearch) count++;
     if (remoteFilter !== 'ALL') count++;
     if (locationFilter.trim()) count++;
+    if (minScoreFilter !== '0') count++;
+    if (includeExpired) count++;
     if (sortBy !== 'newest') count++;
     return count;
-  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, sortBy]);
+  }, [selectedCategory, appliedSearch, remoteFilter, locationFilter, minScoreFilter, includeExpired, sortBy]);
 
   // Helper for type badge styling
   const getTypeBadgeColor = (type: string) => {
@@ -223,6 +282,23 @@ export function OpportunitiesList() {
     return 'border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10';
   };
 
+  // Helper to format last synced time
+  const formatLastSync = (dateString?: string) => {
+    if (!dateString) return 'Active (Continuous Sync)';
+    try {
+      const d = new Date(dateString);
+      const diffMs = Date.now() - d.getTime();
+      const mins = Math.floor(diffMs / 60000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}h ago`;
+      return d.toLocaleDateString();
+    } catch {
+      return 'Active';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       {/* Background Glow Blobs */}
@@ -236,7 +312,7 @@ export function OpportunitiesList() {
           <div>
             <BackButton fallback="/dashboard" label="Back to Dashboard" />
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-2 flex items-center gap-3">
-              Opportunity Discovery
+              Opportunity Intelligence
               {!loading && (
                 <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 dark:text-primary-400">
                   {totalCount} Active
@@ -244,7 +320,7 @@ export function OpportunitiesList() {
               )}
             </h1>
             <p className="text-slate-600 dark:text-slate-400 mt-1">
-              Explore verified jobs, internships, hackathons, and competitions tailored for your career path.
+              Continuously discovered jobs, internships, hackathons, and competitions from verified public providers.
             </p>
           </div>
 
@@ -272,7 +348,7 @@ export function OpportunitiesList() {
               variant={isFilterPanelOpen || activeFiltersCount > 0 ? 'default' : 'outline'}
               onClick={() => setIsFilterPanelOpen(prev => !prev)}
               className={`border-slate-300 dark:border-slate-700 h-10 px-4 rounded-xl flex items-center gap-2 transition-all ${
-                isFilterPanelOpen ? 'bg-primary-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-800'
+                isFilterPanelOpen ? 'bg-primary-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -286,11 +362,46 @@ export function OpportunitiesList() {
           </div>
         </div>
 
+        {/* Live Sync Status & Provider Banner */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 backdrop-blur-md">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
+            <span className="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              Auto-Sync: Every 2 Hours
+            </span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>
+              Last Synced: <strong className="text-slate-800 dark:text-slate-200">{formatLastSync(statusData?.lastSyncAt)}</strong>
+            </span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>
+              Live Providers: <strong className="text-slate-800 dark:text-slate-200">{statusData?.sources?.length || 4} Connected</strong> (Arbeitnow, Remotive, Devpost, Devfolio)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="h-8 text-xs border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-slate-800 flex items-center gap-1.5 rounded-lg"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-primary-500 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? 'Refreshing...' : 'Refresh Opportunities'}</span>
+            </Button>
+          </div>
+        </div>
+
         {/* Category Filter Pills Bar */}
         <div className="flex items-center space-x-2 overflow-x-auto pb-2 hide-scrollbar border-b border-slate-200 dark:border-slate-800">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon;
             const isSelected = selectedCategory.toLowerCase() === cat.id.toLowerCase();
+            const categoryCount = statusData?.countsByCategory?.[cat.countKey];
             return (
               <button
                 key={cat.id}
@@ -302,7 +413,14 @@ export function OpportunitiesList() {
                 }`}
               >
                 <Icon className={`h-3.5 w-3.5 ${isSelected ? 'text-white' : 'text-slate-500'}`} />
-                {cat.label}
+                <span>{cat.label}</span>
+                {categoryCount !== undefined && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}>
+                    {categoryCount}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -342,7 +460,7 @@ export function OpportunitiesList() {
                   <Input
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
-                    placeholder="e.g. Worldwide, USA, Remote..."
+                    placeholder="e.g. Worldwide, Germany, Remote..."
                     className="pl-9 h-10 rounded-xl bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-xs"
                   />
                   {locationFilter && (
@@ -353,6 +471,25 @@ export function OpportunitiesList() {
                       <X className="h-3.5 w-3.5" />
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Minimum Match Score Filter */}
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block">
+                  AI Fit Score
+                </label>
+                <div className="relative">
+                  <select
+                    value={minScoreFilter}
+                    onChange={(e) => setMinScoreFilter(e.target.value)}
+                    className="w-full h-10 px-3 pr-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none cursor-pointer"
+                  >
+                    {MIN_SCORE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
                 </div>
               </div>
 
@@ -375,12 +512,22 @@ export function OpportunitiesList() {
                 </div>
               </div>
 
-              {/* Reset Actions */}
-              <div className="flex items-end">
+              {/* Expiration Toggle & Reset */}
+              <div className="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={includeExpired}
+                    onChange={(e) => setIncludeExpired(e.target.checked)}
+                    className="rounded text-primary-600 focus:ring-primary-500 h-4 w-4 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
+                  />
+                  <span>Show expired or closed listings (Excluded by default)</span>
+                </label>
+
                 <Button
                   variant="outline"
                   onClick={handleResetFilters}
-                  className="w-full h-10 rounded-xl border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-2"
+                  className="rounded-xl border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-2 mt-2 sm:mt-0"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   Reset All Filters
@@ -421,6 +568,20 @@ export function OpportunitiesList() {
               <Badge variant="secondary" className="gap-1.5 py-1 px-2.5 rounded-lg text-xs bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
                 Location: {locationFilter}
                 <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setLocationFilter('')} />
+              </Badge>
+            )}
+
+            {minScoreFilter !== '0' && (
+              <Badge variant="secondary" className="gap-1.5 py-1 px-2.5 rounded-lg text-xs bg-primary-500/10 text-primary-700 dark:text-primary-300 border border-primary-500/20">
+                Min Score: {minScoreFilter}%
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setMinScoreFilter('0')} />
+              </Badge>
+            )}
+
+            {includeExpired && (
+              <Badge variant="secondary" className="gap-1.5 py-1 px-2.5 rounded-lg text-xs bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                Includes Expired
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setIncludeExpired(false)} />
               </Badge>
             )}
 
@@ -465,8 +626,8 @@ export function OpportunitiesList() {
                 No {selectedCategory === 'All' ? 'opportunities' : selectedCategory.toLowerCase()} found
               </h3>
               <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-sm leading-relaxed mb-6">
-                {appliedSearch || locationFilter || remoteFilter !== 'ALL'
-                  ? 'No results matched your specific search filters. Try broadening your terms or resetting filters.'
+                {appliedSearch || locationFilter || remoteFilter !== 'ALL' || minScoreFilter !== '0'
+                  ? 'No results matched your specific search filters. Try broadening your terms or lowering the minimum match score.'
                   : `Currently there are no active listings under "${selectedCategory}". Our automated scout continuously scrapes and ingests new verified opportunities.`}
               </p>
               <Button
@@ -479,170 +640,214 @@ export function OpportunitiesList() {
             </Card>
           ) : (
             <>
-              {opportunities.map(opp => (
-                <Card 
-                  key={opp._id} 
-                  className="glass-card hover:border-primary-500/50 transition-all duration-300 cursor-pointer group border-slate-200 dark:border-slate-800/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.18)] hover:-translate-y-0.5 rounded-2xl"
-                  onClick={() => setSelectedOppForDetail(opp)}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row gap-6">
-                      
-                      {/* Organization / Provider Logo */}
-                      <div className="w-16 h-16 rounded-xl bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
-                        {opp.organizationLogo ? (
-                          <img 
-                            src={opp.organizationLogo} 
-                            alt={opp.organization} 
-                            className="w-12 h-12 object-contain filter brightness-105" 
-                            onError={(e) => {
-                              // Fallback on broken image link
-                              (e.target as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                        ) : opp.type === 'INTERNSHIP' ? (
-                          <GraduationCap className="h-8 w-8 text-emerald-500 dark:text-emerald-400" />
-                        ) : opp.type === 'HACKATHON' ? (
-                          <Trophy className="h-8 w-8 text-amber-500 dark:text-amber-400" />
-                        ) : (
-                          <Briefcase className="h-8 w-8 text-slate-500 dark:text-slate-400" />
-                        )}
-                      </div>
-                      
-                      {/* Details Main Body */}
-                      <div className="flex-1 space-y-3">
-                        <div className="flex justify-between items-start gap-4">
-                          <div>
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary-500 transition-colors tracking-tight">
-                              {opp.title}
-                            </h2>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-700 dark:text-slate-300 mt-2">
-                              <span className="font-semibold text-primary-700 dark:text-primary-200 bg-primary-500/10 px-2 py-0.5 rounded-md border border-primary-500/20 truncate">
-                                {opp.organization}
-                              </span>
-                              <span className="flex items-center truncate text-slate-600 dark:text-slate-400">
-                                <MapPin className="h-3.5 w-3.5 mr-1.5 shrink-0 text-slate-500" /> 
-                                {opp.location || opp.remoteType || 'Remote'}
-                              </span>
-                              {(opp.salary || opp.stipend) && (
-                                <span className="flex items-center truncate text-emerald-600 dark:text-emerald-400 font-medium">
-                                  <DollarSign className="h-3.5 w-3.5 mr-0.5 shrink-0" /> 
-                                  {opp.salary || opp.stipend}
+              {opportunities.map(opp => {
+                const isExpired = opp.status === 'EXPIRED';
+                const isUnverified = opp.status === 'UNVERIFIED';
+
+                return (
+                  <Card 
+                    key={opp._id} 
+                    className={`glass-card hover:border-primary-500/50 transition-all duration-300 cursor-pointer group border-slate-200 dark:border-slate-800/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.18)] hover:-translate-y-0.5 rounded-2xl ${
+                      isExpired ? 'opacity-70 bg-red-50/10' : ''
+                    }`}
+                    onClick={() => setSelectedOppForDetail(opp)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row gap-6">
+                        
+                        {/* Organization / Provider Logo */}
+                        <div className="w-16 h-16 rounded-xl bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
+                          {opp.organizationLogo ? (
+                            <img 
+                              src={opp.organizationLogo} 
+                              alt={opp.organization} 
+                              className="w-12 h-12 object-contain filter brightness-105" 
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : opp.type === 'INTERNSHIP' ? (
+                            <GraduationCap className="h-8 w-8 text-emerald-500 dark:text-emerald-400" />
+                          ) : opp.type === 'HACKATHON' ? (
+                            <Trophy className="h-8 w-8 text-amber-500 dark:text-amber-400" />
+                          ) : (
+                            <Briefcase className="h-8 w-8 text-slate-500 dark:text-slate-400" />
+                          )}
+                        </div>
+                        
+                        {/* Details Main Body */}
+                        <div className="flex-1 space-y-3">
+                          <div className="flex justify-between items-start gap-4">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2 mb-1">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary-500 transition-colors tracking-tight">
+                                  {opp.title}
+                                </h2>
+                                
+                                {/* Status Tags */}
+                                {isExpired && (
+                                  <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 text-[10px] py-0 px-2 font-bold">
+                                    Expired
+                                  </Badge>
+                                )}
+                                {isUnverified && (
+                                  <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[10px] py-0 px-2 font-medium">
+                                    Unverified Link
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-700 dark:text-slate-300 mt-2">
+                                <span className="font-semibold text-primary-700 dark:text-primary-200 bg-primary-500/10 px-2 py-0.5 rounded-md border border-primary-500/20 truncate">
+                                  {opp.organization}
+                                </span>
+                                
+                                {/* Source Attribution Badge */}
+                                {opp.source && (
+                                  <span className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                                    <ShieldCheck className="h-3 w-3 mr-1 text-primary-500" />
+                                    Source: {opp.source}
+                                  </span>
+                                )}
+
+                                <span className="flex items-center truncate text-slate-600 dark:text-slate-400">
+                                  <MapPin className="h-3.5 w-3.5 mr-1.5 shrink-0 text-slate-500" /> 
+                                  {opp.location || opp.remoteType || 'Remote'}
+                                </span>
+                                
+                                {(opp.salary || opp.stipend) && (
+                                  <span className="flex items-center truncate text-emerald-600 dark:text-emerald-400 font-medium">
+                                    <DollarSign className="h-3.5 w-3.5 mr-0.5 shrink-0" /> 
+                                    {opp.salary || opp.stipend}
+                                  </span>
+                                )}
+
+                                {opp.deadline && (
+                                  <span className="flex items-center text-xs font-medium text-amber-600 dark:text-amber-400">
+                                    <Calendar className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                    Deadline: {new Date(opp.deadline).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10 shrink-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                notify.success({
+                                  title: 'Saved to Favorites',
+                                  message: `${opp.title} at ${opp.organization} saved.`
+                                });
+                              }}
+                            >
+                              <Star className="h-5 w-5" />
+                            </Button>
+                          </div>
+
+                          {/* Clean Normalized Excerpt */}
+                          <p className="text-slate-600 dark:text-slate-400 line-clamp-2 text-sm leading-relaxed">
+                            {normalizeJobDescription(opp.description)}
+                          </p>
+                          
+                          {/* AI Match Score Badge */}
+                          {opp.matchDetails && (
+                            <div className="bg-primary-900/20 rounded-xl p-3 border border-primary-500/20 backdrop-blur-sm group/match relative overflow-hidden transition-all hover:bg-primary-900/30">
+                              <div className="flex items-center gap-3 mb-1.5">
+                                <span className="text-primary-700 dark:text-primary-300 font-semibold text-xs flex items-center gap-1.5">
+                                  <Sparkles className="h-3.5 w-3.5 text-primary-500" />
+                                  AI Match: {opp.matchDetails.score}%
+                                </span>
+                                <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-gradient-to-r from-primary-600 to-accent-500 rounded-full" 
+                                    style={{ width: `${opp.matchDetails.score}%` }}
+                                  ></div>
+                                </div>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-6 text-[11px] border-primary-500/30 text-primary-700 dark:text-primary-300 hover:bg-primary-500/20 opacity-0 group-hover/match:opacity-100 transition-opacity"
+                                  onClick={(e) => { e.stopPropagation(); setSelectedOppForAnalysis(opp); }}
+                                >
+                                  Analyze Fit
+                                </Button>
+                              </div>
+                              {opp.matchDetails.reasons?.length > 0 && (
+                                <ul className="text-xs text-primary-700/80 dark:text-primary-200/70 space-y-0.5 ml-4 list-disc marker:text-primary-500/50">
+                                  {opp.matchDetails.reasons.slice(0, 1).map((r: string, i: number) => (
+                                    <li key={i} className="truncate">{r}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Skills / Themes Tags */}
+                          {opp.skills && opp.skills.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-2">
+                              {opp.skills.slice(0, 6).map((s: string) => (
+                                <Badge 
+                                  key={s} 
+                                  variant="secondary" 
+                                  className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border-transparent text-xs py-0.5 px-2 font-normal"
+                                >
+                                  {s}
+                                </Badge>
+                              ))}
+                              {opp.skills.length > 6 && (
+                                <span className="text-[11px] text-slate-500 self-center">
+                                  +{opp.skills.length - 6} more
                                 </span>
                               )}
                             </div>
-                          </div>
+                          )}
+                        </div>
 
+                        {/* Right-side Action Panel */}
+                        <div className="flex md:flex-col justify-between items-center md:items-end w-full md:w-36 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 shrink-0 mt-2 md:mt-0 gap-4 md:gap-0">
+                          <div className="flex flex-col md:items-end w-full">
+                            <Badge 
+                              variant="outline" 
+                              className={`mb-2 md:mb-3 w-fit font-semibold text-xs px-2.5 py-0.5 ${getTypeBadgeColor(opp.type)}`}
+                            >
+                              {opp.type}
+                            </Badge>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center mb-0 md:mb-4 whitespace-nowrap">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {new Date(opp.postedAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          
                           <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10 shrink-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              notify.success({
-                                title: 'Saved to Favorites',
-                                message: `${opp.title} at ${opp.organization} saved.`
+                            disabled={isExpired}
+                            className={`w-auto md:w-full font-semibold shadow-md transition-all rounded-xl h-9 text-xs flex items-center justify-center gap-1.5 ${
+                              isExpired
+                                ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
+                                : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary-600 dark:hover:bg-slate-200'
+                            }`}
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              if (isExpired) return;
+                              notify.info({
+                                title: 'Opening Application',
+                                message: `Opening original portal for ${opp.title}...`
                               });
+                              window.open(opp.applicationUrl || opp.sourceUrl, '_blank', 'noopener,noreferrer'); 
                             }}
                           >
-                            <Star className="h-5 w-5" />
+                            <span>{isExpired ? 'Closed' : 'Apply Now'}</span>
+                            {!isExpired && <ExternalLink className="h-3 w-3" />}
                           </Button>
                         </div>
 
-                        {/* Clean Normalized Excerpt */}
-                        <p className="text-slate-600 dark:text-slate-400 line-clamp-2 text-sm leading-relaxed">
-                          {normalizeJobDescription(opp.description)}
-                        </p>
-                        
-                        {/* AI Match Score Badge (if present) */}
-                        {opp.matchDetails && (
-                          <div className="bg-primary-900/20 rounded-xl p-3 border border-primary-500/20 backdrop-blur-sm group/match relative overflow-hidden transition-all hover:bg-primary-900/30">
-                            <div className="flex items-center gap-3 mb-1.5">
-                              <span className="text-primary-700 dark:text-primary-300 font-semibold text-xs flex items-center gap-1.5">
-                                <Sparkles className="h-3.5 w-3.5 text-primary-500" />
-                                AI Match: {opp.matchDetails.score}%
-                              </span>
-                              <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-primary-600 to-accent-500 rounded-full" 
-                                  style={{ width: `${opp.matchDetails.score}%` }}
-                                ></div>
-                              </div>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-6 text-[11px] border-primary-500/30 text-primary-700 dark:text-primary-300 hover:bg-primary-500/20 opacity-0 group-hover/match:opacity-100 transition-opacity"
-                                onClick={(e) => { e.stopPropagation(); setSelectedOppForAnalysis(opp); }}
-                              >
-                                Analyze
-                              </Button>
-                            </div>
-                            {opp.matchDetails.reasons?.length > 0 && (
-                              <ul className="text-xs text-primary-700/80 dark:text-primary-200/70 space-y-0.5 ml-4 list-disc marker:text-primary-500/50">
-                                {opp.matchDetails.reasons.slice(0, 1).map((r: string, i: number) => (
-                                  <li key={i} className="truncate">{r}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Skills / Themes Tags */}
-                        {opp.skills && opp.skills.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 pt-2">
-                            {opp.skills.slice(0, 6).map((s: string) => (
-                              <Badge 
-                                key={s} 
-                                variant="secondary" 
-                                className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border-transparent text-xs py-0.5 px-2 font-normal"
-                              >
-                                {s}
-                              </Badge>
-                            ))}
-                            {opp.skills.length > 6 && (
-                              <span className="text-[11px] text-slate-500 self-center">
-                                +{opp.skills.length - 6} more
-                              </span>
-                            )}
-                          </div>
-                        )}
                       </div>
-
-                      {/* Right-side Action Panel */}
-                      <div className="flex md:flex-col justify-between items-center md:items-end w-full md:w-36 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 shrink-0 mt-2 md:mt-0 gap-4 md:gap-0">
-                        <div className="flex flex-col md:items-end w-full">
-                          <Badge 
-                            variant="outline" 
-                            className={`mb-2 md:mb-3 w-fit font-semibold text-xs px-2.5 py-0.5 ${getTypeBadgeColor(opp.type)}`}
-                          >
-                            {opp.type}
-                          </Badge>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center mb-0 md:mb-4 whitespace-nowrap">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {new Date(opp.postedAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          className="w-auto md:w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary-600 dark:hover:bg-slate-200 font-semibold shadow-md transition-all rounded-xl h-9 text-xs flex items-center justify-center gap-1.5" 
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            notify.info({
-                              title: 'Opening Application',
-                              message: `Opening original portal for ${opp.title}...`
-                            });
-                            window.open(opp.applicationUrl, '_blank', 'noopener,noreferrer'); 
-                          }}
-                        >
-                          <span>Apply Now</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
-                      </div>
-
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
 
               {/* Load More Pagination Button */}
               {opportunities.length < totalCount && (

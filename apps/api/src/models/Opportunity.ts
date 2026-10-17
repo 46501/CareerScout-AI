@@ -20,8 +20,11 @@ export interface IOpportunity extends Document {
   sourceId: string;
   sourceUrl: string;
   applicationUrl: string;
+  canonicalUrl?: string;
+  status: 'ACTIVE' | 'EXPIRED' | 'UNVERIFIED' | 'CLOSED';
   isActive: boolean;
   lastVerifiedAt: Date;
+  eligibilityRequirements?: string[];
   metadata?: any;
 }
 
@@ -46,8 +49,15 @@ const OpportunitySchema = new Schema<IOpportunity>(
     sourceId: { type: String, required: true },
     sourceUrl: { type: String, required: true },
     applicationUrl: { type: String, required: true },
+    canonicalUrl: { type: String },
+    status: { 
+      type: String, 
+      enum: ['ACTIVE', 'EXPIRED', 'UNVERIFIED', 'CLOSED'], 
+      default: 'ACTIVE' 
+    },
     isActive: { type: Boolean, default: true },
     lastVerifiedAt: { type: Date, required: true },
+    eligibilityRequirements: [{ type: String }],
     metadata: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
@@ -55,9 +65,12 @@ const OpportunitySchema = new Schema<IOpportunity>(
 
 // Indexes for fast querying
 OpportunitySchema.index({ type: 1, isActive: 1 });
+OpportunitySchema.index({ status: 1, isActive: 1 });
 OpportunitySchema.index({ deadline: 1 });
 OpportunitySchema.index({ postedAt: -1 });
 OpportunitySchema.index({ skills: 1 });
 OpportunitySchema.index({ source: 1, sourceId: 1 }, { unique: true });
+OpportunitySchema.index({ canonicalUrl: 1 });
+OpportunitySchema.index({ lastVerifiedAt: -1 });
 
 export const Opportunity = mongoose.model<IOpportunity>('Opportunity', OpportunitySchema);

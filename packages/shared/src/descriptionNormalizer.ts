@@ -178,3 +178,47 @@ export function getJobDescriptionExcerpt(input?: string | null, maxLength = 200)
   if (singleLine.length <= maxLength) return singleLine;
   return singleLine.slice(0, maxLength).trim() + '...';
 }
+
+const TRACKING_PARAMS = new Set([
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+  'ref', 'source', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', '_hsenc', '_hsmi',
+  'si', 'igshid', 'spm', 'trk'
+]);
+
+/**
+ * Normalizes an external job / hackathon URL into a clean canonical URL
+ * by stripping tracking parameters, hash fragments, and normalizing protocol and slashes.
+ */
+export function normalizeCanonicalUrl(input?: string | null): string {
+  if (!input || typeof input !== 'string') return '';
+  const trimmed = input.trim();
+  if (!trimmed) return '';
+
+  try {
+    const parsed = new URL(trimmed.startsWith('//') ? 'https:' + trimmed : trimmed);
+    parsed.protocol = 'https:';
+    parsed.hash = '';
+
+    // Remove tracking query parameters
+    const toDelete: string[] = [];
+    parsed.searchParams.forEach((_, key) => {
+      const lower = key.toLowerCase();
+      if (TRACKING_PARAMS.has(lower) || lower.startsWith('utm_')) {
+        toDelete.push(key);
+      }
+    });
+    for (const key of toDelete) {
+      parsed.searchParams.delete(key);
+    }
+
+    let result = parsed.toString();
+    if (result.endsWith('/')) {
+      result = result.slice(0, -1);
+    }
+    return result;
+  } catch {
+    // If not a valid parseable absolute URL, strip basic query params
+    return trimmed.split('?')[0].replace(/\/+$/, '');
+  }
+}
+

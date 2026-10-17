@@ -81,6 +81,22 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
             <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               {opportunity.remoteType || 'REMOTE'}
             </Badge>
+            {opportunity.source && (
+              <Badge variant="secondary" className="bg-primary-500/10 text-primary-700 dark:text-primary-300 border border-primary-500/20">
+                Source: {opportunity.source}
+              </Badge>
+            )}
+            {opportunity.status === 'EXPIRED' && (
+              <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-bold">
+                Expired
+              </Badge>
+            )}
+            {opportunity.deadline && (
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center">
+                <Clock className="h-3 w-3 mr-1" />
+                Deadline: {new Date(opportunity.deadline).toLocaleDateString()}
+              </span>
+            )}
             {opportunity.postedAt && (
               <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center ml-auto">
                 <Clock className="h-3 w-3 mr-1" />

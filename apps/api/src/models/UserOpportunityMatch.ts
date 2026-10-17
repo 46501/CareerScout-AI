@@ -11,6 +11,8 @@ export interface IUserOpportunityMatch extends Document {
   isViewed: boolean;
   isSaved: boolean;
   isDismissed: boolean;
+  isNotified: boolean;
+  eligibilityWarnings?: string[];
 }
 
 const UserOpportunityMatchSchema = new Schema<IUserOpportunityMatch>(
@@ -21,10 +23,12 @@ const UserOpportunityMatchSchema = new Schema<IUserOpportunityMatch>(
     matchedSkills: [{ type: String }],
     missingSkills: [{ type: String }],
     matchReasons: [{ type: String }],
+    eligibilityWarnings: [{ type: String }],
     generatedAt: { type: Date, default: Date.now },
     isViewed: { type: Boolean, default: false },
     isSaved: { type: Boolean, default: false },
-    isDismissed: { type: Boolean, default: false }
+    isDismissed: { type: Boolean, default: false },
+    isNotified: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

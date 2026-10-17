@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { Opportunity } from '../../../api/src/models/Opportunity';
-import { normalizeJobDescription } from '../utils/descriptionNormalizer';
+import { OpportunitySource } from '../../../api/src/models/OpportunitySource';
+import { normalizeJobDescription, normalizeCanonicalUrl } from '../utils/descriptionNormalizer';
 
 export class DevpostProvider {
   name = 'DevpostProvider';
+  identifier = 'devpost';
   apiUrl = 'https://devpost.com/api/hackathons';
 
   async run() {
+    const startTime = Date.now();
     console.log(`[${this.name}] Fetching real hackathons from Devpost API...`);
     
     try {
@@ -32,12 +35,15 @@ export class DevpostProvider {
           'Participate, build innovative projects, and compete for prizes and recognition.'
         ].filter(Boolean).join(' ');
 
+        const canonical = normalizeCanonicalUrl(h.url);
+
         const opp = {
           title: h.title,
           organization: 'Devpost Hackathon',
           organizationLogo: h.thumbnail_url ? (h.thumbnail_url.startsWith('//') ? 'https:' + h.thumbnail_url : h.thumbnail_url) : undefined,
           description: normalizeJobDescription(descText),
           type: 'HACKATHON',
+          category: 'Hackathon',
           skills: themes.length > 0 ? themes : ['Software Development', 'Hackathon'],
           location: h.displayed_location?.location || 'Online',
           remoteType: (h.displayed_location?.location || '').toLowerCase().includes('online') ? 'REMOTE' : 'HYBRID',
@@ -47,6 +53,8 @@ export class DevpostProvider {
           sourceId: `devpost_${h.id}`,
           sourceUrl: h.url,
           applicationUrl: h.url,
+          canonicalUrl: canonical,
+          status: 'ACTIVE',
           isActive: true,
           lastVerifiedAt: new Date(),
           metadata: {
@@ -67,10 +75,40 @@ export class DevpostProvider {
         }
       }
 
-      console.log(`[${this.name}] Successfully processed ${count} real hackathons from Devpost.`);
+      const activeCount = await Opportunity.countDocuments({ source: 'Devpost', isActive: true });
+      await OpportunitySource.findOneAndUpdate(
+        { identifier: this.identifier },
+        {
+          name: 'Devpost Hackathons',
+          identifier: this.identifier,
+          type: 'API',
+          status: 'ACTIVE',
+          lastRunAt: new Date(),
+          lastSuccessAt: new Date(),
+          opportunitiesFound: count,
+          totalOpportunitiesActive: activeCount,
+          lastRunDurationMs: Date.now() - startTime
+        },
+        { upsert: true }
+      );
+
+      console.log(`[${this.name}] Successfully processed ${count} real hackathons (${activeCount} active).`);
       return count;
-    } catch (error) {
-      console.error(`[${this.name}] Failed to fetch hackathons`, error);
+    } catch (error: any) {
+      console.error(`[${this.name}] Provider error:`, error?.message || error);
+      await OpportunitySource.findOneAndUpdate(
+        { identifier: this.identifier },
+        {
+          name: 'Devpost Hackathons',
+          identifier: this.identifier,
+          type: 'API',
+          status: 'ERROR',
+          lastRunAt: new Date(),
+          lastError: error?.message || 'Failed to fetch from Devpost',
+          lastRunDurationMs: Date.now() - startTime
+        },
+        { upsert: true }
+      );
       return 0;
     }
   }

@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { Opportunity } from '../../../api/src/models/Opportunity';
-import { normalizeJobDescription } from '../utils/descriptionNormalizer';
+import { OpportunitySource } from '../../../api/src/models/OpportunitySource';
+import { normalizeJobDescription, normalizeCanonicalUrl } from '../utils/descriptionNormalizer';
 
 export class ArbeitnowProvider {
   name = 'ArbeitnowProvider';
+  identifier = 'arbeitnow';
   apiUrl = 'https://www.arbeitnow.com/api/job-board-api';
 
   async run() {
+    const startTime = Date.now();
     console.log(`[${this.name}] Fetching real opportunities from Arbeitnow API...`);
     
     try {
@@ -25,7 +28,6 @@ export class ArbeitnowProvider {
       let jobCount = 0;
 
       for (const item of jobs) {
-        // Robust word-boundary check for genuine internships (avoids false positives like 'international')
         const internRegex = /\bintern(ship)?s?\b/i;
         const isInternship = 
           internRegex.test(item.title || '') ||
@@ -33,12 +35,14 @@ export class ArbeitnowProvider {
           (item.tags || []).some((t: string) => internRegex.test(t));
 
         const oppType = isInternship ? 'INTERNSHIP' : 'JOB';
+        const canonical = normalizeCanonicalUrl(item.url);
 
         const opp = {
           title: item.title,
           organization: item.company_name,
           description: normalizeJobDescription(item.description),
           type: oppType,
+          category: isInternship ? 'Internship' : (item.job_types?.[0] || 'Full Time'),
           skills: item.tags || [],
           location: item.location || 'Remote',
           remoteType: item.remote ? 'REMOTE' : (item.location ? 'ONSITE' : 'ANY'),
@@ -47,6 +51,8 @@ export class ArbeitnowProvider {
           sourceId: item.slug || item.url,
           sourceUrl: item.url,
           applicationUrl: item.url,
+          canonicalUrl: canonical,
+          status: 'ACTIVE',
           isActive: true,
           lastVerifiedAt: new Date(),
           metadata: {
@@ -71,10 +77,40 @@ export class ArbeitnowProvider {
         }
       }
 
-      console.log(`[${this.name}] Successfully processed ${count} opportunities (${internshipCount} internships, ${jobCount} jobs).`);
+      const activeCount = await Opportunity.countDocuments({ source: 'Arbeitnow', isActive: true });
+      await OpportunitySource.findOneAndUpdate(
+        { identifier: this.identifier },
+        {
+          name: 'Arbeitnow Jobs & Internships',
+          identifier: this.identifier,
+          type: 'API',
+          status: 'ACTIVE',
+          lastRunAt: new Date(),
+          lastSuccessAt: new Date(),
+          opportunitiesFound: count,
+          totalOpportunitiesActive: activeCount,
+          lastRunDurationMs: Date.now() - startTime
+        },
+        { upsert: true }
+      );
+
+      console.log(`[${this.name}] Successfully processed ${count} opportunities (${internshipCount} internships, ${jobCount} jobs, ${activeCount} active in DB).`);
       return count;
-    } catch (error) {
-      console.error(`[${this.name}] Failed to fetch opportunities`, error);
+    } catch (error: any) {
+      console.error(`[${this.name}] Provider error:`, error?.message || error);
+      await OpportunitySource.findOneAndUpdate(
+        { identifier: this.identifier },
+        {
+          name: 'Arbeitnow Jobs & Internships',
+          identifier: this.identifier,
+          type: 'API',
+          status: 'ERROR',
+          lastRunAt: new Date(),
+          lastError: error?.message || 'Failed to fetch from Arbeitnow',
+          lastRunDurationMs: Date.now() - startTime
+        },
+        { upsert: true }
+      );
       return 0;
     }
   }

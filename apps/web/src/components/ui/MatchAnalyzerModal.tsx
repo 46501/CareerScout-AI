@@ -107,29 +107,61 @@ export const MatchAnalyzerModal: React.FC<MatchAnalyzerModalProps> = ({ isOpen, 
 
           {/* Reasons for Match */}
           <div>
-            <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
-              <CheckCircle className="h-4 w-4 text-green-400" /> Why you're a fit
+            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <CheckCircle className="h-4 w-4 text-green-500" /> Why you're a fit
             </h4>
             <div className="space-y-3">
               {(match.reasons || []).map((reason: string, i: number) => (
-                <div key={i} className="bg-green-900/10 border border-green-500/20 rounded-lg p-3 text-sm text-green-200/80">
+                <div key={i} className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm text-green-800 dark:text-green-200">
                   {reason}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Missing Skills */}
+          {/* Skills You Have */}
+          {match.matchedSkills && match.matchedSkills.length > 0 && (
+            <div>
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
+                <CheckCircle className="h-4 w-4 text-emerald-500" /> Skills You Have
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {match.matchedSkills.map((skill: string, i: number) => (
+                  <Badge key={i} className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-3 py-1.5 flex items-center gap-1.5">
+                    <CheckCircle className="h-3.5 w-3.5" /> {skill}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Missing Skills / Skill Gaps */}
           {match.missingSkills && match.missingSkills.length > 0 && (
             <div>
-              <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
                 <AlertTriangle className="h-4 w-4 text-yellow-500" /> Skill Gaps
               </h4>
               <div className="flex flex-wrap gap-2">
                 {match.missingSkills.map((skill: string, i: number) => (
-                  <Badge key={i} className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1.5 flex items-center gap-1.5">
+                  <Badge key={i} className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/20 px-3 py-1.5 flex items-center gap-1.5">
                     <XCircle className="h-3.5 w-3.5" /> {skill}
                   </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Eligibility Warnings */}
+          {match.eligibilityWarnings && match.eligibilityWarnings.length > 0 && (
+            <div>
+              <h4 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                <AlertTriangle className="h-4 w-4 text-amber-500" /> Eligibility Warnings
+              </h4>
+              <div className="space-y-2">
+                {match.eligibilityWarnings.map((warn: string, i: number) => (
+                  <div key={i} className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-sm text-amber-800 dark:text-amber-200">
+                    {warn}
+                  </div>
                 ))}
               </div>
             </div>
