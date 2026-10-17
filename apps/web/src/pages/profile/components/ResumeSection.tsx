@@ -14,10 +14,11 @@ export const ResumeSection = ({ fetchProfile }: any) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const loadResume = async () => {
       try {
         const res = await api.get('/resume');
-        if (res.data?.data) {
+        if (isMounted && res.data?.data) {
           setResumeData(res.data.data);
           if (res.data.data.status === 'CONFIRMED' || res.data.data.status === 'EXTRACTED') {
             setUploadStatus('completed');
@@ -26,14 +27,37 @@ export const ResumeSection = ({ fetchProfile }: any) => {
              pollStatus();
           }
         }
-      } catch (err) {
-        console.error('No resume found');
+      } catch (err: any) {
+        if (err.response?.status !== 404) {
+          console.warn('Failed to load resume:', err.message || err);
+        }
+        if (isMounted) {
+          setResumeData(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     loadResume();
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  const handleView = () => {
+    if (resumeData?.fileUrl) {
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const cleanBackend = backendUrl.replace(/\/api\/?$/, '');
+      const fullUrl = resumeData.fileUrl.startsWith('http') 
+        ? resumeData.fileUrl 
+        : `${cleanBackend}${resumeData.fileUrl}`;
+      window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      notify.info('Resume file preview is not available.');
+    }
+  };
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
@@ -150,13 +174,13 @@ export const ResumeSection = ({ fetchProfile }: any) => {
     switch(status) {
       case 'CONFIRMED':
       case 'EXTRACTED':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Processed</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40">Processed</span>;
       case 'PROCESSING':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex items-center"><RefreshCw className="h-3 w-3 mr-1 animate-spin"/> Processing...</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300 border border-blue-300/40 flex items-center"><RefreshCw className="h-3 w-3 mr-1 animate-spin"/> Processing...</span>;
       case 'FAILED':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border border-rose-300/40">Failed</span>;
       default:
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{status}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{status}</span>;
     }
   };
 
@@ -164,12 +188,12 @@ export const ResumeSection = ({ fetchProfile }: any) => {
 
   return (
     <div className="flex flex-col">
-      <CardHeader className="border-b border-gray-100 pb-5">
-        <CardTitle className="flex items-center text-xl text-gray-900">
-          <FileText className="mr-2 h-6 w-6 text-primary-600"/> 
+      <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-5">
+        <CardTitle className="flex items-center text-xl text-slate-900 dark:text-white font-bold">
+          <FileText className="mr-2 h-6 w-6 text-primary-600 dark:text-primary-400"/> 
           Resume
         </CardTitle>
-        <CardDescription className="ml-8 text-gray-500">
+        <CardDescription className="ml-8 text-slate-500 dark:text-slate-400">
           Upload your resume for AI-powered profile autocomplete
         </CardDescription>
       </CardHeader>
@@ -179,16 +203,16 @@ export const ResumeSection = ({ fetchProfile }: any) => {
         {!resumeData && uploadStatus === 'idle' ? (
           <div 
             onClick={handleUploadClick}
-            className="border-2 border-dashed border-primary-200 bg-primary-50 hover:bg-primary-100 rounded-xl p-12 text-center transition-colors cursor-pointer group"
+            className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary-400 dark:hover:border-primary-500 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 rounded-xl p-12 text-center transition-colors cursor-pointer group"
           >
             <div className="h-16 w-16 mx-auto bg-white dark:bg-slate-900 rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-105 transition-transform">
                <Upload className="h-8 w-8 text-primary-500" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
               Upload your resume
             </h3>
-            <p className="text-gray-500 text-sm mb-1">Drag & Drop or Browse Files</p>
-            <p className="text-gray-400 text-xs">Supported formats: PDF, DOCX (Max 5MB)</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Drag & Drop or Browse Files</p>
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Supported formats: PDF, DOCX (Max 5MB)</p>
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -198,9 +222,9 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             />
           </div>
         ) : uploadStatus !== 'completed' && uploadStatus !== 'idle' ? (
-          <div className="border border-gray-100 rounded-xl p-10 text-center space-y-6 shadow-sm bg-white dark:bg-slate-900">
+          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-10 text-center space-y-6 shadow-sm bg-white dark:bg-slate-900">
             <div className="flex justify-center">
-              <div className="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="h-20 w-20 bg-blue-50 dark:bg-blue-950/40 rounded-full flex items-center justify-center">
                 {uploadStatus === 'uploading' && <Upload className="h-10 w-10 text-primary-500 animate-bounce" />}
                 {uploadStatus === 'processing' && <FileText className="h-10 w-10 text-blue-500 animate-pulse" />}
                 {uploadStatus === 'analyzing' && <Search className="h-10 w-10 text-purple-500 animate-spin" />}
@@ -208,26 +232,26 @@ export const ResumeSection = ({ fetchProfile }: any) => {
             </div>
             
             <div>
-              <h3 className="text-xl font-bold text-gray-900 capitalize mb-2">{uploadStatus}...</h3>
-              <p className="text-sm text-gray-500">Please wait while we process your resume.</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white capitalize mb-2">{uploadStatus}...</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Please wait while we process your resume.</p>
             </div>
             
-            <div className="w-full max-w-md mx-auto bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
               <div className="bg-primary-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
             </div>
           </div>
         ) : (
-          <div className="border border-gray-100 bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6">
+          <div className="border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/80 rounded-xl shadow-sm p-6 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
-                <div className="h-14 w-14 rounded-lg bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">
+                <div className="h-14 w-14 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200/50 dark:border-red-900/30 flex items-center justify-center text-red-500 dark:text-red-400 flex-shrink-0">
                   <FileText className="h-7 w-7" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">{resumeData?.fileName || 'resume.pdf'}</h3>
-                  <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">{resumeData?.fileName || 'resume.pdf'}</h3>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-slate-500 dark:text-slate-400">
                     <span>PDF Document</span>
-                    <span className="h-1 w-1 rounded-full bg-gray-300"></span>
+                    <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
                     <span>Uploaded {resumeData?.uploadDate ? new Date(resumeData.uploadDate).toLocaleDateString() : 'recently'}</span>
                   </div>
                   <div className="mt-2">
@@ -237,13 +261,13 @@ export const ResumeSection = ({ fetchProfile }: any) => {
               </div>
               
               <div className="flex space-x-2 w-full sm:w-auto">
-                <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-gray-200">
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={handleView}>
                   <Eye className="h-4 w-4 mr-1.5" /> View
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-gray-200" onClick={handleUploadClick}>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={handleUploadClick}>
                   <RefreshCw className="h-4 w-4 mr-1.5" /> Replace
                 </Button>
-                <Button variant="outline" size="sm" className="flex-none border-gray-200 text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100" onClick={handleDelete}>
+                <Button variant="outline" size="sm" className="flex-none border-slate-200 dark:border-slate-700 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30" onClick={handleDelete}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

@@ -192,7 +192,7 @@ export const Profile = () => {
             </div>
 
             <div className="glass-card rounded-xl border border-slate-200 dark:border-slate-800/50 overflow-hidden shadow-2xl relative min-h-[400px] text-slate-900 dark:text-white">
-              <div className="p-6 [&_label]:text-slate-300 [&_p]:text-slate-400 [&_h2]:text-white [&_h3]:text-white [&_.bg-white]:bg-transparent [&_.border-gray-200]:border-slate-700">
+              <div className="p-6 dark:[&_label]:text-slate-300 dark:[&_p]:text-slate-400 dark:[&_h2]:text-white dark:[&_h3]:text-white dark:[&_.border-gray-200]:border-slate-700">
                 {activeSection === 'basic' && <BasicInfoSection data={profileData.personal} onChange={handleSectionChange('personal')} isEditing={true} />}
                 {activeSection === 'education' && <EducationSection data={profileData.education} onChange={handleSectionChange('education')} isEditing={true} />}
                 {activeSection === 'skills' && <SkillsSection data={profileData.skills} onChange={handleSectionChange('skills')} isEditing={true} />}
