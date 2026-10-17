@@ -9,31 +9,52 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [techInput, setTechInput] = useState('');
 
   const openAddModal = () => {
     setEditIndex(null);
     setFormData({ company: '', title: '', employmentType: 'Full-time', startDate: '', endDate: '', currentlyWorking: false, location: '', description: '', technologiesUsed: [] });
+    setTechInput('');
     setModalOpen(true);
   };
 
   const openEditModal = (index: number) => {
     setEditIndex(index);
-    setFormData({ ...data[index] });
+    const entry = data[index] || {};
+    setFormData({ ...entry });
+    const rawTech = entry.technologiesUsed;
+    const initialTech = Array.isArray(rawTech)
+      ? rawTech.join(', ')
+      : typeof rawTech === 'string'
+      ? rawTech
+      : '';
+    setTechInput(initialTech);
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
+    setTechInput('');
   };
 
   const handleSave = () => {
+    const technologiesUsed = techInput
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const entryToSave = {
+      ...formData,
+      technologiesUsed
+    };
+
     if (editIndex !== null) {
       const newData = [...data];
-      newData[editIndex] = formData;
+      newData[editIndex] = entryToSave;
       onChange(newData);
       notify.success('Experience entry updated');
     } else {
-      onChange([...data, formData]);
+      onChange([...data, entryToSave]);
       notify.success('Experience entry added');
     }
     // Also clear the hasNoExperience flag if they add something
@@ -57,10 +78,6 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
       onChange(newData);
       notify.success('Experience entry removed');
     }
-  };
-
-  const handleTechString = (val: string) => {
-    setFormData({ ...formData, technologiesUsed: val.split(',').map(s => s.trim()).filter(Boolean) });
   };
 
   return (
@@ -282,10 +299,10 @@ export const ExperienceSection = ({ data = [], onChange, hasNoExperience = false
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Technologies Used (Comma separated)</label>
                 <input 
                   type="text" 
-                  value={(formData.technologiesUsed || []).join(', ')}
-                  onChange={(e) => handleTechString(e.target.value)}
+                  value={techInput}
+                  onChange={(e) => setTechInput(e.target.value)}
                   className="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="React, Node.js, AWS"
+                  placeholder="e.g. HTML, CSS, JavaScript"
                 />
               </div>
             </div>
